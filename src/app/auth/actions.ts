@@ -34,21 +34,33 @@ export async function login(formData: FormData) {
   }
 
   // Check if athlete already connected their Garmin API key
-  let targetUrl = '/onboarding';
-  if (data?.user) {
-    try {
-      const { data: connection } = await supabase
-        .from('user_garmin_connections')
-        .select('id, is_active, garmin_api_key')
-        .eq('user_id', data.user.id)
-        .maybeSingle();
+  let targetUrl = '/dashboard';
 
-      if (connection && (connection.garmin_api_key || connection.is_active)) {
-        targetUrl = next && next.startsWith('/') && next !== '/login' ? next : '/dashboard';
+  if (data?.user) {
+    const meta = data.user.user_metadata;
+    const hasMetaConnection = meta?.garmin_connected === true || !!meta?.garmin_api_key;
+
+    if (!hasMetaConnection) {
+      try {
+        const { data: connection } = await supabase
+          .from('user_garmin_connections')
+          .select('id, is_active, garmin_api_key')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        if (!connection || (!connection.garmin_api_key && !connection.is_active)) {
+          // Only prompt for onboarding if completely new user without any connection record
+          targetUrl = '/onboarding';
+        }
+      } catch {
+        // If table doesn't exist or query fails, let the user into dashboard smoothly
+        targetUrl = '/dashboard';
       }
-    } catch {
-      targetUrl = '/onboarding';
     }
+  }
+
+  if (next && next.startsWith('/') && next !== '/login' && next !== '/onboarding') {
+    targetUrl = next;
   }
 
   revalidatePath('/', 'layout');
@@ -86,10 +98,39 @@ export async function signup(formData: FormData) {
     return { error: error.message };
   }
 
+  // If email confirmation is required in Supabase, data.session is null and data.user is created
+  const needsEmailConfirmation = !data?.session;
+
   return {
     success: true,
     email: email,
-    message: 'Registrasi akun berhasil! Silakan masukkan kata sandi untuk masuk.',
+    needsEmailConfirmation,
+    message: needsEmailConfirmation
+      ? `Tautan konfirmasi telah dikirim ke ${email}. Silakan buka email Anda untuk mengaktifkan akun.`
+      : 'Registrasi akun berhasil! Silakan masukkan kata sandi untuk masuk.',
+  };
+}
+
+export async function resendConfirmation(formData: FormData) {
+  const supabase = await createClient();
+  const email = (formData.get('email') as string)?.trim();
+
+  if (!email) {
+    return { error: 'Alamat email wajib diisi.' };
+  }
+
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return {
+    success: true,
+    message: `Tautan verifikasi baru berhasil dikirim ke ${email}. Periksa kotak masuk dan folder spam.`,
   };
 }
 
@@ -105,8 +146,19 @@ export async function saveGarminConnection(formData: FormData) {
   const hrZoneMethod = (formData.get('hrZoneMethod') as string) || 'HRR';
   const weeklyTargetKm = parseFloat((formData.get('weeklyTargetKm') as string) || '30');
 
+  // 1. Always save in Supabase Auth user_metadata (guaranteed to persist with user identity)
+  await supabase.auth.updateUser({
+    data: {
+      garmin_api_key: garminApiKey,
+      garmin_connected: true,
+      hr_zone_method: hrZoneMethod,
+      weekly_target_km: weeklyTargetKm,
+      garmin_connected_at: new Date().toISOString(),
+    },
+  });
+
+  // 2. Also save to user_garmin_connections and athlete_biometrics tables
   try {
-    // 1. Save or update Garmin connection record
     await supabase.from('user_garmin_connections').upsert({
       user_id: user.id,
       garmin_api_key: garminApiKey,
@@ -115,7 +167,6 @@ export async function saveGarminConnection(formData: FormData) {
       last_synced_at: new Date().toISOString(),
     }, { onConflict: 'user_id' });
 
-    // 2. Update athlete biometrics preferences
     await supabase.from('athlete_biometrics').upsert({
       user_id: user.id,
       hr_zone_method: hrZoneMethod,
@@ -123,8 +174,7 @@ export async function saveGarminConnection(formData: FormData) {
       weekly_target_km: weeklyTargetKm,
     }, { onConflict: 'user_id' });
   } catch (err: any) {
-    console.error('Error saving garmin connection:', err);
-    // Even if db tables haven't been migrated yet, allow user to proceed
+    console.warn('Optional table upsert notice:', err);
   }
 
   revalidatePath('/', 'layout');

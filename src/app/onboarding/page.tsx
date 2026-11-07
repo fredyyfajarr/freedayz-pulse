@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import BrandLogo from '@/components/brand/BrandLogo';
 import { saveGarminConnection } from '@/app/auth/actions';
+import { createClient } from '@/utils/supabase/client';
 import {
   Key,
   HeartPulse,
@@ -40,6 +41,31 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isAlreadyConnected, setIsAlreadyConnected] = useState(false);
+
+  useEffect(() => {
+    async function loadUserConnection() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.user_metadata?.garmin_connected) {
+          setIsAlreadyConnected(true);
+          if (user.user_metadata.garmin_api_key) {
+            setGarminKey(user.user_metadata.garmin_api_key);
+          }
+          if (user.user_metadata.hr_zone_method) {
+            setHrMethod(user.user_metadata.hr_zone_method);
+          }
+          if (user.user_metadata.weekly_target_km) {
+            setWeeklyTarget(user.user_metadata.weekly_target_km.toString());
+          }
+        }
+      } catch (err) {
+        console.warn('Could not load user metadata:', err);
+      }
+    }
+    loadUserConnection();
+  }, []);
 
   const handleUseEnvKey = () => {
     setGarminKey(defaultKeyFromEnv);
@@ -159,6 +185,40 @@ export default function OnboardingPage() {
                 : 'Enter your Garmin Connect Personal API Key to fetch your actual runs, 7-day rolling RHR, and live cardio telemetry with complete privacy.'}
             </p>
           </div>
+
+          {/* Active Connection Banner if Already Saved */}
+          {isAlreadyConnected && (
+            <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-950/60 border-2 border-emerald-500 text-emerald-900 dark:text-emerald-300 font-mono text-xs flex flex-col gap-2 shadow-[2px_2px_0px_#10b981]">
+              <div className="flex items-center gap-2 font-black text-sm">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>
+                  {isId
+                    ? 'KONEKSI GARMIN SUDAH AKTIF DI AKUN ANDA'
+                    : 'GARMIN CONNECTION ALREADY ACTIVE'}
+                </span>
+              </div>
+              <p className="font-sans text-xs text-slate-700 dark:text-zinc-300 leading-relaxed">
+                {isId
+                  ? 'Kunci API Garmin tersimpan permanen di profil akun Anda dan tetap aktif mengikuti masa kedaluwarsa (expired) dari Garmin. Anda tidak perlu memasukkan ulang setiap kali login.'
+                  : 'Your Garmin API Key is permanently saved and remains active until its expiration date. You do not need to re-enter it on every login.'}
+              </p>
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => router.push('/dashboard')}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#047857]"
+                >
+                  <span>{isId ? 'Lanjut ke Dashboard' : 'Continue to Dashboard'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+                  {isId
+                    ? 'Atau gunakan formulir di bawah jika ingin memperbarui kunci baru.'
+                    : 'Or use the form below to update your key.'}
+                </span>
+              </div>
+            </div>
+          )}
 
           {errorMsg && (
             <div className="mb-6 p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2 font-mono">

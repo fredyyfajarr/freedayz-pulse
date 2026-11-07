@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { login, signup } from '@/app/auth/actions';
+import { login, signup, resendConfirmation } from '@/app/auth/actions';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import BrandLogo from '@/components/brand/BrandLogo';
@@ -21,6 +21,8 @@ import {
   Eye,
   EyeOff,
   CheckCircle2,
+  MailCheck,
+  RefreshCw,
 } from 'lucide-react';
 
 interface Props {
@@ -43,6 +45,27 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [awaitingVerificationEmail, setAwaitingVerificationEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
+  const [resendStatus, setResendStatus] = useState<string | null>(null);
+
+  const handleResend = async (targetEmail: string) => {
+    setResending(true);
+    setResendStatus(null);
+    const fd = new FormData();
+    fd.set('email', targetEmail);
+    const res = await resendConfirmation(fd);
+    if (res?.error) {
+      setResendStatus(res.error);
+    } else {
+      setResendStatus(
+        isId
+          ? 'Tautan konfirmasi baru berhasil dikirim! Silakan periksa inbox dan spam.'
+          : 'New confirmation link sent! Please check your inbox and spam folder.'
+      );
+    }
+    setResending(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -75,8 +98,12 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
         if (res?.error) {
           setErrorMsg(res.error);
           setLoading(false);
+        } else if (res?.needsEmailConfirmation) {
+          // Explicit upfront notification to check email
+          setAwaitingVerificationEmail(res.email || email);
+          setLoading(false);
         } else {
-          // Success: Switch to login tab and show congratulatory alert
+          // Success with auto-session: Switch to login
           setSuccessMsg(
             isId
               ? 'Akun berhasil dibuat! Silakan masukkan kata sandi untuk masuk ke Telemetry Lab.'
@@ -137,81 +164,199 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
         </div>
       </div>
 
-      {/* Main Authentication Card */}
-      <div className="max-w-md w-full mx-auto my-auto bg-white dark:bg-[#0d1224] border-2 border-slate-300 dark:border-violet-900/70 p-6 sm:p-8 shadow-[6px_6px_0px_#cbd5e1] dark:shadow-[6px_6px_0px_#1e1b4b] font-mono">
-        {/* Mode Segmented Tab Switch */}
-        <div className="flex items-center p-1 bg-slate-100 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-800 mb-6">
-          <button
-            type="button"
-            onClick={() => {
-              setMode('login');
-              setErrorMsg(null);
-            }}
-            className={`flex-1 py-2 text-center text-xs font-black tracking-wider transition-all cursor-pointer ${
-              mode === 'login'
-                ? 'bg-violet-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            {isId ? 'MASUK' : 'SIGN IN'}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode('register');
-              setErrorMsg(null);
-            }}
-            className={`flex-1 py-2 text-center text-xs font-black tracking-wider transition-all cursor-pointer ${
-              mode === 'register'
-                ? 'bg-violet-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            {isId ? 'DAFTAR AKUN' : 'REGISTER'}
-          </button>
-        </div>
+      {/* Main Authentication Card or Verification Screen */}
+      {awaitingVerificationEmail ? (
+        <div className="max-w-md w-full mx-auto my-auto bg-white dark:bg-[#0a0f24] border-2 border-slate-300 dark:border-violet-700/80 p-6 sm:p-8 shadow-[6px_6px_0px_#cbd5e1] dark:shadow-[6px_6px_0px_#1e1b4b] font-mono animate-in fade-in zoom-in-95 duration-200">
+          <div className="text-center space-y-4">
+            <div className="inline-flex p-4 bg-violet-100 dark:bg-violet-950/80 border-2 border-violet-500 shadow-[3px_3px_0px_#7c3aed] text-violet-600 dark:text-cyan-400">
+              <MailCheck className="w-10 h-10 animate-pulse" />
+            </div>
 
-        {/* Title & Micro Copy */}
-        <div className="mb-5">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-violet-600 dark:text-violet-400">
+            <div>
+              <span className="text-[10px] font-mono font-black uppercase tracking-widest text-violet-600 dark:text-cyan-400 block mb-1">
+                {isId ? 'VERIFIKASI EMAIL DIPERLUKAN' : 'EMAIL CONFIRMATION REQUIRED'}
+              </span>
+              <h1 className="text-xl sm:text-2xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase">
+                {isId ? 'PERIKSA EMAIL ANDA' : 'CHECK YOUR EMAIL'}
+              </h1>
+              <p className="text-xs text-slate-600 dark:text-zinc-400 mt-2 font-sans leading-relaxed">
+                {isId
+                  ? 'Kami telah mengirimkan tautan konfirmasi pendaftaran ke alamat email:'
+                  : 'We have sent an activation link to your email address:'}
+              </p>
+              <div className="mt-2 py-1 px-3 bg-violet-50 dark:bg-[#070a14] border border-violet-300 dark:border-violet-700/60 text-xs font-mono font-bold text-violet-700 dark:text-cyan-300 break-all select-all inline-block">
+                {awaitingVerificationEmail}
+              </div>
+            </div>
+
+            {/* Instruction Checklist */}
+            <div className="p-3 bg-slate-50 dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 text-left text-xs space-y-2 font-sans">
+              <div className="flex items-start gap-2">
+                <span className="font-mono font-black text-violet-600 dark:text-cyan-400">1.</span>
+                <span className="text-slate-700 dark:text-zinc-300">
+                  {isId
+                    ? 'Buka kotak masuk email Anda dan klik tautan "Confirm your mail".'
+                    : 'Open your email inbox and click "Confirm your mail".'}
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="font-mono font-black text-violet-600 dark:text-cyan-400">2.</span>
+                <span className="text-slate-700 dark:text-zinc-300">
+                  {isId
+                    ? 'Periksa juga folder Spam atau Promosi jika email belum terlihat dalam 1 menit.'
+                    : 'Check your Spam or Promotions folder if it doesn’t arrive in 1 minute.'}
+                </span>
+              </div>
+            </div>
+
+            {resendStatus && (
+              <div className="p-2.5 bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-300 dark:border-cyan-700 text-cyan-900 dark:text-cyan-300 text-xs font-mono">
+                {resendStatus}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="space-y-2 pt-2 font-mono">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail(awaitingVerificationEmail);
+                  setAwaitingVerificationEmail(null);
+                  setMode('login');
+                  setSuccessMsg(
+                    isId
+                      ? 'Setelah klik konfirmasi di email Anda, silakan masukkan kata sandi di bawah untuk masuk.'
+                      : 'After confirming in your email, please enter your password below to sign in.'
+                  );
+                }}
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider border border-violet-400 shadow-[3px_3px_0px_#cbd5e1] dark:shadow-[3px_3px_0px_#1e1b4b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>{isId ? 'SAYA SUDAH VERIFIKASI // MASUK' : 'I CONFIRMED // SIGN IN'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                disabled={resending}
+                onClick={() => handleResend(awaitingVerificationEmail)}
+                className="w-full py-2 px-3 bg-slate-100 dark:bg-[#070a14] hover:bg-slate-200 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-xs uppercase tracking-wider border border-slate-300 dark:border-zinc-800 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3 h-3 ${resending ? 'animate-spin' : ''}`} />
+                <span>
+                  {resending
+                    ? (isId ? 'MENGIRIM...' : 'RESENDING...')
+                    : (isId ? 'Kirim Ulang Email Konfirmasi' : 'Resend Confirmation Email')}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setAwaitingVerificationEmail(null);
+                  setMode('register');
+                }}
+                className="text-[11px] text-slate-500 dark:text-zinc-500 hover:underline pt-1 block mx-auto cursor-pointer"
+              >
+                {isId ? 'Daftar dengan alamat email lain' : 'Register with a different email'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="max-w-md w-full mx-auto my-auto bg-white dark:bg-[#0d1224] border-2 border-slate-300 dark:border-violet-900/70 p-6 sm:p-8 shadow-[6px_6px_0px_#cbd5e1] dark:shadow-[6px_6px_0px_#1e1b4b] font-mono">
+          {/* Mode Segmented Tab Switch */}
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-800 mb-6">
+            <button
+              type="button"
+              onClick={() => {
+                setMode('login');
+                setErrorMsg(null);
+              }}
+              className={`flex-1 py-2 text-center text-xs font-black tracking-wider transition-all cursor-pointer ${
+                mode === 'login'
+                  ? 'bg-violet-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              {isId ? 'MASUK' : 'SIGN IN'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode('register');
+                setErrorMsg(null);
+              }}
+              className={`flex-1 py-2 text-center text-xs font-black tracking-wider transition-all cursor-pointer ${
+                mode === 'register'
+                  ? 'bg-violet-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              {isId ? 'DAFTAR AKUN' : 'REGISTER'}
+            </button>
+          </div>
+
+          {/* Title & Micro Copy */}
+          <div className="mb-5">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-violet-600 dark:text-violet-400">
+                {mode === 'login'
+                  ? (isId ? 'AUTENTIKASI ATLET // SUPABASE' : 'ATHLETE AUTH // SUPABASE')
+                  : (isId ? 'REGISTRASI LAB // PILIH PERAN' : 'LAB REGISTRATION // SELECT ROLE')}
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase">
               {mode === 'login'
-                ? (isId ? 'AUTENTIKASI ATLET // SUPABASE' : 'ATHLETE AUTH // SUPABASE')
-                : (isId ? 'REGISTRASI LAB // PILIH PERAN' : 'LAB REGISTRATION // SELECT ROLE')}
-            </span>
+                ? (isId ? 'MASUK KE FREEDAYZZ' : 'SIGN IN TO FREEDAYZZ')
+                : (isId ? 'BUAT AKUN BARU' : 'CREATE NEW ACCOUNT')}
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-1">
+              {mode === 'login'
+                ? (isId
+                    ? 'Akses analitik lari, metrik pemulihan Firstbeat, dan VDOT Jack Daniels Anda.'
+                    : 'Access your telemetry lab, Firstbeat recovery metrics, and Jack Daniels VDOT.')
+                : (isId
+                    ? 'Mulai pantau telemetri kardio Anda secara gratis tanpa paywall.'
+                    : 'Start tracking cardio telemetry with zero paywalls and complete data privacy.')}
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase">
-            {mode === 'login'
-              ? (isId ? 'MASUK KE FREEDAYZZ' : 'SIGN IN TO FREEDAYZZ')
-              : (isId ? 'BUAT AKUN BARU' : 'CREATE NEW ACCOUNT')}
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-1">
-            {mode === 'login'
-              ? (isId
-                  ? 'Akses analitik lari, metrik pemulihan Firstbeat, dan VDOT Jack Daniels Anda.'
-                  : 'Access your telemetry lab, Firstbeat recovery metrics, and Jack Daniels VDOT.')
-              : (isId
-                  ? 'Mulai pantau telemetri kardio Anda secara gratis tanpa paywall.'
-                  : 'Start tracking cardio telemetry with zero paywalls and complete data privacy.')}
-          </p>
-        </div>
 
-        {/* Error Alert Box */}
-        {errorMsg && (
-          <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-700/60 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2 animate-in fade-in">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
-            <div className="flex-1 font-sans font-medium">{errorMsg}</div>
-          </div>
-        )}
+          {/* Error Alert Box */}
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-700/60 text-rose-800 dark:text-rose-300 text-xs flex flex-col gap-2 animate-in fade-in font-sans">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+                <div className="flex-1 font-medium leading-relaxed">{errorMsg}</div>
+              </div>
+              {errorMsg.toLowerCase().includes('belum dikonfirmasi') && email && (
+                <div className="pt-1 border-t border-rose-200 dark:border-rose-800/60 flex items-center justify-between font-mono">
+                  <button
+                    type="button"
+                    disabled={resending}
+                    onClick={() => handleResend(email)}
+                    className="text-[11px] font-bold text-rose-700 dark:text-rose-300 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${resending ? 'animate-spin' : ''}`} />
+                    <span>{resending ? 'Mengirim...' : 'Kirim Ulang Email Konfirmasi'}</span>
+                  </button>
+                  {resendStatus && (
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-sans">
+                      Terkirim!
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
-        {/* Success Alert Box */}
-        {successMsg && (
-          <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700/60 text-emerald-800 dark:text-emerald-300 text-xs flex items-start gap-2 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
-            <div className="flex-1 font-sans font-medium">{successMsg}</div>
-          </div>
-        )}
+          {/* Success Alert Box */}
+          {successMsg && (
+            <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700/60 text-emerald-800 dark:text-emerald-300 text-xs flex items-start gap-2 animate-in fade-in font-sans">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
+              <div className="flex-1 font-medium leading-relaxed">{successMsg}</div>
+            </div>
+          )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Base Role Selector (Only in Register Mode) */}
@@ -373,6 +518,7 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
           )}
         </div>
       </div>
+      )}
 
       {/* Footer Branding */}
       <div className="max-w-md w-full mx-auto text-center text-[10px] text-slate-400 dark:text-zinc-500 font-mono py-2">
