@@ -36,6 +36,9 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
 
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const [role, setRole] = useState<'athlete' | 'coach'>('athlete');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -49,6 +52,11 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
 
     const formData = new FormData(e.currentTarget);
     formData.set('role', role);
+    formData.set('email', email);
+    formData.set('password', password);
+    if (mode === 'register') {
+      formData.set('fullName', fullName);
+    }
 
     const nextParam = searchParams.get('next');
     if (nextParam) {
@@ -68,11 +76,18 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
           setErrorMsg(res.error);
           setLoading(false);
         } else {
+          // Success: Switch to login tab and show congratulatory alert
           setSuccessMsg(
             isId
-              ? 'Akun berhasil dibuat! Mengalihkan ke dashboard...'
-              : 'Account created successfully! Redirecting...'
+              ? 'Akun berhasil dibuat! Silakan masukkan kata sandi untuk masuk ke Telemetry Lab.'
+              : 'Account created successfully! Please enter your password to sign in.'
           );
+          if (res?.email) {
+            setEmail(res.email);
+          }
+          setPassword('');
+          setMode('login');
+          setLoading(false);
         }
       }
     } catch (err: any) {
@@ -255,6 +270,8 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
                   name="fullName"
                   type="text"
                   required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder={isId ? 'Misal: Fredy Fajar' : 'e.g. John Doe'}
                   className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-800 text-slate-900 dark:text-white text-xs font-mono rounded-none focus:outline-none focus:border-violet-500 transition-colors"
                 />
@@ -273,6 +290,8 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
                 name="email"
                 type="email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="athlete@domain.com"
                 className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-800 text-slate-900 dark:text-white text-xs font-mono rounded-none focus:outline-none focus:border-violet-500 transition-colors"
               />
@@ -290,6 +309,8 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
                 name="password"
                 type={showPassword ? 'text' : 'password'}
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="w-full pl-9 pr-9 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-800 text-slate-900 dark:text-white text-xs font-mono rounded-none focus:outline-none focus:border-violet-500 transition-colors"
               />

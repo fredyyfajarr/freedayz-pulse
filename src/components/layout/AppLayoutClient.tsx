@@ -13,10 +13,14 @@ export default function AppLayoutClient({
   const { isDesktopOpen } = useSidebar();
   const pathname = usePathname();
 
-  // Public pages (Landing page, future login/register) don't use internal athlete sidebar
-  const isPublicPage = pathname === '/' || pathname === '/login' || pathname === '/register';
+  // Public / standalone flows (Landing, Auth, Onboarding) don't use internal athlete dashboard sidebar
+  const isStandalonePage =
+    pathname === '/' ||
+    pathname === '/login' ||
+    pathname === '/register' ||
+    pathname === '/onboarding';
 
-  if (isPublicPage) {
+  if (isStandalonePage) {
     return (
       <div className="min-h-full flex flex-col w-full">
         <main className="flex-1 w-full">{children}</main>

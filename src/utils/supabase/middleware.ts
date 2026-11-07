@@ -45,6 +45,7 @@ export async function updateSession(request: NextRequest) {
     '/recovery',
     '/records',
     '/settings',
+    '/onboarding',
   ];
 
   const isProtectedRoute = protectedRoutes.some(

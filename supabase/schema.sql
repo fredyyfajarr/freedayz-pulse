@@ -32,6 +32,7 @@ create table if not exists public.athlete_biometrics (
 create table if not exists public.user_garmin_connections (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references public.profiles(id) on delete cascade not null unique,
+  garmin_api_key text, -- Personal API Key or token for Garmin BYOK
   garmin_display_name text,
   is_active boolean default true,
   last_synced_at timestamp with time zone,
@@ -64,6 +65,10 @@ create policy "Users can update own biometrics"
 create policy "Users can view own garmin connection" 
   on public.user_garmin_connections for select 
   using (auth.uid() = user_id);
+
+create policy "Users can insert own garmin connection" 
+  on public.user_garmin_connections for insert 
+  with check (auth.uid() = user_id);
 
 create policy "Users can update own garmin connection" 
   on public.user_garmin_connections for update 
