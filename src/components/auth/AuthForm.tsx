@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { login, signup } from '@/app/auth/actions';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -29,6 +29,7 @@ interface Props {
 
 export default function AuthForm({ initialMode = 'login' }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { language, setLanguage } = useLanguage();
   const { theme, setTheme } = useTheme();
   const isId = language === 'ID';
@@ -48,6 +49,11 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
 
     const formData = new FormData(e.currentTarget);
     formData.set('role', role);
+
+    const nextParam = searchParams.get('next');
+    if (nextParam) {
+      formData.set('next', nextParam);
+    }
 
     try {
       if (mode === 'login') {
@@ -70,6 +76,10 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
         }
       }
     } catch (err: any) {
+      // Ignore NEXT_REDIRECT error which is triggered when server action redirects
+      if (err?.digest?.includes('NEXT_REDIRECT') || err?.message?.includes('NEXT_REDIRECT')) {
+        return;
+      }
       setErrorMsg(err.message || 'Terjadi kesalahan sistem');
       setLoading(false);
     }

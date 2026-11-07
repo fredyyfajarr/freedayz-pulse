@@ -9,6 +9,7 @@ export async function login(formData: FormData) {
 
   const email = (formData.get('email') as string)?.trim();
   const password = formData.get('password') as string;
+  const next = (formData.get('next') as string) || '/dashboard';
 
   if (!email || !password) {
     return { error: 'Email dan kata sandi wajib diisi' };
@@ -24,7 +25,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout');
-  redirect('/dashboard');
+  redirect(next.startsWith('/') ? next : '/dashboard');
 }
 
 export async function signup(formData: FormData) {
@@ -34,6 +35,7 @@ export async function signup(formData: FormData) {
   const password = formData.get('password') as string;
   const fullName = (formData.get('fullName') as string)?.trim() || email.split('@')[0];
   const role = (formData.get('role') as string) || 'athlete';
+  const next = (formData.get('next') as string) || '/dashboard';
 
   if (!email || !password) {
     return { error: 'Email dan kata sandi wajib diisi' };
@@ -59,7 +61,7 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath('/', 'layout');
-  redirect('/dashboard');
+  redirect(next.startsWith('/') ? next : '/dashboard');
 }
 
 export async function signout() {
