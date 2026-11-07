@@ -18,6 +18,7 @@ import {
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import BrandLogo from '@/components/brand/BrandLogo';
+import UserAuthPill from '@/components/auth/UserAuthPill';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -131,6 +132,11 @@ export default function Navbar() {
                 </>
               )}
             </button>
+
+            {/* User Profile Compact Pill */}
+            <div className="hidden sm:block">
+              <UserAuthPill isCompact={true} />
+            </div>
 
             {/* Sync Feedback */}
             {syncMessage && (

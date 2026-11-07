@@ -21,6 +21,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useSidebar } from '@/context/SidebarContext';
 import BrandLogo from '@/components/brand/BrandLogo';
 import HamburgerButton from '@/components/layout/HamburgerButton';
+import UserAuthPill from '@/components/auth/UserAuthPill';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -225,6 +226,9 @@ export default function Sidebar() {
           {isDesktopOpen ? (
             /* Expanded Bottom Controls */
             <>
+              {/* User Profile & Auth Pill */}
+              <UserAuthPill />
+
               {/* Quick Controls: Segmented Theme & Language Switches (Crystal Clear Status) */}
               <div className="grid grid-cols-2 gap-2">
                 {/* Theme Segmented Switch */}
@@ -319,6 +323,9 @@ export default function Sidebar() {
           ) : (
             /* Collapsed Bottom Controls: Compact Icon Buttons */
             <>
+              {/* User Profile Compact Pill */}
+              <UserAuthPill isCompact={true} />
+
               {/* Theme Toggle Icon */}
               <button
                 type="button"
@@ -482,6 +489,9 @@ export default function Sidebar() {
 
             {/* Drawer Bottom Controls */}
             <div className="pt-4 border-t border-slate-200 dark:border-violet-900/60 space-y-3 font-mono">
+              {/* User Profile Pill */}
+              <UserAuthPill />
+
               <div className="grid grid-cols-2 gap-2">
                 {/* Theme Switch */}
                 <div className="flex items-center p-0.5 bg-slate-100 dark:bg-[#090d1c] border border-slate-300 dark:border-violet-900/70">
