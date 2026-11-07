@@ -21,6 +21,15 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
+    if (error.message.toLowerCase().includes('email not confirmed')) {
+      return {
+        error:
+          'Email belum dikonfirmasi. Silakan klik link konfirmasi di inbox email Anda, atau matikan "Confirm email" di Supabase Dashboard (Authentication -> Sign In / Providers -> Email).',
+      };
+    }
+    if (error.message.toLowerCase().includes('invalid login credentials')) {
+      return { error: 'Email atau kata sandi tidak cocok. Silakan periksa kembali.' };
+    }
     return { error: error.message };
   }
 
