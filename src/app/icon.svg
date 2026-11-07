@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <!-- Dark Background Gradient -->
+    <linearGradient id="brandBgDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="60%" stop-color="#5b21b6" />
+      <stop offset="100%" stop-color="#31104b" />
+    </linearGradient>
+
+    <!-- Cyan Pulse Gradient -->
+    <linearGradient id="cyanPulse" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="60%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+
+    <!-- Speed streaks gradient -->
+    <linearGradient id="speedStreaks" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c084fc" stop-opacity="0" />
+      <stop offset="100%" stop-color="#e879f9" stop-opacity="0.9" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Squircle with brutalist border -->
+  <rect x="4" y="4" width="92" height="92" rx="20" fill="url(#brandBgDark)" stroke="#a78bfa" stroke-width="2.5" />
+
+  <!-- Speed Dash Trails -->
+  <line x1="12" y1="28" x2="28" y2="28" stroke="url(#speedStreaks)" stroke-width="2.5" stroke-linecap="round" />
+  <line x1="8" y1="36" x2="22" y2="36" stroke="url(#speedStreaks)" stroke-width="2.5" stroke-linecap="round" />
+  <line x1="14" y1="64" x2="26" y2="64" stroke="url(#speedStreaks)" stroke-width="2.5" stroke-linecap="round" />
+  <line x1="10" y1="72" x2="22" y2="72" stroke="url(#speedStreaks)" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Dynamic Running Athlete Silhouette (Sharp White) -->
+  <!-- Head -->
+  <circle cx="67" cy="22" r="6.5" fill="#ffffff" />
+
+  <!-- Torso & Core -->
+  <path d="M 57 28 L 68 30 L 54 52 L 44 48 Z" fill="#ffffff" />
+
+  <!-- Back Arm (pumping backwards) -->
+  <polyline points="52,33 40,38 34,34" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Front Arm (driving forward) -->
+  <polyline points="63,33 76,38 80,48" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Back Leg (trailing stride extension) -->
+  <polyline points="46,50 34,62 20,72" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Front Leg (high knee power drive) -->
+  <polyline points="52,50 66,60 58,78" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Telemetry ECG Heart Rate Pulse Wave (Neon Cyan Glow cutting across) -->
+  <polyline points="8,52 24,52 30,42 36,62 44,34 50,66 56,44 62,52 92,52" 
+            fill="none" 
+            stroke="url(#cyanPulse)" 
+            stroke-width="3.5" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" />
+
+  <!-- Forward Telemetry Pulse Terminal Arrow -->
+  <polyline points="87,48 92,52 87,56" 
+            fill="none" 
+            stroke="#22d3ee" 
+            stroke-width="3" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" />
+</svg>

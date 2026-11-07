@@ -1,0 +1,54 @@
+[
+  {
+    "id": "pr-1k",
+    "milestone": "1k",
+    "milestoneName": "1 Kilometer",
+    "targetMeters": 1000,
+    "timeSeconds": 344,
+    "paceSecPerKm": 344,
+    "dateAchieved": "2026-10-26T22:32:59.000Z",
+    "activityId": "24863029863",
+    "activityName": "Tangerang Running",
+    "isAllTimePr": true,
+    "isYearPr": true
+  },
+  {
+    "id": "pr-1mi",
+    "milestone": "1mi",
+    "milestoneName": "1 Mile",
+    "targetMeters": 1609.34,
+    "timeSeconds": 554,
+    "paceSecPerKm": 344.24049610399294,
+    "dateAchieved": "2026-10-26T22:32:59.000Z",
+    "activityId": "24863029863",
+    "activityName": "Tangerang Running",
+    "isAllTimePr": true,
+    "isYearPr": true
+  },
+  {
+    "id": "pr-5k",
+    "milestone": "5k",
+    "milestoneName": "5 Kilometers",
+    "targetMeters": 5000,
+    "timeSeconds": 1720,
+    "paceSecPerKm": 344,
+    "dateAchieved": "2026-10-26T22:32:59.000Z",
+    "activityId": "24863029863",
+    "activityName": "Tangerang Running",
+    "isAllTimePr": true,
+    "isYearPr": true
+  },
+  {
+    "id": "pr-10k",
+    "milestone": "10k",
+    "milestoneName": "10 Kilometers",
+    "targetMeters": 10000,
+    "timeSeconds": 4241,
+    "paceSecPerKm": 424.1,
+    "dateAchieved": "2026-10-22T08:39:47.000Z",
+    "activityId": "24812165203",
+    "activityName": "Tangerang Running",
+    "isAllTimePr": true,
+    "isYearPr": true
+  }
+]
