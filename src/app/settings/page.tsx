@@ -2,7 +2,9 @@ import React from 'react';
 import { container } from '@/infrastructure/di/container';
 import { AthleteSettingsManager } from '@/infrastructure/persistence/AthleteSettingsManager';
 import AthletePersonalInfoCard from '@/components/profile/AthletePersonalInfoCard';
+import AthleteBiodataCard from '@/components/profile/AthleteBiodataCard';
 import SystemPreferencesCard from '@/components/profile/SystemPreferencesCard';
+import { createClient } from '@/utils/supabase/server';
 import { Settings, Watch, Key } from 'lucide-react';
 
 export default async function SettingsPage() {
@@ -10,6 +12,23 @@ export default async function SettingsPage() {
   const biometrics = AthleteSettingsManager.getSettings();
   const healthSnapshot = await container.healthUseCase.execute();
   const garmin7dAvgRhr = healthSnapshot.dailySummary?.lastSevenDaysAvgRestingHeartRate ?? healthSnapshot.dailySummary?.restingHeartRate ?? 52;
+
+  // Supabase user profile & metadata for biodata card
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const userMeta = user?.user_metadata || {};
+
+  const initialProfile = {
+    fullName: userMeta.full_name || '',
+    email: user?.email || '',
+    role: userMeta.role || 'athlete',
+    gender: userMeta.gender || 'male',
+    birthDate: userMeta.birth_date || '2000-01-01',
+    weightKg: userMeta.weight_kg ? Number(userMeta.weight_kg) : 62,
+    heightCm: userMeta.height_cm ? Number(userMeta.height_cm) : 172,
+    runningClub: userMeta.running_club || 'Freedayzz Running Club',
+    weeklyTargetKm: userMeta.weekly_target_km ? Number(userMeta.weekly_target_km) : 30,
+  };
 
   const keyPreview = process.env.GARMIN_PERSONAL_API_KEY 
     ? `${process.env.GARMIN_PERSONAL_API_KEY.slice(0, 16)}...${process.env.GARMIN_PERSONAL_API_KEY.slice(-10)}`
@@ -36,7 +55,12 @@ export default async function SettingsPage() {
       {/* 1. Language & Theme System Preferences (Clean Dropdowns) */}
       <SystemPreferencesCard />
 
-      {/* 2. Athlete Personal HR Calibration Card */}
+      {/* 2. Athlete Biodata & Physical Profile (Weight, Height, Age, Gender, Running Club) */}
+      <div id="biodata">
+        <AthleteBiodataCard initialProfile={initialProfile} />
+      </div>
+
+      {/* 3. Athlete Personal HR Calibration Card */}
       <div id="biometrics">
         <AthletePersonalInfoCard
           activities={activities}

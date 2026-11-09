@@ -181,6 +181,76 @@ export async function saveGarminConnection(formData: FormData) {
   redirect('/dashboard');
 }
 
+export async function updateAthleteBiodata(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'Sesi kedaluwarsa, silakan masuk kembali.' };
+  }
+
+  const fullName = (formData.get('fullName') as string)?.trim() || '';
+  const gender = (formData.get('gender') as string) || 'male';
+  const birthDate = (formData.get('birthDate') as string) || '';
+  const weightKg = parseFloat((formData.get('weightKg') as string) || '0');
+  const heightCm = parseFloat((formData.get('heightCm') as string) || '0');
+  const runningClub = (formData.get('runningClub') as string)?.trim() || '';
+  const weeklyTargetKm = parseFloat((formData.get('weeklyTargetKm') as string) || '30');
+
+  // 1. Update user metadata in Supabase Auth (always persists with user session)
+  const { error: metaError } = await supabase.auth.updateUser({
+    data: {
+      full_name: fullName,
+      gender,
+      birth_date: birthDate,
+      weight_kg: weightKg,
+      height_cm: heightCm,
+      running_club: runningClub,
+      weekly_target_km: weeklyTargetKm,
+      biodata_updated_at: new Date().toISOString(),
+    },
+  });
+
+  if (metaError) {
+    return { error: metaError.message };
+  }
+
+  // 2. Update profiles table
+  try {
+    await supabase
+      .from('profiles')
+      .update({
+        full_name: fullName,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id);
+  } catch (err) {
+    console.warn('Optional profile update notice:', err);
+  }
+
+  // 3. Update athlete_biometrics table
+  try {
+    await supabase
+      .from('athlete_biometrics')
+      .upsert(
+        {
+          user_id: user.id,
+          weekly_target_km: weeklyTargetKm,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      );
+  } catch (err) {
+    console.warn('Optional biometrics update notice:', err);
+  }
+
+  revalidatePath('/settings');
+  revalidatePath('/dashboard');
+  return { success: true, message: 'Biodata atlet berhasil disimpan!' };
+}
+
 export async function signout() {
   const supabase = await createClient();
   await supabase.auth.signOut();

@@ -444,12 +444,15 @@ export default function MonthlyTrainingCalendar({ activities }: Props) {
             <span>{language === 'ID' ? 'RATA-RATA PACE' : 'AVG MONTHLY PACE'}</span>
             <TrendingUp className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
           </div>
-          <div className="flex items-baseline gap-1 mt-1.5">
+          <div className="flex items-baseline gap-1 mt-1.5 whitespace-nowrap">
             <span className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-300">
-              {monthStats.monthlyAvgPace > 0 ? PaceCalculator.formatPace(monthStats.monthlyAvgPace) : '--:--'}
+              {monthStats.monthlyAvgPace > 0
+                ? PaceCalculator.formatPace(monthStats.monthlyAvgPace).replace(' /km', '')
+                : '--:--'}
             </span>
+            <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">/KM</span>
           </div>
-          <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
+          <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1 truncate">
             {language === 'ID' ? 'TERTIMBANG JARAK' : 'WEIGHTED BY DISTANCE'}
           </span>
         </div>
