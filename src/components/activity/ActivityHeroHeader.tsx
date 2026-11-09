@@ -227,12 +227,14 @@ export default function ActivityHeroHeader({ activity, polyline = [] }: Props) {
       </div>
 
       {/* Share / Export Story Infographic Modal */}
-      <ActivityStoryExportModal
-        activity={activity}
-        polyline={polyline}
-        isOpen={isExportOpen}
-        onClose={() => setIsExportOpen(false)}
-      />
+      {isExportOpen && (
+        <ActivityStoryExportModal
+          activity={activity}
+          polyline={polyline}
+          isOpen={isExportOpen}
+          onClose={() => setIsExportOpen(false)}
+        />
+      )}
     </div>
   );
 }

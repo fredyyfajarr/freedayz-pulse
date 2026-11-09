@@ -54,8 +54,6 @@ export default function ActivityStoryExportModal({
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [downloadSuccess, setDownloadSuccess] = useState<boolean>(false);
 
-  if (!isOpen) return null;
-
   const durationSec = activity.movingDurationSeconds || activity.durationSeconds;
   const distanceKm = (activity.distanceMeters / 1000).toFixed(2);
   const formattedPace = PaceCalculator.formatPace(activity.avgPaceSecPerKm);
@@ -194,6 +192,8 @@ export default function ActivityStoryExportModal({
       setIsExporting(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
