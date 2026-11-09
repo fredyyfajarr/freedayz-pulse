@@ -10,8 +10,9 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const updated = AthleteSettingsManager.updateSettings({
-      maxHr: Number(body.maxHr),
-      restingHr: Number(body.restingHr),
+      maxHr: body.maxHr !== undefined ? Number(body.maxHr) : undefined,
+      restingHr: body.restingHr !== undefined ? Number(body.restingHr) : undefined,
+      customZones: body.customZones || undefined,
     });
     return NextResponse.json({ success: true, settings: updated });
   } catch (err: any) {

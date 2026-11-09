@@ -14,9 +14,11 @@ import {
   ChevronRight,
   Flame, 
   Compass,
-  GitCompare
+  GitCompare,
+  UploadCloud,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import ActivityFileImportModal from './ActivityFileImportModal';
 
 interface Props {
   activities: Activity[];
@@ -28,6 +30,7 @@ export default function PaginatedActivitiesList({ activities }: Props) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSport, setSelectedSport] = useState<string>('ALL');
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -122,6 +125,15 @@ export default function PaginatedActivitiesList({ activities }: Props) {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsImportModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-100 dark:bg-violet-950 hover:bg-violet-200 dark:hover:bg-violet-900 border border-violet-400 dark:border-violet-600 text-violet-800 dark:text-violet-300 text-xs font-mono font-black uppercase tracking-wider transition-all shadow-[2px_2px_0px_#7c3aed] cursor-pointer"
+          >
+            <UploadCloud className="w-3.5 h-3.5" />
+            <span>{isId ? 'IMPORT FILE (.GPX)' : 'IMPORT GPX FILE'}</span>
+          </button>
+
           <Link
             href="/activities/compare"
             className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-100 dark:bg-cyan-950 hover:bg-cyan-200 dark:hover:bg-cyan-900 border border-cyan-400 dark:border-cyan-500 hover:border-cyan-500 dark:hover:border-cyan-300 text-cyan-800 dark:text-cyan-300 hover:text-cyan-900 dark:hover:text-white text-xs font-mono font-black uppercase tracking-wider transition-all shadow-[2px_2px_0px_#06b6d4]"
@@ -366,6 +378,12 @@ export default function PaginatedActivitiesList({ activities }: Props) {
           </div>
         </div>
       )}
+
+      {/* Manual Activity File Import Modal (.GPX / .JSON) */}
+      <ActivityFileImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+      />
     </div>
   );
 }

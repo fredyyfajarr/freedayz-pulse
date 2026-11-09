@@ -4,36 +4,40 @@ import React, { useState } from 'react';
 import { Activity } from '@/domain/entities/Activity';
 import { HRProfileCalculator, AthleteHRProfile } from '@/domain/services/HRProfileCalculator';
 import { PaceCalculator } from '@/domain/services/PaceCalculator';
-import { Heart, ShieldCheck, Zap, Watch, Edit3, X, Check, RefreshCw } from 'lucide-react';
+import { AthleteBiometricSettings, CustomHRZoneThresholds, DEFAULT_CUSTOM_ZONES } from '@/domain/entities/AthleteSettings';
+import { Heart, ShieldCheck, Zap, Watch, Edit3, X, Check, RefreshCw, Sliders } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface Props {
   activities: Activity[];
-  initialSettings?: {
-    maxHr: number;
-    restingHr: number;
-  };
+  initialSettings?: AthleteBiometricSettings;
   garmin7dAvgRhr?: number;
 }
 
 export default function AthletePersonalInfoCard({ activities, initialSettings, garmin7dAvgRhr }: Props) {
   const { language } = useLanguage();
   const isId = language === 'ID';
-  const [restingHr, setRestingHr] = useState<number>(garmin7dAvgRhr || initialSettings?.restingHr || 52);
+  const [restingHr, setRestingHr] = useState<number>(garmin7dAvgRhr || initialSettings?.restingHr || 51);
   const [maxHr, setMaxHr] = useState<number>(initialSettings?.maxHr || 200);
+  const [customZones, setCustomZones] = useState<CustomHRZoneThresholds>(
+    initialSettings?.customZones || DEFAULT_CUSTOM_ZONES
+  );
 
   // Edit Modal State
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [draftRestingHr, setDraftRestingHr] = useState<number>(garmin7dAvgRhr || restingHr);
   const [draftMaxHr, setDraftMaxHr] = useState<number>(maxHr);
+  const [draftCustomZones, setDraftCustomZones] = useState<CustomHRZoneThresholds>(
+    initialSettings?.customZones || DEFAULT_CUSTOM_ZONES
+  );
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
-  // Exact %HRR brackets configured in user's Garmin Connect Running profile
+  // Exact %HRR brackets configured in user's Garmin Connect Running profile (Zone 2 max = 162 BPM)
   const brackets = [
-    { idx: 1, minP: 50, maxP: 63 },
-    { idx: 2, minP: 63, maxP: 76 },
-    { idx: 3, minP: 76, maxP: 84 },
+    { idx: 1, minP: 50, maxP: 62.5 },
+    { idx: 2, minP: 62.5, maxP: 74.5 },
+    { idx: 3, minP: 74.5, maxP: 84 },
     { idx: 4, minP: 84, maxP: 92 },
     { idx: 5, minP: 92, maxP: 100 },
   ];
@@ -42,16 +46,20 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
     activities,
     restingHr,
     maxHr,
-    brackets
+    brackets,
+    customZones
   );
 
   // Preview draft zones in edit modal
   const draftHrr = Math.max(1, draftMaxHr - draftRestingHr);
-  const previewZ1Min = Math.round(draftRestingHr + draftHrr * 0.50);
-  const previewZ1Max = Math.round(draftRestingHr + draftHrr * 0.63);
-  const previewZ2Max = Math.round(draftRestingHr + draftHrr * 0.76);
-  const previewZ3Max = Math.round(draftRestingHr + draftHrr * 0.84);
-  const previewZ4Max = Math.round(draftRestingHr + draftHrr * 0.92);
+  const previewZ1Min = draftCustomZones.zone1Min || Math.round(draftRestingHr + draftHrr * 0.50);
+  const previewZ1Max = draftCustomZones.zone1Max || Math.round(draftRestingHr + draftHrr * 0.625);
+  const previewZ2Min = draftCustomZones.zone2Min || (previewZ1Max + 1);
+  const previewZ2Max = draftCustomZones.zone2Max || 162;
+  const previewZ3Min = draftCustomZones.zone3Min || (previewZ2Max + 1);
+  const previewZ3Max = draftCustomZones.zone3Max || Math.round(draftRestingHr + draftHrr * 0.84);
+  const previewZ4Min = draftCustomZones.zone4Min || (previewZ3Max + 1);
+  const previewZ4Max = draftCustomZones.zone4Max || Math.round(draftRestingHr + draftHrr * 0.92);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -62,11 +70,13 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
         body: JSON.stringify({
           maxHr: draftMaxHr,
           restingHr: draftRestingHr,
+          customZones: draftCustomZones,
         }),
       });
       if (res.ok) {
         setRestingHr(draftMaxHr > draftRestingHr ? draftRestingHr : restingHr);
         setMaxHr(draftMaxHr > draftRestingHr ? draftMaxHr : maxHr);
+        setCustomZones(draftCustomZones);
         setSaveSuccess(true);
         setTimeout(() => {
           setSaveSuccess(false);
@@ -325,6 +335,49 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
                 )}
               </div>
 
+              {/* Zone 2 Upper Limit (Max Easy BPM) */}
+              <div>
+                <label className="text-xs text-slate-700 dark:text-zinc-300 uppercase font-bold block mb-1.5 flex justify-between">
+                  <span>{isId ? 'BATAS ATAS ZONA 2 (MAKSIMUM EASY BPM)' : 'ZONE 2 CEILING (MAX EASY BPM)'}</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-black">{previewZ2Max} BPM</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    min="135"
+                    max="180"
+                    value={draftCustomZones.zone2Max || 162}
+                    onChange={e => {
+                      const val = Number(e.target.value);
+                      setDraftCustomZones(prev => ({
+                        ...prev,
+                        zone2Max: val,
+                        zone3Min: val + 1,
+                      }));
+                    }}
+                    className="flex-1 bg-slate-50 dark:bg-[#070a14] border-2 border-emerald-500/80 p-2 text-slate-900 dark:text-white font-mono font-bold text-base focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDraftCustomZones(prev => ({
+                        ...prev,
+                        zone2Max: 162,
+                        zone3Min: 163,
+                      }));
+                    }}
+                    className="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 hover:bg-emerald-200 border border-emerald-400 dark:border-emerald-600 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold uppercase transition-colors"
+                  >
+                    162 BPM ({isId ? 'JAM GARMIN' : 'GARMIN WATCH'})
+                  </button>
+                </div>
+                <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
+                  {isId
+                    ? 'Batas denyut jantung maksimum lari santai (Zona 2) sesuai angka di jam tangan Anda (misal 162 BPM).'
+                    : 'Maximum heart rate boundary for easy runs (Zone 2) matching your watch setting (e.g. 162 BPM).'}
+                </span>
+              </div>
+
               {/* Live Preview Box */}
               <div className="bg-slate-50 dark:bg-[#070a14] border border-violet-300 dark:border-violet-800/80 p-3 space-y-2 text-xs">
                 <div className="flex justify-between items-center text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold border-b border-slate-200 dark:border-zinc-800 pb-1">
@@ -338,19 +391,19 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
                   </div>
                   <div>
                     <span className="text-slate-500 dark:text-zinc-500">{isId ? 'Z2 (Lari Santai):' : 'Z2 (Easy):'}</span>{' '}
-                    <strong className="text-emerald-600 dark:text-emerald-400">{previewZ1Max}–{previewZ2Max}</strong>
+                    <strong className="text-emerald-600 dark:text-emerald-400">{previewZ2Min}–{previewZ2Max}</strong>
                   </div>
                   <div>
                     <span className="text-slate-500 dark:text-zinc-500">{isId ? 'Z3 (Aerobik):' : 'Z3 (Aerobic):'}</span>{' '}
-                    <strong className="text-cyan-600 dark:text-cyan-300">{previewZ2Max}–{previewZ3Max}</strong>
+                    <strong className="text-cyan-600 dark:text-cyan-300">{previewZ3Min}–{previewZ3Max}</strong>
                   </div>
                   <div>
                     <span className="text-slate-500 dark:text-zinc-500">{isId ? 'Z4 (Ambang Laktat):' : 'Z4 (Threshold):'}</span>{' '}
-                    <strong className="text-amber-600 dark:text-amber-300">{previewZ3Max}–{previewZ4Max}</strong>
+                    <strong className="text-amber-600 dark:text-amber-300">{previewZ4Min}–{previewZ4Max}</strong>
                   </div>
                   <div className="col-span-2">
                     <span className="text-slate-500 dark:text-zinc-500">{isId ? 'Z5 (Maksimal):' : 'Z5 (Max):'}</span>{' '}
-                    <strong className="text-rose-600 dark:text-rose-400">{previewZ4Max}–{draftMaxHr} BPM</strong>
+                    <strong className="text-rose-600 dark:text-rose-400">{previewZ4Max + 1}–{draftMaxHr} BPM</strong>
                   </div>
                 </div>
               </div>

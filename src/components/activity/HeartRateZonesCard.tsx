@@ -11,6 +11,20 @@ interface Props {
   aerobicTE?: number;
   anaerobicTE?: number;
   trainingEffectLabel?: string;
+  customZones?: {
+    zone1Min: number;
+    zone1Max: number;
+    zone2Min: number;
+    zone2Max: number;
+    zone3Min: number;
+    zone3Max: number;
+    zone4Min: number;
+    zone4Max: number;
+    zone5Min: number;
+    zone5Max: number;
+  };
+  restingHr?: number;
+  maxHr?: number;
 }
 
 export default function HeartRateZonesCard({
@@ -18,19 +32,33 @@ export default function HeartRateZonesCard({
   aerobicTE,
   anaerobicTE,
   trainingEffectLabel,
+  customZones,
+  restingHr,
+  maxHr,
 }: Props) {
   const { language } = useLanguage();
   const isId = language === 'ID';
   const totalSeconds = zones.totalZoneSeconds || 1;
 
-  // Matching user's exact Garmin Connect configuration: Max HR 200, RHR 51, HRR 149
+  // Dynamic user-calibrated BPM brackets (Garmin Forerunner 165 calibration)
+  const z1Min = customZones?.zone1Min ?? 126;
+  const z1Max = customZones?.zone1Max ?? 144;
+  const z2Min = customZones?.zone2Min ?? 145;
+  const z2Max = customZones?.zone2Max ?? 162; // Dynamic 162 BPM max for Zone 2
+  const z3Min = customZones?.zone3Min ?? 163;
+  const z3Max = customZones?.zone3Max ?? 176;
+  const z4Min = customZones?.zone4Min ?? 177;
+  const z4Max = customZones?.zone4Max ?? 188;
+  const z5Min = customZones?.zone5Min ?? 189;
+  const z5Max = customZones?.zone5Max ?? (maxHr || 200);
+
   const zoneConfigs = [
     {
       num: 1,
       name: isId ? 'ZONA 1 // PEMANASAN' : 'ZONE 1 // WARM UP',
       desc: isId 
-        ? '50% – 63% HRR (126 – 145 BPM) // Pemanasan & Pemulihan Aktif'
-        : '50% – 63% HRR (126 – 145 BPM) // Warm-up & Recovery',
+        ? `50% – 62% HRR (${z1Min} – ${z1Max} BPM) // Pemanasan & Pemulihan Aktif`
+        : `50% – 62% HRR (${z1Min} – ${z1Max} BPM) // Warm-up & Recovery`,
       seconds: zones.zone1Seconds,
       percent: Math.round((zones.zone1Seconds / totalSeconds) * 100),
       color: 'bg-slate-400',
@@ -41,8 +69,8 @@ export default function HeartRateZonesCard({
       num: 2,
       name: isId ? 'ZONA 2 // LARI SANTAI' : 'ZONE 2 // EASY',
       desc: isId 
-        ? '63% – 76% HRR (145 – 164 BPM) // Membangun Fondasi Aerobik'
-        : '63% – 76% HRR (145 – 164 BPM) // Aerobic Base Building',
+        ? `63% – 75% HRR (${z2Min} – ${z2Max} BPM) // Membangun Fondasi Aerobik`
+        : `63% – 75% HRR (${z2Min} – ${z2Max} BPM) // Aerobic Base Building`,
       seconds: zones.zone2Seconds,
       percent: Math.round((zones.zone2Seconds / totalSeconds) * 100),
       color: 'bg-emerald-500',
@@ -53,8 +81,8 @@ export default function HeartRateZonesCard({
       num: 3,
       name: isId ? 'ZONA 3 // AEROBIK' : 'ZONE 3 // AEROBIC',
       desc: isId 
-        ? '76% – 84% HRR (164 – 176 BPM) // Tempo Aliran Kardiovaskular'
-        : '76% – 84% HRR (164 – 176 BPM) // Cardiovascular Tempo Flow',
+        ? `75% – 84% HRR (${z3Min} – ${z3Max} BPM) // Tempo Aliran Kardiovaskular`
+        : `75% – 84% HRR (${z3Min} – ${z3Max} BPM) // Cardiovascular Tempo Flow`,
       seconds: zones.zone3Seconds,
       percent: Math.round((zones.zone3Seconds / totalSeconds) * 100),
       color: 'bg-cyan-500',
@@ -65,8 +93,8 @@ export default function HeartRateZonesCard({
       num: 4,
       name: isId ? 'ZONA 4 // AMBANG LAKTAT' : 'ZONE 4 // THRESHOLD',
       desc: isId 
-        ? '84% – 92% HRR (176 – 188 BPM) // Ketahanan Ambang Laktat'
-        : '84% – 92% HRR (176 – 188 BPM) // Lactate Threshold Stamina',
+        ? `84% – 92% HRR (${z4Min} – ${z4Max} BPM) // Ketahanan Ambang Laktat`
+        : `84% – 92% HRR (${z4Min} – ${z4Max} BPM) // Lactate Threshold Stamina`,
       seconds: zones.zone4Seconds,
       percent: Math.round((zones.zone4Seconds / totalSeconds) * 100),
       color: 'bg-amber-500',
@@ -77,8 +105,8 @@ export default function HeartRateZonesCard({
       num: 5,
       name: isId ? 'ZONA 5 // MAKSIMUM' : 'ZONE 5 // MAXIMUM',
       desc: isId 
-        ? '92% – 100% HRR (188 – 200 BPM) // Kapasitas Puncak Anaerobik'
-        : '92% – 100% HRR (188 – 200 BPM) // Anaerobic Peak Capacity',
+        ? `92% – 100% HRR (${z5Min} – ${z5Max} BPM) // Kapasitas Puncak Anaerobik`
+        : `92% – 100% HRR (${z5Min} – ${z5Max} BPM) // Anaerobic Peak Capacity`,
       seconds: zones.zone5Seconds,
       percent: Math.round((zones.zone5Seconds / totalSeconds) * 100),
       color: 'bg-rose-500',

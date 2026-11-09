@@ -1,5 +1,6 @@
 import { container } from '@/infrastructure/di/container';
 import { notFound } from 'next/navigation';
+import { AthleteSettingsManager } from '@/infrastructure/persistence/AthleteSettingsManager';
 import ActivityHeroHeader from '@/components/activity/ActivityHeroHeader';
 import RouteMap from '@/components/activity/RouteMap';
 import ElevationPaceChart from '@/components/activity/ElevationPaceChart';
@@ -31,6 +32,7 @@ export default async function ActivityDetailPage({
   }
 
   const { activity, detail } = result;
+  const athleteSettings = AthleteSettingsManager.getSettings();
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
@@ -67,6 +69,9 @@ export default async function ActivityDetailPage({
             aerobicTE={activity.aerobicTrainingEffect}
             anaerobicTE={activity.anaerobicTrainingEffect}
             trainingEffectLabel={activity.trainingEffectLabel}
+            customZones={athleteSettings.customZones}
+            restingHr={athleteSettings.restingHr}
+            maxHr={athleteSettings.maxHr}
           />
         </div>
         <div>

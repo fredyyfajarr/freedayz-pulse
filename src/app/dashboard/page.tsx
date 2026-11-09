@@ -10,6 +10,7 @@ import DashboardWelcomeBar from '@/components/dashboard/DashboardWelcomeBar';
 import BestEffortsShowcaseCard from '@/components/dashboard/BestEffortsShowcaseCard';
 import WeeklyTargetWidget from '@/components/dashboard/WeeklyTargetWidget';
 import HRRProfileWidget from '@/components/dashboard/HRRProfileWidget';
+import RacePredictorWidget from '@/components/dashboard/RacePredictorWidget';
 import { ACWRCalculator } from '@/domain/services/ACWRCalculator';
 
 export default async function DashboardPage() {
@@ -52,6 +53,9 @@ export default async function DashboardPage() {
 
       {/* 2.5. Garmin Biometrics & Recovery Hub (HRV, VO2Max, Body Battery, RHR) */}
       <GarminRecoveryHub snapshot={healthSnapshot} />
+
+      {/* 2.6. Jack Daniels VDOT Race Finish Time Predictor Matrix */}
+      <RacePredictorWidget prs={summary.bestEfforts} />
 
       {/* 3. Bottom Row: Recent Activities + Right Side Widgets */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">

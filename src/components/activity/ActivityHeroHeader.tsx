@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Activity } from '@/domain/entities/Activity';
 import { PaceCalculator } from '@/domain/services/PaceCalculator';
-import { ArrowLeft, Calendar, MapPin, Zap, Flame, Mountain, BatteryCharging, Heart, Footprints, Thermometer, GitCompare } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, Zap, Flame, Mountain, BatteryCharging, Heart, Footprints, Thermometer, GitCompare, Share2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import ActivityStoryExportModal from './ActivityStoryExportModal';
 
 interface Props {
   activity: Activity;
@@ -13,6 +14,7 @@ interface Props {
 
 export default function ActivityHeroHeader({ activity }: Props) {
   const { t, language } = useLanguage();
+  const [isExportOpen, setIsExportOpen] = useState(false);
 
   const localeStr = language === 'ID' ? 'id-ID' : 'en-US';
   const dateFormatted = new Date(activity.startTime).toLocaleDateString(localeStr, {
@@ -64,6 +66,16 @@ export default function ActivityHeroHeader({ activity }: Props) {
             <GitCompare className="w-3 h-3" />
             <span>{t('detail.compare')}</span>
           </Link>
+
+          <button
+            type="button"
+            onClick={() => setIsExportOpen(true)}
+            className="flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 bg-violet-50 dark:bg-violet-950/80 hover:bg-violet-100 dark:hover:bg-violet-900 border border-violet-400 dark:border-violet-600 text-violet-700 dark:text-violet-300 font-bold uppercase transition-all cursor-pointer"
+            title="Export run as Instagram Story / WhatsApp Infographic"
+          >
+            <Share2 className="w-3 h-3" />
+            <span>{language === 'ID' ? 'BAGIKAN STORY' : 'SHARE STORY'}</span>
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -211,6 +223,13 @@ export default function ActivityHeroHeader({ activity }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Share / Export Story Infographic Modal */}
+      <ActivityStoryExportModal
+        activity={activity}
+        isOpen={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+      />
     </div>
   );
 }

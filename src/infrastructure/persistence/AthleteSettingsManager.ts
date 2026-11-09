@@ -1,12 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import {
+  AthleteBiometricSettings,
+  CustomHRZoneThresholds,
+  DEFAULT_CUSTOM_ZONES,
+} from '@/domain/entities/AthleteSettings';
 
-export interface AthleteBiometricSettings {
-  maxHr: number;
-  restingHr: number;
-  dailySleepScores?: Record<string, number>;
-  lastUpdated?: string;
-}
+export type { AthleteBiometricSettings, CustomHRZoneThresholds };
+export { DEFAULT_CUSTOM_ZONES };
 
 const DEFAULT_SETTINGS: AthleteBiometricSettings = {
   maxHr: 200,
@@ -14,6 +15,7 @@ const DEFAULT_SETTINGS: AthleteBiometricSettings = {
   dailySleepScores: {
     '2026-10-26': 67,
   },
+  customZones: DEFAULT_CUSTOM_ZONES,
   lastUpdated: new Date().toISOString(),
 };
 
@@ -36,6 +38,7 @@ export class AthleteSettingsManager {
         maxHr: typeof parsed.maxHr === 'number' && parsed.maxHr > 100 && parsed.maxHr < 250 ? parsed.maxHr : 200,
         restingHr: typeof parsed.restingHr === 'number' && parsed.restingHr > 30 && parsed.restingHr < 120 ? parsed.restingHr : 51,
         dailySleepScores: typeof parsed.dailySleepScores === 'object' && parsed.dailySleepScores !== null ? parsed.dailySleepScores : {},
+        customZones: parsed.customZones && typeof parsed.customZones.zone2Max === 'number' ? parsed.customZones : DEFAULT_CUSTOM_ZONES,
         lastUpdated: parsed.lastUpdated || new Date().toISOString(),
       };
     } catch (e) {
@@ -58,6 +61,7 @@ export class AthleteSettingsManager {
       maxHr: newSettings.maxHr && newSettings.maxHr > 100 && newSettings.maxHr < 250 ? Math.round(newSettings.maxHr) : current.maxHr,
       restingHr: newSettings.restingHr && newSettings.restingHr > 30 && newSettings.restingHr < 120 ? Math.round(newSettings.restingHr) : current.restingHr,
       dailySleepScores: newSettings.dailySleepScores !== undefined ? { ...current.dailySleepScores, ...newSettings.dailySleepScores } : current.dailySleepScores,
+      customZones: newSettings.customZones ? { ...(current.customZones || DEFAULT_CUSTOM_ZONES), ...newSettings.customZones } : (current.customZones || DEFAULT_CUSTOM_ZONES),
       lastUpdated: new Date().toISOString(),
     };
 

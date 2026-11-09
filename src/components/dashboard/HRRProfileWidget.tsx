@@ -26,7 +26,7 @@ export default function HRRProfileWidget() {
       </p>
       <div className="mt-3 pt-2 border-t border-slate-200 dark:border-zinc-800/80 flex justify-between items-center text-[10px]">
         <span className="text-slate-500 dark:text-zinc-500">{t('hrr.z2_title')}</span>
-        <span className="text-emerald-600 dark:text-emerald-400 font-bold">145 – 164 BPM</span>
+        <span className="text-emerald-600 dark:text-emerald-400 font-bold">145 – 162 BPM</span>
       </div>
       <div className="mt-2 text-right">
         <Link

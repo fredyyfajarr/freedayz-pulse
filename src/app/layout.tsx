@@ -21,14 +21,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Freedayzz Pulse',
-  description: 'Running Analytics & Telemetry Lab',
+  title: 'Freedayzz Pulse // Running Telemetry Lab',
+  description: 'Athlete telemetry lab, Jack Daniels VDOT, Firstbeat metrics & Garmin Connect analytics.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Freedayzz Pulse',
+  },
   icons: {
     icon: [
       { url: '/logo.svg', type: 'image/svg+xml' },
+      { url: '/logo.png', type: 'image/png' },
     ],
     shortcut: '/logo.svg',
-    apple: '/logo.svg',
+    apple: '/logo.png',
   },
 };
 

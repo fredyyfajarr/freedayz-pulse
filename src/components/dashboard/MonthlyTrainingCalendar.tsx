@@ -545,14 +545,14 @@ export default function MonthlyTrainingCalendar({ activities }: Props) {
                         if (!hasRuns) return;
                         setSelectedDay(prev => prev?.dateStr === cell.dateStr ? null : cell);
                       }}
-                      className={`min-h-[76px] p-1.5 border transition-all flex flex-col justify-between select-none ${
+                      className={`min-h-[76px] p-1.5 transition-all flex flex-col justify-between select-none ${
                         !cell.isCurrentMonth
-                          ? 'bg-slate-100/50 dark:bg-[#05070f]/40 border-slate-200/60 dark:border-zinc-900/60 opacity-35'
+                          ? 'bg-slate-100/50 dark:bg-[#05070f]/40 border border-slate-200/60 dark:border-zinc-900/60 opacity-35'
                           : isSelected
-                          ? 'bg-violet-50 dark:bg-[#0e1630] border-violet-500 shadow-[3px_3px_0px_#7c3aed] ring-2 ring-violet-500 scale-[1.02] z-10'
+                          ? 'bg-violet-50/90 dark:bg-violet-950/40 border-2 border-violet-600 dark:border-violet-400 relative z-20 shadow-sm'
                           : cell.isToday
-                          ? 'bg-cyan-50/40 dark:bg-[#070a14] border-cyan-500/80 hover:border-cyan-400'
-                          : 'bg-white dark:bg-[#070a14] hover:bg-slate-50 dark:hover:bg-[#0a0f24] hover:border-slate-300 dark:hover:border-zinc-700 border-slate-200 dark:border-zinc-800/80'
+                          ? 'bg-cyan-50/40 dark:bg-[#070a14] border border-cyan-500/80 hover:border-cyan-400'
+                          : 'bg-white dark:bg-[#070a14] hover:bg-slate-50 dark:hover:bg-[#0a0f24] hover:border-slate-300 dark:hover:border-zinc-700 border border-slate-200 dark:border-zinc-800/80'
                       } ${hasRuns ? 'cursor-pointer hover:shadow-md' : ''}`}
                     >
                       {/* Top Bar: Date Number + Multi-session Badge */}
