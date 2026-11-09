@@ -59,9 +59,9 @@ ${polyline.map(pt => `      <trkpt lat="${pt.lat}" lon="${pt.lon}">${pt.altitude
   };
 
   return (
-    <div className="relative w-full h-[400px] border-2 border-slate-200 dark:border-violet-900/60 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] overflow-hidden">
+    <div className="relative w-full h-[400px] border-2 border-slate-200 dark:border-violet-900/60 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] overflow-hidden isolate">
       {/* Top Banner Overlay with GPX Export */}
-      <div className="absolute top-3 right-3 z-[400] bg-white/90 dark:bg-[#090d1a]/90 backdrop-blur-md border border-slate-300 dark:border-violet-600/70 px-2.5 py-1 text-[10px] font-mono text-slate-800 dark:text-zinc-300 flex items-center gap-2.5 shadow-[2px_2px_0px_#cbd5e1] dark:shadow-[2px_2px_0px_#1e1b4b]">
+      <div className="absolute top-3 right-3 z-20 bg-white/90 dark:bg-[#090d1a]/90 backdrop-blur-md border border-slate-300 dark:border-violet-600/70 px-2.5 py-1 text-[10px] font-mono text-slate-800 dark:text-zinc-300 flex items-center gap-2.5 shadow-[2px_2px_0px_#cbd5e1] dark:shadow-[2px_2px_0px_#1e1b4b]">
         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block"></span>
         <span>{isId ? 'TELEMETRI GPS' : 'GPS TELEMETRY'} // {polyline.length} {isId ? 'TITIK' : 'PTS'}</span>
         <button

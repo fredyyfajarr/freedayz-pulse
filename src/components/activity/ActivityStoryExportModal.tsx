@@ -130,9 +130,9 @@ export default function ActivityStoryExportModal({
       if (pt.lon > maxLon) maxLon = pt.lon;
     }
 
-    const width = format === 'story' ? 320 : 360;
-    const height = format === 'story' ? 220 : 180;
-    const padding = 24;
+    const width = format === 'story' ? 270 : 310;
+    const height = format === 'story' ? 160 : 150;
+    const padding = 16;
 
     const midLat = (minLat + maxLat) / 2;
     const cosLat = Math.cos((midLat * Math.PI) / 180);
@@ -175,7 +175,7 @@ export default function ActivityStoryExportModal({
       const isTransparent = bgStyle === 'transparent';
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
-        pixelRatio: 3, // Ultra-crisp 3x for Instagram Story / WhatsApp
+        pixelRatio: format === 'story' ? 3.73 : 3.375, // Ultra-crisp 1080x1920 (Story) or 1080x1080 (Square)
         backgroundColor: isTransparent ? undefined : (bgStyle === 'dark' ? '#06070a' : undefined),
       });
 
@@ -196,8 +196,8 @@ export default function ActivityStoryExportModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#0b0e1b] border-2 border-zinc-800 max-w-4xl w-full max-h-[96vh] flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden font-mono text-zinc-100">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-[#0b0e1b] border-2 border-zinc-800 max-w-2xl w-full max-h-[96vh] flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden font-mono text-zinc-100">
         {/* Top Control Bar */}
         <div className="flex flex-wrap items-center justify-between p-3.5 sm:p-4 border-b border-zinc-800 bg-[#070913] gap-3">
           <div className="flex items-center gap-2">
@@ -360,10 +360,10 @@ export default function ActivityStoryExportModal({
         </div>
 
         {/* Modal Body: Live Canvas Preview Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex items-center justify-center bg-[#05060b]">
+        <div className="flex-1 overflow-y-auto p-2 sm:p-3 flex items-center justify-center bg-[#05060b]">
           {/* Simulated Photo / Checkerboard Wrapper */}
           <div
-            className={`relative p-2 rounded-xl transition-all ${
+            className={`relative p-1.5 rounded-xl transition-all ${
               bgStyle === 'transparent'
                 ? previewBg === 'photo'
                   ? 'bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#020617] shadow-[0_10px_35px_rgba(0,0,0,0.8)] border border-zinc-800'
@@ -378,15 +378,15 @@ export default function ActivityStoryExportModal({
                 backgroundColor: bgStyle === 'dark' ? '#06070a' : (bgStyle === 'glass' ? 'rgba(9, 11, 22, 0.75)' : 'transparent'),
               }}
               className={`relative flex flex-col justify-between transition-all select-none ${
-                bgStyle === 'glass' ? 'backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-7' : 'p-6 sm:p-7'
+                bgStyle === 'glass' ? 'backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5' : 'p-4 sm:p-5'
               } ${
-                format === 'story' ? 'w-[340px] h-[600px]' : 'w-[380px] h-[380px]'
+                format === 'story' ? 'w-[285px] h-[506px] sm:w-[295px] sm:h-[524px]' : 'w-[320px] h-[320px]'
               }`}
             >
               {/* Top Header: Brand & Date (Clean floating overlay) */}
-              <div className="flex items-center justify-between pb-2 border-b border-white/15">
+              <div className="flex items-center justify-between pb-1.5 border-b border-white/15">
                 <div className="flex items-center gap-2">
-                  <BrandLogo size={24} />
+                  <BrandLogo size={22} />
                   <div>
                     <span className="text-xs font-black italic tracking-widest text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
                       FREEDAYZZ<span className={currentTheme.textAccent}>.PULSE</span>
@@ -395,7 +395,7 @@ export default function ActivityStoryExportModal({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className={`text-[9px] px-2 py-0.5 font-bold uppercase rounded tracking-wider border ${currentTheme.badgeBg} drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]`}>
+                  <span className={`text-[8px] px-1.5 py-0.5 font-bold uppercase rounded tracking-wider border ${currentTheme.badgeBg} drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]`}>
                     {activity.sportType.toUpperCase()}
                   </span>
                   <span className="text-[8px] font-mono text-zinc-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
@@ -405,12 +405,12 @@ export default function ActivityStoryExportModal({
               </div>
 
               {/* Centerpiece: GPS Route Map (Minimalist Vector Polyline) */}
-              <div className="flex-1 flex flex-col items-center justify-center my-2 relative">
+              <div className="flex-1 flex flex-col items-center justify-center my-1 relative">
                 {svgMap ? (
                   <div className="relative flex items-center justify-center w-full">
                     <svg
                       viewBox={`0 0 ${svgMap.width} ${svgMap.height}`}
-                      className="w-full max-h-[220px] filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]"
+                      className="w-full max-h-[160px] filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]"
                     >
                       <defs>
                         <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -474,40 +474,40 @@ export default function ActivityStoryExportModal({
               </div>
 
               {/* Main Typography Metrics (Ala Strava Clean HUD — NO nested boxes!) */}
-              <div className="space-y-3 pt-2">
+              <div className="space-y-2 pt-1">
                 {/* Hero Distance (Giant & Crisp) */}
                 <div className="text-center">
-                  <div className="flex items-baseline justify-center gap-1.5">
-                    <span className="text-5xl sm:text-6xl font-black italic tracking-tighter text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] leading-none">
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-4xl sm:text-5xl font-black italic tracking-tighter text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] leading-none">
                       {distanceKm}
                     </span>
-                    <span className={`text-sm sm:text-base font-black italic ${currentTheme.textAccent} drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]`}>
+                    <span className={`text-xs sm:text-sm font-black italic ${currentTheme.textAccent} drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]`}>
                       KM
                     </span>
                   </div>
-                  <span className="text-[9px] tracking-widest uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block mt-0.5">
+                  <span className="text-[8px] tracking-widest uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block mt-0.5">
                     {isId ? 'JARAK LARI' : 'DISTANCE'}
                   </span>
                 </div>
 
                 {/* Secondary Row: Pace, Time, Heart Rate (Clean columns) */}
-                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/15 text-center">
+                <div className="grid grid-cols-3 gap-1.5 pt-1.5 border-t border-white/15 text-center">
                   {/* Pace */}
                   <div>
-                    <span className="text-xl sm:text-2xl font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block leading-tight">
+                    <span className="text-lg sm:text-xl font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block leading-tight">
                       {paceNum}
                     </span>
-                    <span className="text-[8px] tracking-wider uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block">
+                    <span className="text-[7.5px] tracking-wider uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block">
                       {isId ? 'PACE (/KM)' : 'AVG PACE'}
                     </span>
                   </div>
 
                   {/* Duration */}
                   <div>
-                    <span className="text-xl sm:text-2xl font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block leading-tight">
+                    <span className="text-lg sm:text-xl font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block leading-tight">
                       {durationStr}
                     </span>
-                    <span className="text-[8px] tracking-wider uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block">
+                    <span className="text-[7.5px] tracking-wider uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block">
                       {isId ? 'WAKTU' : 'TIME'}
                     </span>
                   </div>
@@ -515,11 +515,11 @@ export default function ActivityStoryExportModal({
                   {/* Heart Rate */}
                   <div>
                     <div className="flex items-center justify-center gap-0.5">
-                      <span className={`text-xl sm:text-2xl font-black italic ${activity.avgHeartRate ? currentTheme.textAccent : 'text-white'} drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] leading-tight`}>
+                      <span className={`text-lg sm:text-xl font-black italic ${activity.avgHeartRate ? currentTheme.textAccent : 'text-white'} drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] leading-tight`}>
                         {activity.avgHeartRate ? Math.round(activity.avgHeartRate) : '--'}
                       </span>
                     </div>
-                    <span className="text-[8px] tracking-wider uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block">
+                    <span className="text-[7.5px] tracking-wider uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block">
                       {isId ? 'DETAK JANTUNG' : 'AVG HR (BPM)'}
                     </span>
                   </div>
@@ -527,7 +527,7 @@ export default function ActivityStoryExportModal({
 
                 {/* Tertiary Micro Row: Elevation, Cadence, Calories (Story format only) */}
                 {format === 'story' && (
-                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 text-center text-[9px] text-zinc-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
+                  <div className="grid grid-cols-3 gap-1 pt-1.5 border-t border-white/10 text-center text-[8px] text-zinc-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
                     <div>
                       <span className="text-white font-bold block">{activity.elevationGainMeters || 0} m</span>
                       <span className="text-[7px] uppercase tracking-wider text-zinc-400 block">{isId ? 'ELEVASI' : 'ELEVATION'}</span>
