@@ -6,13 +6,15 @@ import { Activity } from '@/domain/entities/Activity';
 import { PaceCalculator } from '@/domain/services/PaceCalculator';
 import { ArrowLeft, Calendar, MapPin, Zap, Flame, Mountain, BatteryCharging, Heart, Footprints, Thermometer, GitCompare, Share2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { GeoPoint } from '@/domain/entities/ActivityDetail';
 import ActivityStoryExportModal from './ActivityStoryExportModal';
 
 interface Props {
   activity: Activity;
+  polyline?: GeoPoint[];
 }
 
-export default function ActivityHeroHeader({ activity }: Props) {
+export default function ActivityHeroHeader({ activity, polyline = [] }: Props) {
   const { t, language } = useLanguage();
   const [isExportOpen, setIsExportOpen] = useState(false);
 
@@ -227,6 +229,7 @@ export default function ActivityHeroHeader({ activity }: Props) {
       {/* Share / Export Story Infographic Modal */}
       <ActivityStoryExportModal
         activity={activity}
+        polyline={polyline}
         isOpen={isExportOpen}
         onClose={() => setIsExportOpen(false)}
       />

@@ -37,7 +37,7 @@ export default async function ActivityDetailPage({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
       {/* 1. Hero Header */}
-      <ActivityHeroHeader activity={activity} />
+      <ActivityHeroHeader activity={activity} polyline={detail?.polyline || []} />
 
       {/* 2. Freedayzz Performance Lab (Pacing, GAP, Decoupling, Matched Runs) */}
       <FreedayzzPerformanceLab
