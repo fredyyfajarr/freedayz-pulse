@@ -452,7 +452,7 @@ export default function MonthlyTrainingCalendar({ activities }: Props) {
             </span>
             <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">/KM</span>
           </div>
-          <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1 truncate">
+          <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-zinc-500 block mt-1 leading-tight">
             {language === 'ID' ? 'TERTIMBANG JARAK' : 'WEIGHTED BY DISTANCE'}
           </span>
         </div>
