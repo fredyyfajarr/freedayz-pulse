@@ -130,9 +130,9 @@ export default function ActivityStoryExportModal({
       if (pt.lon > maxLon) maxLon = pt.lon;
     }
 
-    const width = format === 'story' ? 270 : 310;
-    const height = format === 'story' ? 160 : 150;
-    const padding = 16;
+    const width = format === 'story' ? 220 : 280;
+    const height = format === 'story' ? 140 : 135;
+    const padding = 12;
 
     const midLat = (minLat + maxLat) / 2;
     const cosLat = Math.cos((midLat * Math.PI) / 180);
@@ -173,9 +173,11 @@ export default function ActivityStoryExportModal({
 
     try {
       const isTransparent = bgStyle === 'transparent';
+      const targetW = format === 'story' ? 230 : 290;
+      const pixelRatio = 1080 / targetW; // Ultra-crisp 1080x1920 (Story) or 1080x1080 (Square) HD PNG
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
-        pixelRatio: format === 'story' ? 3.73 : 3.375, // Ultra-crisp 1080x1920 (Story) or 1080x1080 (Square)
+        pixelRatio,
         backgroundColor: isTransparent ? undefined : (bgStyle === 'dark' ? '#06070a' : undefined),
       });
 
@@ -197,9 +199,9 @@ export default function ActivityStoryExportModal({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#0b0e1b] border-2 border-zinc-800 max-w-2xl w-full max-h-[96vh] flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden font-mono text-zinc-100">
+      <div className="bg-[#0b0e1b] border-2 border-zinc-800 max-w-xl w-full max-h-[96vh] flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden font-mono text-zinc-100">
         {/* Top Control Bar */}
-        <div className="flex flex-wrap items-center justify-between p-3.5 sm:p-4 border-b border-zinc-800 bg-[#070913] gap-3">
+        <div className="flex flex-wrap items-center justify-between px-3.5 py-2.5 sm:px-4 sm:py-3 border-b border-zinc-800 bg-[#070913] gap-2">
           <div className="flex items-center gap-2">
             <Share2 className="w-4 h-4 text-orange-400" />
             <div>
@@ -207,7 +209,7 @@ export default function ActivityStoryExportModal({
                 {isId ? 'SHARE STORY // STIKER ALA STRAVA' : 'SHARE STORY // STRAVA-STYLE STICKER'}
               </h2>
               <span className="text-[10px] text-zinc-400 font-sans block">
-                {isId ? 'Download PNG transparan untuk ditempel di foto IG Story / status WA' : 'Export transparent PNG sticker for Instagram Stories / WhatsApp'}
+                {isId ? 'Download PNG transparan untuk ditempel di foto IG Story / WA' : 'Export transparent PNG sticker for Instagram Stories / WhatsApp'}
               </span>
             </div>
           </div>
@@ -218,7 +220,7 @@ export default function ActivityStoryExportModal({
               <button
                 type="button"
                 onClick={() => setFormat('story')}
-                className={`px-2 py-1 flex items-center gap-1 font-bold text-[10px] uppercase rounded transition-colors ${
+                className={`px-2 py-0.5 flex items-center gap-1 font-bold text-[10px] uppercase rounded transition-colors ${
                   format === 'story' ? 'bg-orange-600 text-white shadow-sm' : 'text-zinc-400 hover:text-white'
                 }`}
                 title="9:16 Instagram Story Format"
@@ -229,7 +231,7 @@ export default function ActivityStoryExportModal({
               <button
                 type="button"
                 onClick={() => setFormat('square')}
-                className={`px-2 py-1 flex items-center gap-1 font-bold text-[10px] uppercase rounded transition-colors ${
+                className={`px-2 py-0.5 flex items-center gap-1 font-bold text-[10px] uppercase rounded transition-colors ${
                   format === 'square' ? 'bg-orange-600 text-white shadow-sm' : 'text-zinc-400 hover:text-white'
                 }`}
                 title="1:1 Square Feed Format"
@@ -242,7 +244,7 @@ export default function ActivityStoryExportModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors rounded"
+              className="p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors rounded"
             >
               <X className="w-5 h-5" />
             </button>
@@ -250,7 +252,7 @@ export default function ActivityStoryExportModal({
         </div>
 
         {/* Style Customizer Bar */}
-        <div className="px-4 py-2.5 bg-[#090b16] border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#090b16] border-b border-zinc-800 flex flex-wrap items-center justify-between gap-2 text-xs">
           {/* Background Style Option */}
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-zinc-400 uppercase font-bold flex items-center gap-1">
@@ -261,35 +263,35 @@ export default function ActivityStoryExportModal({
               <button
                 type="button"
                 onClick={() => setBgStyle('transparent')}
-                className={`px-2.5 py-1 text-[10px] font-black uppercase rounded transition-all ${
+                className={`px-2 py-0.5 text-[9.5px] font-black uppercase rounded transition-all ${
                   bgStyle === 'transparent'
                     ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
                     : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
                 }`}
               >
-                ✨ {isId ? 'TRANSPARAN (STIKER)' : 'TRANSPARENT'}
+                ✨ {isId ? 'TRANSPARAN' : 'TRANSPARENT'}
               </button>
               <button
                 type="button"
                 onClick={() => setBgStyle('dark')}
-                className={`px-2.5 py-1 text-[10px] font-black uppercase rounded transition-all ${
+                className={`px-2 py-0.5 text-[9.5px] font-black uppercase rounded transition-all ${
                   bgStyle === 'dark'
                     ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
                     : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
                 }`}
               >
-                🌑 {isId ? 'HITAM OLED' : 'OLED DARK'}
+                🌑 {isId ? 'OLED DARK' : 'OLED DARK'}
               </button>
               <button
                 type="button"
                 onClick={() => setBgStyle('glass')}
-                className={`px-2.5 py-1 text-[10px] font-black uppercase rounded transition-all ${
+                className={`px-2 py-0.5 text-[9.5px] font-black uppercase rounded transition-all ${
                   bgStyle === 'glass'
                     ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
                     : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
                 }`}
               >
-                🌫️ {isId ? 'FROSTED KACA' : 'FROSTED GLASS'}
+                🌫️ {isId ? 'KACA' : 'GLASS'}
               </button>
             </div>
           </div>
@@ -304,8 +306,8 @@ export default function ActivityStoryExportModal({
               <button
                 type="button"
                 onClick={() => setTheme('coral')}
-                className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded border transition-all ${
-                  theme === 'coral' ? 'border-[#ff5722] text-[#ff5722] bg-[#ff5722]/10 font-black' : 'border-zinc-800 text-zinc-400 hover:text-white'
+                className={`px-1.5 py-0.5 text-[9px] font-bold uppercase rounded border transition-all ${
+                  theme === 'coral' ? 'border-[#ff5722] text-[#ff5722] bg-[#ff5722]/15 font-black' : 'border-zinc-800 text-zinc-400 hover:text-white'
                 }`}
               >
                 CORAL
@@ -313,8 +315,8 @@ export default function ActivityStoryExportModal({
               <button
                 type="button"
                 onClick={() => setTheme('cyan')}
-                className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded border transition-all ${
-                  theme === 'cyan' ? 'border-cyan-400 text-cyan-400 bg-cyan-400/10 font-black' : 'border-zinc-800 text-zinc-400 hover:text-white'
+                className={`px-1.5 py-0.5 text-[9px] font-bold uppercase rounded border transition-all ${
+                  theme === 'cyan' ? 'border-cyan-400 text-cyan-400 bg-cyan-400/15 font-black' : 'border-zinc-800 text-zinc-400 hover:text-white'
                 }`}
               >
                 CYAN
@@ -322,8 +324,8 @@ export default function ActivityStoryExportModal({
               <button
                 type="button"
                 onClick={() => setTheme('volt')}
-                className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded border transition-all ${
-                  theme === 'volt' ? 'border-lime-400 text-lime-400 bg-lime-400/10 font-black' : 'border-zinc-800 text-zinc-400 hover:text-white'
+                className={`px-1.5 py-0.5 text-[9px] font-bold uppercase rounded border transition-all ${
+                  theme === 'volt' ? 'border-lime-400 text-lime-400 bg-lime-400/15 font-black' : 'border-zinc-800 text-zinc-400 hover:text-white'
                 }`}
               >
                 VOLT
@@ -331,8 +333,8 @@ export default function ActivityStoryExportModal({
               <button
                 type="button"
                 onClick={() => setTheme('white')}
-                className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded border transition-all ${
-                  theme === 'white' ? 'border-white text-white bg-white/10 font-black' : 'border-zinc-800 text-zinc-400 hover:text-white'
+                className={`px-1.5 py-0.5 text-[9px] font-bold uppercase rounded border transition-all ${
+                  theme === 'white' ? 'border-white text-white bg-white/15 font-black' : 'border-zinc-800 text-zinc-400 hover:text-white'
                 }`}
               >
                 WHITE
@@ -351,7 +353,7 @@ export default function ActivityStoryExportModal({
                 type="button"
                 onClick={() => setPreviewBg(prev => prev === 'photo' ? 'checker' : 'photo')}
                 className="px-2 py-0.5 bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white text-[9px] font-bold rounded uppercase transition-colors"
-                title="Ganti latar belakang simulasi di layar ini saja"
+                title="Ganti simulasi latar belakang pratinjau"
               >
                 {previewBg === 'photo' ? (isId ? '🖼️ Simulasi Foto' : '🖼️ Photo Simulation') : (isId ? '🏁 Transparan Grid' : '🏁 Checkerboard')}
               </button>
@@ -359,205 +361,223 @@ export default function ActivityStoryExportModal({
           )}
         </div>
 
-        {/* Modal Body: Live Canvas Preview Area */}
-        <div className="flex-1 overflow-y-auto p-2 sm:p-3 flex items-center justify-center bg-[#05060b]">
-          {/* Simulated Photo / Checkerboard Wrapper */}
-          <div
-            className={`relative p-1.5 rounded-xl transition-all ${
-              bgStyle === 'transparent'
-                ? previewBg === 'photo'
-                  ? 'bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#020617] shadow-[0_10px_35px_rgba(0,0,0,0.8)] border border-zinc-800'
-                  : 'bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:12px_12px] bg-zinc-950 border border-zinc-800'
-                : 'bg-black/60 border border-zinc-800'
-            }`}
-          >
-            {/* The Actual Downloadable Canvas Container */}
+        {/* Modal Body: Live Canvas Preview Area (No negative space overflow, perfect viewport scaling) */}
+        <div className="flex-1 overflow-y-auto p-2 sm:p-3 flex flex-col items-center justify-start sm:justify-center bg-[#05060b] min-h-0">
+          <div className="my-auto flex flex-col items-center justify-center">
+            {/* Simulated Photo / Checkerboard Wrapper */}
             <div
-              ref={cardRef}
-              style={{
-                backgroundColor: bgStyle === 'dark' ? '#06070a' : (bgStyle === 'glass' ? 'rgba(9, 11, 22, 0.75)' : 'transparent'),
-              }}
-              className={`relative flex flex-col justify-between transition-all select-none ${
-                bgStyle === 'glass' ? 'backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5' : 'p-4 sm:p-5'
-              } ${
-                format === 'story' ? 'w-[285px] h-[506px] sm:w-[295px] sm:h-[524px]' : 'w-[320px] h-[320px]'
+              className={`relative p-1.5 rounded-xl transition-all shadow-[0_10px_35px_rgba(0,0,0,0.8)] border border-zinc-800/80 ${
+                bgStyle === 'transparent'
+                  ? previewBg === 'photo'
+                    ? 'bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#020617]'
+                    : ''
+                  : 'bg-black/60'
               }`}
+              style={
+                bgStyle === 'transparent' && previewBg === 'checker'
+                  ? {
+                      backgroundImage:
+                        'linear-gradient(45deg, #222634 25%, transparent 25%), linear-gradient(-45deg, #222634 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #222634 75%), linear-gradient(-45deg, transparent 75%, #222634 75%)',
+                      backgroundSize: '16px 16px',
+                      backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0px',
+                      backgroundColor: '#13151f',
+                    }
+                  : undefined
+              }
             >
-              {/* Top Header: Brand & Date (Clean floating overlay) */}
-              <div className="flex items-center justify-between pb-1.5 border-b border-white/15">
-                <div className="flex items-center gap-2">
-                  <BrandLogo size={22} />
-                  <div>
-                    <span className="text-xs font-black italic tracking-widest text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
-                      FREEDAYZZ<span className={currentTheme.textAccent}>.PULSE</span>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className={`text-[8px] px-1.5 py-0.5 font-bold uppercase rounded tracking-wider border ${currentTheme.badgeBg} drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]`}>
-                    {activity.sportType.toUpperCase()}
-                  </span>
-                  <span className="text-[8px] font-mono text-zinc-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
-                    {dateFormatted}
-                  </span>
-                </div>
-              </div>
-
-              {/* Centerpiece: GPS Route Map (Minimalist Vector Polyline) */}
-              <div className="flex-1 flex flex-col items-center justify-center my-1 relative">
-                {svgMap ? (
-                  <div className="relative flex items-center justify-center w-full">
-                    <svg
-                      viewBox={`0 0 ${svgMap.width} ${svgMap.height}`}
-                      className="w-full max-h-[160px] filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]"
-                    >
-                      <defs>
-                        <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor={currentTheme.accent} />
-                          <stop offset="100%" stopColor="#ffffff" />
-                        </linearGradient>
-                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                          <feGaussianBlur stdDeviation="3" result="blur" />
-                          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                        </filter>
-                      </defs>
-
-                      {/* Under-glow stroke for extreme readability on any photo background */}
-                      <path
-                        d={svgMap.pathD}
-                        fill="none"
-                        stroke="#000000"
-                        strokeWidth="7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        opacity="0.7"
-                      />
-
-                      {/* Main vibrant glowing route path */}
-                      <path
-                        d={svgMap.pathD}
-                        fill="none"
-                        stroke={currentTheme.mapStroke}
-                        strokeWidth="3.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-
-                      {/* Start Point Marker (Neon Dot) */}
-                      {svgMap.startPt && (
-                        <g>
-                          <circle cx={svgMap.startPt[0]} cy={svgMap.startPt[1]} r="5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" />
-                        </g>
-                      )}
-
-                      {/* Finish Point Marker (Checkered / Accent Dot) */}
-                      {svgMap.endPt && (
-                        <g>
-                          <circle cx={svgMap.endPt[0]} cy={svgMap.endPt[1]} r="6" fill="#f43f5e" stroke="#ffffff" strokeWidth="1.5" />
-                          <circle cx={svgMap.endPt[0]} cy={svgMap.endPt[1]} r="2" fill="#ffffff" />
-                        </g>
-                      )}
-                    </svg>
-                  </div>
-                ) : (
-                  /* Fallback elegant wave for treadmill or stationary workouts */
-                  <div className="w-full flex flex-col items-center justify-center py-6 text-center">
-                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center mb-2">
-                      <Zap className={`w-8 h-8 ${currentTheme.textAccent} animate-pulse`} />
-                    </div>
-                    <span className="text-[10px] text-zinc-300 font-bold uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
-                      {activity.name}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Main Typography Metrics (Ala Strava Clean HUD — NO nested boxes!) */}
-              <div className="space-y-2 pt-1">
-                {/* Hero Distance (Giant & Crisp) */}
-                <div className="text-center">
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl sm:text-5xl font-black italic tracking-tighter text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] leading-none">
-                      {distanceKm}
-                    </span>
-                    <span className={`text-xs sm:text-sm font-black italic ${currentTheme.textAccent} drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]`}>
-                      KM
-                    </span>
-                  </div>
-                  <span className="text-[8px] tracking-widest uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block mt-0.5">
-                    {isId ? 'JARAK LARI' : 'DISTANCE'}
-                  </span>
-                </div>
-
-                {/* Secondary Row: Pace, Time, Heart Rate (Clean columns) */}
-                <div className="grid grid-cols-3 gap-1.5 pt-1.5 border-t border-white/15 text-center">
-                  {/* Pace */}
-                  <div>
-                    <span className="text-lg sm:text-xl font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block leading-tight">
-                      {paceNum}
-                    </span>
-                    <span className="text-[7.5px] tracking-wider uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block">
-                      {isId ? 'PACE (/KM)' : 'AVG PACE'}
-                    </span>
-                  </div>
-
-                  {/* Duration */}
-                  <div>
-                    <span className="text-lg sm:text-xl font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block leading-tight">
-                      {durationStr}
-                    </span>
-                    <span className="text-[7.5px] tracking-wider uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block">
-                      {isId ? 'WAKTU' : 'TIME'}
-                    </span>
-                  </div>
-
-                  {/* Heart Rate */}
-                  <div>
-                    <div className="flex items-center justify-center gap-0.5">
-                      <span className={`text-lg sm:text-xl font-black italic ${activity.avgHeartRate ? currentTheme.textAccent : 'text-white'} drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] leading-tight`}>
-                        {activity.avgHeartRate ? Math.round(activity.avgHeartRate) : '--'}
+              {/* The Actual Downloadable Canvas Container */}
+              <div
+                ref={cardRef}
+                style={{
+                  backgroundColor:
+                    bgStyle === 'dark'
+                      ? '#06070a'
+                      : bgStyle === 'glass'
+                      ? 'rgba(9, 11, 22, 0.75)'
+                      : 'transparent',
+                }}
+                className={`relative flex flex-col justify-between transition-all select-none ${
+                  bgStyle === 'glass'
+                    ? 'backdrop-blur-xl border border-white/10 rounded-2xl p-3 sm:p-4'
+                    : 'p-3 sm:p-4'
+                } ${
+                  format === 'story'
+                    ? 'w-[230px] h-[409px]'
+                    : 'w-[290px] h-[290px]'
+                }`}
+              >
+                {/* Top Header: Brand & Date (Clean floating overlay) */}
+                <div className="flex items-center justify-between pb-1.5 border-b border-white/20">
+                  <div className="flex items-center gap-1.5">
+                    <BrandLogo size={18} />
+                    <div>
+                      <span className="text-[11px] font-black italic tracking-widest text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                        FREEDAYZZ<span className={currentTheme.textAccent}>.PULSE</span>
                       </span>
                     </div>
-                    <span className="text-[7.5px] tracking-wider uppercase text-zinc-300 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] block">
-                      {isId ? 'DETAK JANTUNG' : 'AVG HR (BPM)'}
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-[7px] px-1.5 py-0.5 font-bold uppercase rounded tracking-wider border ${currentTheme.badgeBg} drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]`}>
+                      {activity.sportType.toUpperCase()}
+                    </span>
+                    <span className="text-[7.5px] font-mono text-zinc-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                      {dateFormatted}
                     </span>
                   </div>
                 </div>
 
-                {/* Tertiary Micro Row: Elevation, Cadence, Calories (Story format only) */}
-                {format === 'story' && (
-                  <div className="grid grid-cols-3 gap-1 pt-1.5 border-t border-white/10 text-center text-[8px] text-zinc-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
-                    <div>
-                      <span className="text-white font-bold block">{activity.elevationGainMeters || 0} m</span>
-                      <span className="text-[7px] uppercase tracking-wider text-zinc-400 block">{isId ? 'ELEVASI' : 'ELEVATION'}</span>
+                {/* Centerpiece: GPS Route Map (Minimalist Vector Polyline) */}
+                <div className="flex-1 flex flex-col items-center justify-center my-1 relative">
+                  {svgMap ? (
+                    <div className="relative flex items-center justify-center w-full">
+                      <svg
+                        viewBox={`0 0 ${svgMap.width} ${svgMap.height}`}
+                        className="w-full max-h-[140px] filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.95)]"
+                      >
+                        <defs>
+                          <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor={currentTheme.accent} />
+                            <stop offset="100%" stopColor="#ffffff" />
+                          </linearGradient>
+                        </defs>
+
+                        {/* Under-glow stroke for extreme readability on any photo background */}
+                        <path
+                          d={svgMap.pathD}
+                          fill="none"
+                          stroke="#000000"
+                          strokeWidth="6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          opacity="0.8"
+                        />
+
+                        {/* Main vibrant glowing route path */}
+                        <path
+                          d={svgMap.pathD}
+                          fill="none"
+                          stroke={currentTheme.mapStroke}
+                          strokeWidth="3.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+
+                        {/* Start Point Marker (Neon Dot) */}
+                        {svgMap.startPt && (
+                          <g>
+                            <circle cx={svgMap.startPt[0]} cy={svgMap.startPt[1]} r="4.5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" />
+                          </g>
+                        )}
+
+                        {/* Finish Point Marker (Checkered / Accent Dot) */}
+                        {svgMap.endPt && (
+                          <g>
+                            <circle cx={svgMap.endPt[0]} cy={svgMap.endPt[1]} r="5.5" fill="#f43f5e" stroke="#ffffff" strokeWidth="1.5" />
+                            <circle cx={svgMap.endPt[0]} cy={svgMap.endPt[1]} r="1.8" fill="#ffffff" />
+                          </g>
+                        )}
+                      </svg>
                     </div>
-                    <div>
-                      <span className="text-white font-bold block">{calculatedCadence || '--'} spm</span>
-                      <span className="text-[7px] uppercase tracking-wider text-zinc-400 block">{isId ? 'KADENSI' : 'CADENCE'}</span>
+                  ) : (
+                    /* Fallback elegant wave for treadmill or stationary workouts */
+                    <div className="w-full flex flex-col items-center justify-center py-4 text-center">
+                      <div className="w-12 h-12 rounded-full border border-dashed border-white/25 flex items-center justify-center mb-1.5">
+                        <Zap className={`w-6 h-6 ${currentTheme.textAccent} animate-pulse`} />
+                      </div>
+                      <span className="text-[9px] text-zinc-200 font-bold uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                        {activity.name}
+                      </span>
                     </div>
+                  )}
+                </div>
+
+                {/* Main Typography Metrics (Ala Strava Clean HUD — Solid White, High Contrast) */}
+                <div className="space-y-1.5 pt-0.5">
+                  {/* Hero Distance (Giant & Crisp Solid White) */}
+                  <div className="text-center">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-4xl font-black italic tracking-tighter text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.95)] leading-none">
+                        {distanceKm}
+                      </span>
+                      <span className={`text-xs font-black italic ${currentTheme.textAccent} drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]`}>
+                        KM
+                      </span>
+                    </div>
+                    <span className="text-[7.5px] tracking-widest uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block mt-0.5">
+                      {isId ? 'JARAK LARI' : 'DISTANCE'}
+                    </span>
+                  </div>
+
+                  {/* Secondary Row: Pace, Time, Heart Rate (Clean columns) */}
+                  <div className="grid grid-cols-3 gap-1 pt-1.5 border-t border-white/20 text-center">
+                    {/* Pace */}
                     <div>
-                      <span className="text-white font-bold block">{activity.calories || '--'} kcal</span>
-                      <span className="text-[7px] uppercase tracking-wider text-zinc-400 block">{isId ? 'KALORI' : 'CALORIES'}</span>
+                      <span className="text-base font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block leading-tight">
+                        {paceNum}
+                      </span>
+                      <span className="text-[7px] tracking-wider uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block">
+                        {isId ? 'PACE' : 'AVG PACE'}
+                      </span>
+                    </div>
+
+                    {/* Duration */}
+                    <div>
+                      <span className="text-base font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block leading-tight">
+                        {durationStr}
+                      </span>
+                      <span className="text-[7px] tracking-wider uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block">
+                        {isId ? 'WAKTU' : 'TIME'}
+                      </span>
+                    </div>
+
+                    {/* Heart Rate */}
+                    <div>
+                      <div className="flex items-center justify-center gap-0.5">
+                        <span className={`text-base font-black italic ${activity.avgHeartRate ? currentTheme.textAccent : 'text-white'} drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] leading-tight`}>
+                          {activity.avgHeartRate ? Math.round(activity.avgHeartRate) : '--'}
+                        </span>
+                      </div>
+                      <span className="text-[7px] tracking-wider uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block">
+                        {isId ? 'DETAK JT' : 'AVG HR'}
+                      </span>
                     </div>
                   </div>
-                )}
-              </div>
 
-              {/* Bottom Subtle Runner Tag */}
-              <div className="flex items-center justify-between pt-2 border-t border-white/15 text-[8px] text-zinc-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
-                <span className="font-mono tracking-widest">#FREEDAYZZPULSE</span>
-                <span className="font-mono font-bold tracking-wider text-white">FORERUNNER 165</span>
+                  {/* Tertiary Micro Row: Elevation, Cadence, Calories (Story format only) */}
+                  {format === 'story' && (
+                    <div className="grid grid-cols-3 gap-1 pt-1 border-t border-white/15 text-center text-[7.5px] text-zinc-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                      <div>
+                        <span className="text-white font-bold block leading-tight">{activity.elevationGainMeters || 0} m</span>
+                        <span className="text-[6.5px] uppercase tracking-wider text-zinc-300 block font-semibold">{isId ? 'ELEV' : 'ELEV'}</span>
+                      </div>
+                      <div>
+                        <span className="text-white font-bold block leading-tight">{calculatedCadence || '--'} spm</span>
+                        <span className="text-[6.5px] uppercase tracking-wider text-zinc-300 block font-semibold">{isId ? 'KADENSI' : 'CADENCE'}</span>
+                      </div>
+                      <div>
+                        <span className="text-white font-bold block leading-tight">{activity.calories || '--'} kcal</span>
+                        <span className="text-[6.5px] uppercase tracking-wider text-zinc-300 block font-semibold">{isId ? 'KALORI' : 'CALORIES'}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom Subtle Runner Tag */}
+                <div className="flex items-center justify-between pt-1.5 border-t border-white/20 text-[7.5px] text-zinc-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                  <span className="font-mono tracking-widest text-zinc-300">#FREEDAYZZPULSE</span>
+                  <span className="font-mono font-bold tracking-wider text-white">FORERUNNER 165</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Modal Action Bar */}
-        <div className="p-4 border-t border-zinc-800 bg-[#070913] flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="px-3.5 py-2.5 sm:px-4 sm:py-3 border-t border-zinc-800 bg-[#070913] flex flex-col sm:flex-row items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="text-[11px] text-zinc-300 font-sans">
+            <span className="text-[10.5px] text-zinc-300 font-sans">
               {bgStyle === 'transparent'
                 ? (isId ? 'Hasil unduhan berupa PNG transparan, siap ditempel di atas foto story Anda.' : 'Outputs a clean transparent PNG, perfect as a floating sticker over your photos.')
                 : (isId ? 'Hasil unduhan memiliki latar belakang solid siap posting.' : 'Outputs a high-resolution graphic ready for sharing.')}
@@ -568,7 +588,7 @@ export default function ActivityStoryExportModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 sm:flex-initial px-4 py-2 border border-zinc-700 text-xs font-bold uppercase hover:bg-zinc-800 transition-colors rounded"
+              className="flex-1 sm:flex-initial px-3.5 py-1.5 border border-zinc-700 text-xs font-bold uppercase hover:bg-zinc-800 transition-colors rounded"
             >
               {isId ? 'Tutup' : 'Close'}
             </button>
@@ -577,7 +597,7 @@ export default function ActivityStoryExportModal({
               type="button"
               disabled={isExporting}
               onClick={handleDownload}
-              className="flex-1 sm:flex-initial px-5 py-2.5 bg-gradient-to-r from-orange-600 via-[#ff5722] to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-black text-xs uppercase tracking-wider rounded shadow-[0_4px_16px_rgba(255,87,34,0.4)] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="flex-1 sm:flex-initial px-4 py-2 bg-gradient-to-r from-orange-600 via-[#ff5722] to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-black text-xs uppercase tracking-wider rounded shadow-[0_4px_16px_rgba(255,87,34,0.4)] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {downloadSuccess ? (
                 <>
@@ -589,7 +609,7 @@ export default function ActivityStoryExportModal({
                   <Download className="w-4 h-4 text-white" />
                   <span>
                     {isExporting
-                      ? (isId ? 'MERENDER 3X HD...' : 'RENDERING 3X HD...')
+                      ? (isId ? 'MERENDER HD...' : 'RENDERING HD...')
                       : (bgStyle === 'transparent' ? (isId ? 'DOWNLOAD STIKER TRANSPARAN' : 'DOWNLOAD TRANSPARENT PNG') : (isId ? 'DOWNLOAD GAMBAR STORY' : 'DOWNLOAD STORY PNG'))}
                   </span>
                 </>
