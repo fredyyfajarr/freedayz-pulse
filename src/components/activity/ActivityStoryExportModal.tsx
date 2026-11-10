@@ -199,7 +199,7 @@ export default function ActivityStoryExportModal({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#0b0e1b] border-2 border-zinc-800 max-w-xl w-full max-h-[96vh] flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden font-mono text-zinc-100">
+      <div className="story-modal bg-[#0b0e1b] border-2 border-zinc-800 max-w-xl w-full max-h-[96vh] flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden font-mono text-zinc-100">
         {/* Top Control Bar */}
         <div className="flex flex-wrap items-center justify-between px-3.5 py-2.5 sm:px-4 sm:py-3 border-b border-zinc-800 bg-[#070913] gap-2">
           <div className="flex items-center gap-2">
@@ -396,7 +396,7 @@ export default function ActivityStoryExportModal({
                       ? 'rgba(9, 11, 22, 0.75)'
                       : 'transparent',
                 }}
-                className={`relative flex flex-col justify-between transition-all select-none ${
+                className={`story-export-canvas relative flex flex-col justify-between transition-all select-none ${
                   bgStyle === 'glass'
                     ? 'backdrop-blur-xl border border-white/10 rounded-2xl p-3 sm:p-4'
                     : 'p-3 sm:p-4'
@@ -411,7 +411,7 @@ export default function ActivityStoryExportModal({
                   <div className="flex items-center gap-1.5">
                     <BrandLogo size={18} />
                     <div>
-                      <span className="text-[11px] font-black italic tracking-widest text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                      <span data-force-white="true" style={{ color: '#ffffff' }} className="text-[11px] font-black italic tracking-widest text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
                         FREEDAYZZ<span className={currentTheme.textAccent}>.PULSE</span>
                       </span>
                     </div>
@@ -421,7 +421,7 @@ export default function ActivityStoryExportModal({
                     <span className={`text-[7px] px-1.5 py-0.5 font-bold uppercase rounded tracking-wider border ${currentTheme.badgeBg} drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]`}>
                       {activity.sportType.toUpperCase()}
                     </span>
-                    <span className="text-[7.5px] font-mono text-zinc-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                    <span data-force-zinc200="true" style={{ color: '#e4e4e7' }} className="text-[7.5px] font-mono text-zinc-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
                       {dateFormatted}
                     </span>
                   </div>
@@ -485,7 +485,7 @@ export default function ActivityStoryExportModal({
                       <div className="w-12 h-12 rounded-full border border-dashed border-white/25 flex items-center justify-center mb-1.5">
                         <Zap className={`w-6 h-6 ${currentTheme.textAccent} animate-pulse`} />
                       </div>
-                      <span className="text-[9px] text-zinc-200 font-bold uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                      <span data-force-zinc200="true" style={{ color: '#e4e4e7' }} className="text-[9px] text-zinc-200 font-bold uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
                         {activity.name}
                       </span>
                     </div>
@@ -497,14 +497,14 @@ export default function ActivityStoryExportModal({
                   {/* Hero Distance (Giant & Crisp Solid White) */}
                   <div className="text-center">
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-black italic tracking-tighter text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.95)] leading-none">
+                      <span data-force-white="true" style={{ color: '#ffffff' }} className="text-4xl font-black italic tracking-tighter text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.95)] leading-none">
                         {distanceKm}
                       </span>
                       <span className={`text-xs font-black italic ${currentTheme.textAccent} drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]`}>
                         KM
                       </span>
                     </div>
-                    <span className="text-[7.5px] tracking-widest uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block mt-0.5">
+                    <span data-force-zinc200="true" style={{ color: '#e4e4e7' }} className="text-[7.5px] tracking-widest uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block mt-0.5">
                       {isId ? 'JARAK LARI' : 'DISTANCE'}
                     </span>
                   </div>
@@ -513,20 +513,20 @@ export default function ActivityStoryExportModal({
                   <div className="grid grid-cols-3 gap-1 pt-1.5 border-t border-white/20 text-center">
                     {/* Pace */}
                     <div>
-                      <span className="text-base font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block leading-tight">
+                      <span data-force-white="true" style={{ color: '#ffffff' }} className="text-base font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block leading-tight">
                         {paceNum}
                       </span>
-                      <span className="text-[7px] tracking-wider uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block">
+                      <span data-force-zinc200="true" style={{ color: '#e4e4e7' }} className="text-[7px] tracking-wider uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block">
                         {isId ? 'PACE' : 'AVG PACE'}
                       </span>
                     </div>
 
                     {/* Duration */}
                     <div>
-                      <span className="text-base font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block leading-tight">
+                      <span data-force-white="true" style={{ color: '#ffffff' }} className="text-base font-black italic text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block leading-tight">
                         {durationStr}
                       </span>
-                      <span className="text-[7px] tracking-wider uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block">
+                      <span data-force-zinc200="true" style={{ color: '#e4e4e7' }} className="text-[7px] tracking-wider uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block">
                         {isId ? 'WAKTU' : 'TIME'}
                       </span>
                     </div>
@@ -534,11 +534,11 @@ export default function ActivityStoryExportModal({
                     {/* Heart Rate */}
                     <div>
                       <div className="flex items-center justify-center gap-0.5">
-                        <span className={`text-base font-black italic ${activity.avgHeartRate ? currentTheme.textAccent : 'text-white'} drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] leading-tight`}>
+                        <span data-force-white="true" style={{ color: activity.avgHeartRate ? currentTheme.accent : '#ffffff' }} className={`text-base font-black italic ${activity.avgHeartRate ? currentTheme.textAccent : 'text-white'} drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] leading-tight`}>
                           {activity.avgHeartRate ? Math.round(activity.avgHeartRate) : '--'}
                         </span>
                       </div>
-                      <span className="text-[7px] tracking-wider uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block">
+                      <span data-force-zinc200="true" style={{ color: '#e4e4e7' }} className="text-[7px] tracking-wider uppercase text-zinc-200 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] block">
                         {isId ? 'DETAK JT' : 'AVG HR'}
                       </span>
                     </div>
@@ -548,16 +548,16 @@ export default function ActivityStoryExportModal({
                   {format === 'story' && (
                     <div className="grid grid-cols-3 gap-1 pt-1 border-t border-white/15 text-center text-[7.5px] text-zinc-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
                       <div>
-                        <span className="text-white font-bold block leading-tight">{activity.elevationGainMeters || 0} m</span>
-                        <span className="text-[6.5px] uppercase tracking-wider text-zinc-300 block font-semibold">{isId ? 'ELEV' : 'ELEV'}</span>
+                        <span data-force-white="true" style={{ color: '#ffffff' }} className="text-white font-bold block leading-tight">{activity.elevationGainMeters || 0} m</span>
+                        <span data-force-zinc300="true" style={{ color: '#d4d4d8' }} className="text-[6.5px] uppercase tracking-wider text-zinc-300 block font-semibold">{isId ? 'ELEV' : 'ELEV'}</span>
                       </div>
                       <div>
-                        <span className="text-white font-bold block leading-tight">{calculatedCadence || '--'} spm</span>
-                        <span className="text-[6.5px] uppercase tracking-wider text-zinc-300 block font-semibold">{isId ? 'KADENSI' : 'CADENCE'}</span>
+                        <span data-force-white="true" style={{ color: '#ffffff' }} className="text-white font-bold block leading-tight">{calculatedCadence || '--'} spm</span>
+                        <span data-force-zinc300="true" style={{ color: '#d4d4d8' }} className="text-[6.5px] uppercase tracking-wider text-zinc-300 block font-semibold">{isId ? 'KADENSI' : 'CADENCE'}</span>
                       </div>
                       <div>
-                        <span className="text-white font-bold block leading-tight">{activity.calories || '--'} kcal</span>
-                        <span className="text-[6.5px] uppercase tracking-wider text-zinc-300 block font-semibold">{isId ? 'KALORI' : 'CALORIES'}</span>
+                        <span data-force-white="true" style={{ color: '#ffffff' }} className="text-white font-bold block leading-tight">{activity.calories || '--'} kcal</span>
+                        <span data-force-zinc300="true" style={{ color: '#d4d4d8' }} className="text-[6.5px] uppercase tracking-wider text-zinc-300 block font-semibold">{isId ? 'KALORI' : 'CALORIES'}</span>
                       </div>
                     </div>
                   )}
@@ -565,8 +565,8 @@ export default function ActivityStoryExportModal({
 
                 {/* Bottom Subtle Runner Tag */}
                 <div className="flex items-center justify-between pt-1.5 border-t border-white/20 text-[7.5px] text-zinc-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
-                  <span className="font-mono tracking-widest text-zinc-300">#FREEDAYZZPULSE</span>
-                  <span className="font-mono font-bold tracking-wider text-white">FORERUNNER 165</span>
+                  <span data-force-zinc300="true" style={{ color: '#d4d4d8' }} className="font-mono tracking-widest text-zinc-300">#FREEDAYZZPULSE</span>
+                  <span data-force-white="true" style={{ color: '#ffffff' }} className="font-mono font-bold tracking-wider text-white">FORERUNNER 165</span>
                 </div>
               </div>
             </div>

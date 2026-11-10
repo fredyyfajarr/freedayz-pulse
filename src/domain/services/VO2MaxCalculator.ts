@@ -101,6 +101,7 @@ export class VO2MaxCalculator {
         minPaceSecPerKm: easyFastPace,
         maxPaceSecPerKm: easySlowPace,
         paceFormatted: `${fmtPace(easyFastPace)} – ${fmtPace(easySlowPace)} /km`,
+        split400m: `${fmtSplit(easyFastPace, 400)} – ${fmtSplit(easySlowPace, 400)}`,
         split1000m: `${fmtPace(easyFastPace)} – ${fmtPace(easySlowPace)}`,
       },
       {
@@ -113,6 +114,7 @@ export class VO2MaxCalculator {
         purposeId: 'Simulasi ritme balapan, efisiensi pembakaran lemak untuk jarak 21K & 42K.',
         minPaceSecPerKm: marathonPace,
         paceFormatted: `${fmtPace(marathonPace)} /km`,
+        split400m: fmtSplit(marathonPace, 400),
         split1000m: fmtPace(marathonPace),
       },
       {

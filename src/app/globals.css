@@ -341,6 +341,46 @@ html[data-theme="light"] .btn-solid * {
   color: #ffffff !important;
 }
 
+/* Retain solid white and light-zinc text for Story Export Modal & Stickers regardless of light theme */
+html.light .story-modal .text-white,
+html.light .story-modal [data-force-white],
+html.light .story-export-canvas .text-white,
+html.light .story-export-canvas [data-force-white],
+html[data-theme="light"] .story-modal .text-white,
+html[data-theme="light"] .story-modal [data-force-white],
+html[data-theme="light"] .story-export-canvas .text-white,
+html[data-theme="light"] .story-export-canvas [data-force-white] {
+  color: #ffffff !important;
+}
+
+html.light .story-modal .text-zinc-100,
+html.light .story-export-canvas .text-zinc-100,
+html[data-theme="light"] .story-modal .text-zinc-100,
+html[data-theme="light"] .story-export-canvas .text-zinc-100 {
+  color: #f4f4f5 !important;
+}
+
+html.light .story-modal .text-zinc-200,
+html.light .story-export-canvas .text-zinc-200,
+html[data-theme="light"] .story-modal .text-zinc-200,
+html[data-theme="light"] .story-export-canvas .text-zinc-200 {
+  color: #e4e4e7 !important;
+}
+
+html.light .story-modal .text-zinc-300,
+html.light .story-export-canvas .text-zinc-300,
+html[data-theme="light"] .story-modal .text-zinc-300,
+html[data-theme="light"] .story-export-canvas .text-zinc-300 {
+  color: #d4d4d8 !important;
+}
+
+html.light .story-modal .text-zinc-400,
+html.light .story-export-canvas .text-zinc-400,
+html[data-theme="light"] .story-modal .text-zinc-400,
+html[data-theme="light"] .story-export-canvas .text-zinc-400 {
+  color: #a1a1aa !important;
+}
+
 /* Dark Borders converted to Clean Light Borders */
 html.light .border-zinc-900,
 html.light .border-zinc-900\/60,

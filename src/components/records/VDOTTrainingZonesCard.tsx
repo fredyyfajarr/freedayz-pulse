@@ -179,6 +179,11 @@ export default function VDOTTrainingZonesCard({ prs }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
         {currentPaces.map((zone) => {
           const style = zoneStyles[zone.zoneKey] || zoneStyles.E;
+          const isEasyZone = zone.zoneKey === 'E';
+          const paceNum = zone.paceFormatted.replace(' /km', '');
+          const trackSplitNum = zone.split400m || paceNum;
+          const trackUnit = zone.split400m ? '/lap' : '/km';
+
           return (
             <div
               key={zone.zoneKey}
@@ -186,36 +191,54 @@ export default function VDOTTrainingZonesCard({ prs }: Props) {
             >
               <div>
                 {/* Zone Identifier */}
-                <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-zinc-800">
-                  <span className={`text-[11px] font-black uppercase tracking-wider ${style.text}`}>
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-zinc-800 min-h-[32px]">
+                  <span className={`text-[11px] font-black uppercase tracking-wider ${style.text} leading-tight`}>
                     {isId ? zone.nameId : zone.name}
                   </span>
-                  <span className={`text-[9px] px-1.5 py-0.5 border font-bold ${style.badgeBg} ${style.border} ${style.text}`}>
+                  <span className={`text-[9px] px-1.5 py-0.5 border font-bold ${style.badgeBg} ${style.border} ${style.text} shrink-0 ml-1`}>
                     {zone.zoneKey}
                   </span>
                 </div>
 
                 {/* Intensity */}
-                <span className="text-[9px] text-slate-500 dark:text-zinc-400 font-bold block mt-1.5 uppercase">
+                <span className="text-[9px] text-slate-500 dark:text-zinc-400 font-bold block mt-1.5 uppercase h-[16px] leading-[16px]">
                   {zone.intensityDesc}
                 </span>
 
                 {/* Target Pace */}
-                <div className="my-3">
+                <div className="my-3 min-h-[56px] flex flex-col justify-center">
                   {splitMode === 'km' ? (
                     <div>
-                      <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white block">
-                        {zone.paceFormatted}
-                      </span>
+                      <div className="flex items-baseline gap-1 whitespace-nowrap overflow-hidden">
+                        <span className={`font-black text-slate-900 dark:text-white tracking-tight ${
+                          isEasyZone
+                            ? 'text-base sm:text-[17px] xl:text-[19px]'
+                            : 'text-xl sm:text-2xl'
+                        }`}>
+                          {paceNum}
+                        </span>
+                        <span className="text-xs font-bold text-slate-400 dark:text-zinc-500 shrink-0">
+                          /km
+                        </span>
+                      </div>
                       <span className="text-[10px] text-slate-400 dark:text-zinc-500 block mt-0.5">
                         {isId ? 'RITME TARGET / KM' : 'TARGET PACE / KM'}
                       </span>
                     </div>
                   ) : (
                     <div>
-                      <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white block">
-                        {zone.split400m ? `${zone.split400m} /lap` : (zone.split1000m ? `${zone.split1000m} /km` : zone.paceFormatted)}
-                      </span>
+                      <div className="flex items-baseline gap-1 whitespace-nowrap overflow-hidden">
+                        <span className={`font-black text-slate-900 dark:text-white tracking-tight ${
+                          isEasyZone && zone.split400m && zone.split400m.includes('–')
+                            ? 'text-base sm:text-[17px] xl:text-[19px]'
+                            : 'text-xl sm:text-2xl'
+                        }`}>
+                          {trackSplitNum}
+                        </span>
+                        <span className="text-xs font-bold text-slate-400 dark:text-zinc-500 shrink-0">
+                          {trackUnit}
+                        </span>
+                      </div>
                       <span className="text-[10px] text-slate-400 dark:text-zinc-500 block mt-0.5">
                         {zone.split400m ? (isId ? 'PUTARAN TRACK 400M' : '400M TRACK LAP') : '1000M SPLIT'}
                       </span>
@@ -224,16 +247,16 @@ export default function VDOTTrainingZonesCard({ prs }: Props) {
                 </div>
 
                 {/* Purpose / Physiological Benefit */}
-                <p className="text-[10px] text-slate-600 dark:text-zinc-400 font-sans leading-relaxed pt-2 border-t border-slate-200 dark:border-zinc-800/80">
+                <p className="text-[10px] text-slate-600 dark:text-zinc-400 font-sans leading-relaxed pt-2 border-t border-slate-200 dark:border-zinc-800/80 min-h-[46px] flex items-start">
                   {isId ? zone.purposeId : zone.purpose}
                 </p>
               </div>
 
               {/* Quick Split Reference Footer */}
               {zone.split1000m && (
-                <div className="mt-3 pt-2 border-t border-slate-200 dark:border-zinc-800 text-[9px] text-slate-400 dark:text-zinc-500 flex justify-between">
+                <div className="mt-3 pt-2 border-t border-slate-200 dark:border-zinc-800 text-[9px] text-slate-400 dark:text-zinc-500 flex justify-between items-center">
                   <span>1000m repeat:</span>
-                  <strong className="text-slate-700 dark:text-zinc-300">{zone.split1000m}</strong>
+                  <strong className="text-slate-700 dark:text-zinc-300 font-mono">{zone.split1000m}</strong>
                 </div>
               )}
             </div>
