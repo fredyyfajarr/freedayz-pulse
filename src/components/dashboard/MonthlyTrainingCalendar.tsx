@@ -422,87 +422,99 @@ export default function MonthlyTrainingCalendar({ activities }: Props) {
       {/* 2. Prominent Monthly Telemetry KPI Bar (The Monthly Averages) */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 font-mono">
         {/* Total Monthly Distance */}
-        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-violet-400 dark:border-violet-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#7c3aed]">
-          <div className="flex items-center justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider">
-            <span>{language === 'ID' ? 'VOLUME BULANAN' : 'MONTHLY VOLUME'}</span>
-            <Route className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-violet-400 dark:border-violet-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#7c3aed] flex flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider min-h-[28px] gap-1">
+              <span>{language === 'ID' ? 'VOLUME BULANAN' : 'MONTHLY VOLUME'}</span>
+              <Route className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400 flex-shrink-0 mt-0.5" />
+            </div>
+            <div className="flex items-baseline gap-1 mt-1.5 whitespace-nowrap">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                {monthStats.totalDistKm.toFixed(1)}
+              </span>
+              <span className="text-xs font-bold text-violet-600 dark:text-violet-400">KM</span>
+            </div>
           </div>
-          <div className="flex items-baseline gap-1 mt-1.5">
-            <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-              {monthStats.totalDistKm.toFixed(1)}
-            </span>
-            <span className="text-xs font-bold text-violet-600 dark:text-violet-400">KM</span>
-          </div>
-          <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
+          <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1.5 truncate">
             {monthStats.runsCount} {language === 'ID' ? 'TOTAL SESI' : 'TOTAL SESSIONS'}
           </span>
         </div>
 
         {/* Monthly Weighted Average Pace */}
-        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-cyan-400 dark:border-cyan-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#06b6d4]">
-          <div className="flex items-center justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider">
-            <span>{language === 'ID' ? 'RATA-RATA PACE' : 'AVG MONTHLY PACE'}</span>
-            <TrendingUp className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-cyan-400 dark:border-cyan-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#06b6d4] flex flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider min-h-[28px] gap-1">
+              <span>{language === 'ID' ? 'RATA-RATA PACE' : 'AVG MONTHLY PACE'}</span>
+              <TrendingUp className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
+            </div>
+            <div className="flex items-baseline gap-1 mt-1.5 whitespace-nowrap">
+              <span className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-300">
+                {monthStats.monthlyAvgPace > 0
+                  ? PaceCalculator.formatPace(monthStats.monthlyAvgPace).replace(' /km', '')
+                  : '--:--'}
+              </span>
+              <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">/KM</span>
+            </div>
           </div>
-          <div className="flex items-baseline gap-1 mt-1.5 whitespace-nowrap">
-            <span className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-300">
-              {monthStats.monthlyAvgPace > 0
-                ? PaceCalculator.formatPace(monthStats.monthlyAvgPace).replace(' /km', '')
-                : '--:--'}
-            </span>
-            <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">/KM</span>
-          </div>
-          <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-zinc-500 block mt-1 leading-tight">
+          <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-zinc-500 block mt-1.5 truncate leading-tight">
             {language === 'ID' ? 'TERTIMBANG JARAK' : 'WEIGHTED BY DISTANCE'}
           </span>
         </div>
 
         {/* Average Weekly Volume for Month */}
-        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-emerald-400 dark:border-emerald-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#10b981]">
-          <div className="flex items-center justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider">
-            <span>{language === 'ID' ? 'RATA-RATA JARAK MINGGUAN' : 'AVG WEEKLY MILEAGE'}</span>
-            <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-emerald-400 dark:border-emerald-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#10b981] flex flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider min-h-[28px] gap-1">
+              <span>{language === 'ID' ? 'RATA-RATA JARAK MINGGUAN' : 'AVG WEEKLY MILEAGE'}</span>
+              <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+            </div>
+            <div className="flex items-baseline gap-1 mt-1.5 whitespace-nowrap">
+              <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                {monthStats.avgWeeklyDistKm.toFixed(1)}
+              </span>
+              <span className="text-[11px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-500 whitespace-nowrap">
+                KM/WK
+              </span>
+            </div>
           </div>
-          <div className="flex items-baseline gap-1 mt-1.5">
-            <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
-              {monthStats.avgWeeklyDistKm.toFixed(1)}
-            </span>
-            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-500">KM / WK</span>
-          </div>
-          <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
+          <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1.5 truncate">
             {language === 'ID' ? 'RUN RATE BULANAN' : 'MONTHLY RUN RATE'}
           </span>
         </div>
 
         {/* Average Distance Per Session */}
-        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-amber-400 dark:border-amber-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#f59e0b]">
-          <div className="flex items-center justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider">
-            <span>{language === 'ID' ? 'RATA-RATA JARAK SESI' : 'AVG SESSION DISTANCE'}</span>
-            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-amber-400 dark:border-amber-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#f59e0b] flex flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider min-h-[28px] gap-1">
+              <span>{language === 'ID' ? 'RATA-RATA JARAK SESI' : 'AVG SESSION DISTANCE'}</span>
+              <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+            </div>
+            <div className="flex items-baseline gap-1 mt-1.5 whitespace-nowrap">
+              <span className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-300">
+                {monthStats.avgDistPerRun.toFixed(1)}
+              </span>
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-500">KM</span>
+            </div>
           </div>
-          <div className="flex items-baseline gap-1 mt-1.5">
-            <span className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-300">
-              {monthStats.avgDistPerRun.toFixed(1)}
-            </span>
-            <span className="text-xs font-bold text-amber-600 dark:text-amber-500">KM</span>
-          </div>
-          <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
+          <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1.5 truncate">
             {language === 'ID' ? 'PER SESI LARI' : 'PER LOGGED RUN'}
           </span>
         </div>
 
         {/* Monthly Time & Cardiac Load */}
-        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-rose-400 dark:border-rose-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#f43f5e] col-span-2 md:col-span-4 lg:col-span-1">
-          <div className="flex items-center justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider">
-            <span>{language === 'ID' ? 'TOTAL WAKTU BERGERAK' : 'TOTAL MOVING TIME'}</span>
-            <Flame className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-rose-400 dark:border-rose-800/80 p-3.5 shadow-sm dark:shadow-[2px_2px_0px_#f43f5e] col-span-2 md:col-span-4 lg:col-span-1 flex flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold tracking-wider min-h-[28px] gap-1">
+              <span>{language === 'ID' ? 'TOTAL WAKTU BERGERAK' : 'TOTAL MOVING TIME'}</span>
+              <Flame className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" />
+            </div>
+            <div className="flex items-baseline gap-1 mt-1.5 whitespace-nowrap">
+              <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                {PaceCalculator.formatDuration(monthStats.totalDurationS)}
+              </span>
+            </div>
           </div>
-          <div className="flex items-baseline gap-1 mt-1.5">
-            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-              {PaceCalculator.formatDuration(monthStats.totalDurationS)}
-            </span>
-          </div>
-          <span className="text-[10px] text-rose-600 dark:text-rose-400 block mt-1 font-bold">
+          <span className="text-[10px] text-rose-600 dark:text-rose-400 block mt-1.5 font-bold truncate">
             {monthStats.totalTrimp} PTS {language === 'ID' ? 'STRES KARDIAC' : 'RELATIVE EFFORT'}
           </span>
         </div>
