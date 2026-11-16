@@ -214,8 +214,36 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
         </div>
       </div>
 
-      {/* 5-Zone Table */}
-      <div className="overflow-x-auto">
+      {/* Mobile-Optimized Compact Zone Cards (screens < sm) */}
+      <div className="block sm:hidden space-y-2.5 font-mono">
+        {profile.zones.map(z => (
+          <div key={z.zoneIndex} className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-0.5 text-[10px] font-black ${z.color}`}>
+                  Z{z.zoneIndex}
+                </span>
+                <span className="font-bold text-xs text-slate-900 dark:text-white uppercase">{z.name}</span>
+              </div>
+              <span className="font-black text-cyan-600 dark:text-cyan-300 text-xs">
+                {z.minBpm} – {z.maxBpm} BPM
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-600 dark:text-zinc-300 font-sans leading-snug">
+              {z.physiologicalRole}
+            </p>
+            <div className="flex items-center justify-between text-[10px] pt-1.5 border-t border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400">
+              <span>{isId ? 'Rentang' : 'Range'}: {z.minPercent}% – {z.maxPercent}% HRR</span>
+              <span className="font-bold text-slate-900 dark:text-white">
+                {PaceCalculator.formatDuration(z.totalTimeSeconds)} ({z.totalPercentOfTraining}%)
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop 5-Zone Table (screens >= sm) */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-left font-mono text-xs">
           <thead>
             <tr className="border-b-2 border-slate-200 dark:border-zinc-800 text-[10px] text-slate-500 dark:text-zinc-400 uppercase tracking-widest">

@@ -15,7 +15,8 @@ import {
   Compass, 
   HeartCrack,
   Award,
-  Layers
+  Layers,
+  Thermometer
 } from 'lucide-react';
 
 interface Props {
@@ -378,6 +379,17 @@ export default function FreedayzzPerformanceLab({
                     </span>
                   )}
                 </div>
+
+                {activity.maxTemperatureCelsius && activity.maxTemperatureCelsius >= 30 && (
+                  <div className="flex items-center gap-1.5 text-[9px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 p-1.5">
+                    <Thermometer className="w-3 h-3 text-amber-500 shrink-0" />
+                    <span>
+                      {isId 
+                        ? `Suhu lingkungan ${activity.maxTemperatureCelsius}°C mempercepat kenaikan detak jantung (+4–8 BPM) akibat pendinginan tubuh.`
+                        : `Ambient temp ${activity.maxTemperatureCelsius}°C accelerated heart rate rise (+4–8 BPM) due to thermoregulation.`}
+                    </span>
+                  </div>
+                )}
               </div>
             ) : matchedRuns ? (
               <div className="space-y-2 mt-2">

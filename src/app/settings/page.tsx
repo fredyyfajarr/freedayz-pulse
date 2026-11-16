@@ -4,8 +4,9 @@ import { AthleteSettingsManager } from '@/infrastructure/persistence/AthleteSett
 import AthletePersonalInfoCard from '@/components/profile/AthletePersonalInfoCard';
 import AthleteBiodataCard from '@/components/profile/AthleteBiodataCard';
 import SystemPreferencesCard from '@/components/profile/SystemPreferencesCard';
+import GarminConnectionCard from '@/components/profile/GarminConnectionCard';
 import { createClient } from '@/utils/supabase/server';
-import { Settings, Watch, Key } from 'lucide-react';
+import { Settings, Watch } from 'lucide-react';
 
 export default async function SettingsPage() {
   const activities = await container.repository.getAllActivities();
@@ -13,10 +14,15 @@ export default async function SettingsPage() {
   const healthSnapshot = await container.healthUseCase.execute();
   const garmin7dAvgRhr = healthSnapshot.dailySummary?.lastSevenDaysAvgRestingHeartRate ?? healthSnapshot.dailySummary?.restingHeartRate ?? 52;
 
-  // Supabase user profile & metadata for biodata card
+  // Supabase user profile & metadata for biodata & cloud biometrics
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const userMeta = user?.user_metadata || {};
+
+  const mergedBiometrics = {
+    ...biometrics,
+    ...(userMeta.athlete_biometrics || {}),
+  };
 
   const initialProfile = {
     fullName: userMeta.full_name || '',
@@ -29,10 +35,6 @@ export default async function SettingsPage() {
     runningClub: userMeta.running_club || 'Freedayzz Running Club',
     weeklyTargetKm: userMeta.weekly_target_km ? Number(userMeta.weekly_target_km) : 30,
   };
-
-  const keyPreview = process.env.GARMIN_PERSONAL_API_KEY 
-    ? `${process.env.GARMIN_PERSONAL_API_KEY.slice(0, 16)}...${process.env.GARMIN_PERSONAL_API_KEY.slice(-10)}`
-    : 'NOT_CONFIGURED';
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
@@ -64,38 +66,15 @@ export default async function SettingsPage() {
       <div id="biometrics">
         <AthletePersonalInfoCard
           activities={activities}
-          initialSettings={biometrics}
+          initialSettings={mergedBiometrics}
           garmin7dAvgRhr={garmin7dAvgRhr}
         />
       </div>
 
-      {/* 3. Garmin API Key & Connected Device Status */}
+      {/* 4. Garmin Live Connection & Diagnostics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* API Key Status */}
-        <div className="bg-[#0d1224] border-2 border-violet-900/60 p-5 shadow-[4px_4px_0px_#1e1b4b] space-y-3 font-mono">
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
-            <div className="flex items-center gap-2">
-              <Key className="w-4 h-4 text-violet-400" />
-              <h3 className="font-black italic tracking-widest uppercase text-xs sm:text-sm text-white">
-                GARMIN_PERSONAL_API_KEY
-              </h3>
-            </div>
-            <span className="text-[9px] px-1.5 py-0.5 bg-emerald-950 border border-emerald-500 text-emerald-400 font-bold">
-              ACTIVE
-            </span>
-          </div>
-
-          <div className="text-xs space-y-2">
-            <div className="bg-[#070a14] border border-zinc-800 p-2.5">
-              <span className="text-zinc-500 text-[10px] block">ACTIVE TOKEN PREVIEW</span>
-              <span className="text-violet-300 font-bold text-xs">{keyPreview}</span>
-            </div>
-            <div className="bg-[#070a14] border border-zinc-800 p-2.5">
-              <span className="text-zinc-500 text-[10px] block">EXPIRATION STATUS</span>
-              <span className="text-emerald-400 font-bold">VALID 1 YEAR FROM ISSUANCE</span>
-            </div>
-          </div>
-        </div>
+        {/* Live Garmin Ping & Diagnostics Card */}
+        <GarminConnectionCard />
 
         {/* Hardware & Multi-User Architecture */}
         <div className="bg-[#0d1224] border-2 border-violet-900/60 p-5 shadow-[4px_4px_0px_#1e1b4b] space-y-3 font-mono">

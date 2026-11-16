@@ -195,16 +195,16 @@ export default function HeartRateZonesCard({
       <div className="space-y-3 font-mono">
         {zoneConfigs.map(z => (
           <div key={z.num} className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 p-2.5">
-            <div className="flex items-center justify-between text-xs mb-1.5">
-              <div>
+            <div className="flex items-start justify-between gap-2 text-xs mb-1.5">
+              <div className="min-w-0">
                 <span className={`font-black tracking-wider ${z.textColor}`}>
                   {z.name}
                 </span>
-                <span className="text-[10px] text-slate-600 dark:text-zinc-400 block font-sans">
+                <span className="text-[10px] text-slate-600 dark:text-zinc-400 block font-sans leading-tight mt-0.5">
                   {z.desc}
                 </span>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <span className="text-sm font-black text-slate-900 dark:text-white">
                   {PaceCalculator.formatDuration(z.seconds)}
                 </span>
