@@ -492,15 +492,7 @@ export default function ActivityStoryExportModal({
                 </div>
 
                 {/* Main Typography Metrics (Pro Clean HUD — Solid White, High Contrast) */}
-                <div className="space-y-1 pt-0.5">
-                  {/* Sport Badge Pill (Spacious, centered, aesthetic) */}
-                  <div className="flex items-center justify-center -mb-0.5">
-                    <span className={`text-[7.5px] px-2 py-0.5 font-bold uppercase rounded-full tracking-wider border ${currentTheme.badgeBg} drop-shadow-md flex items-center gap-1`}>
-                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                      {activity.sportType.toUpperCase()}
-                    </span>
-                  </div>
-
+                <div className="space-y-1 pt-1">
                   {/* Hero Distance (Giant & Crisp Solid White) */}
                   <div className="text-center">
                     <div className="flex items-baseline justify-center gap-1">
