@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS: AthleteBiometricSettings = {
     '2026-10-26': 67,
   },
   customZones: DEFAULT_CUSTOM_ZONES,
+  deviceName: 'FORERUNNER 165',
   lastUpdated: new Date().toISOString(),
 };
 
@@ -39,6 +40,7 @@ export class AthleteSettingsManager {
         restingHr: typeof parsed.restingHr === 'number' && parsed.restingHr > 30 && parsed.restingHr < 120 ? parsed.restingHr : 51,
         dailySleepScores: typeof parsed.dailySleepScores === 'object' && parsed.dailySleepScores !== null ? parsed.dailySleepScores : {},
         customZones: parsed.customZones && typeof parsed.customZones.zone2Max === 'number' ? parsed.customZones : DEFAULT_CUSTOM_ZONES,
+        deviceName: typeof parsed.deviceName === 'string' && parsed.deviceName.trim() ? parsed.deviceName.trim() : 'FORERUNNER 165',
         lastUpdated: parsed.lastUpdated || new Date().toISOString(),
       };
     } catch (e) {
@@ -62,6 +64,7 @@ export class AthleteSettingsManager {
       restingHr: newSettings.restingHr && newSettings.restingHr > 30 && newSettings.restingHr < 120 ? Math.round(newSettings.restingHr) : current.restingHr,
       dailySleepScores: newSettings.dailySleepScores !== undefined ? { ...current.dailySleepScores, ...newSettings.dailySleepScores } : current.dailySleepScores,
       customZones: newSettings.customZones ? { ...(current.customZones || DEFAULT_CUSTOM_ZONES), ...newSettings.customZones } : (current.customZones || DEFAULT_CUSTOM_ZONES),
+      deviceName: newSettings.deviceName !== undefined ? newSettings.deviceName.trim() : (current.deviceName || 'FORERUNNER 165'),
       lastUpdated: new Date().toISOString(),
     };
 

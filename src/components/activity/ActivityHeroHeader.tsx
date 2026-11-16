@@ -12,9 +12,10 @@ import ActivityStoryExportModal from './ActivityStoryExportModal';
 interface Props {
   activity: Activity;
   polyline?: GeoPoint[];
+  deviceName?: string;
 }
 
-export default function ActivityHeroHeader({ activity, polyline = [] }: Props) {
+export default function ActivityHeroHeader({ activity, polyline = [], deviceName }: Props) {
   const { t, language } = useLanguage();
   const [isExportOpen, setIsExportOpen] = useState(false);
 
@@ -231,6 +232,7 @@ export default function ActivityHeroHeader({ activity, polyline = [] }: Props) {
         <ActivityStoryExportModal
           activity={activity}
           polyline={polyline}
+          deviceName={deviceName}
           isOpen={isExportOpen}
           onClose={() => setIsExportOpen(false)}
         />

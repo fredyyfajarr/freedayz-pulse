@@ -29,5 +29,6 @@ export interface AthleteBiometricSettings {
   restingHr: number;
   dailySleepScores?: Record<string, number>;
   customZones?: CustomHRZoneThresholds;
+  deviceName?: string;
   lastUpdated?: string;
 }

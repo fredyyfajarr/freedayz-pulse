@@ -13,6 +13,7 @@ export async function POST(request: Request) {
       maxHr: body.maxHr !== undefined ? Number(body.maxHr) : undefined,
       restingHr: body.restingHr !== undefined ? Number(body.restingHr) : undefined,
       customZones: body.customZones || undefined,
+      deviceName: typeof body.deviceName === 'string' ? body.deviceName : undefined,
     });
     return NextResponse.json({ success: true, settings: updated });
   } catch (err: any) {

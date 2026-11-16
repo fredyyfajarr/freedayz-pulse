@@ -22,6 +22,7 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
   const [customZones, setCustomZones] = useState<CustomHRZoneThresholds>(
     initialSettings?.customZones || DEFAULT_CUSTOM_ZONES
   );
+  const [deviceName, setDeviceName] = useState<string>(initialSettings?.deviceName || 'FORERUNNER 165');
 
   // Edit Modal State
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -30,6 +31,7 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
   const [draftCustomZones, setDraftCustomZones] = useState<CustomHRZoneThresholds>(
     initialSettings?.customZones || DEFAULT_CUSTOM_ZONES
   );
+  const [draftDeviceName, setDraftDeviceName] = useState<string>(initialSettings?.deviceName || 'FORERUNNER 165');
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
@@ -71,12 +73,14 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
           maxHr: draftMaxHr,
           restingHr: draftRestingHr,
           customZones: draftCustomZones,
+          deviceName: draftDeviceName.trim() || 'FORERUNNER 165',
         }),
       });
       if (res.ok) {
         setRestingHr(draftMaxHr > draftRestingHr ? draftRestingHr : restingHr);
         setMaxHr(draftMaxHr > draftRestingHr ? draftMaxHr : maxHr);
         setCustomZones(draftCustomZones);
+        setDeviceName(draftDeviceName.trim() || 'FORERUNNER 165');
         setSaveSuccess(true);
         setTimeout(() => {
           setSaveSuccess(false);
@@ -96,9 +100,9 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-2 border-slate-200 dark:border-zinc-800 gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <Watch className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-            <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-100 dark:bg-blue-950 border border-blue-400 dark:border-blue-600/60 text-blue-800 dark:text-blue-300 font-bold uppercase tracking-wider">
-              {isId ? 'KALIBRASI_GARMIN // PROFIL_%HRR' : 'GARMIN_CALIBRATION // %HRR_PROFILE'}
+            <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-100 dark:bg-blue-950 border border-blue-400 dark:border-blue-600/60 text-blue-800 dark:text-blue-300 font-bold uppercase tracking-wider flex items-center gap-1">
+              <Watch className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
+              {deviceName.toUpperCase()}
             </span>
             <span className="text-[10px] font-mono px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold uppercase tracking-wider flex items-center gap-1">
               <Zap className="w-3 h-3 text-cyan-500" />
@@ -121,6 +125,8 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
             onClick={() => {
               setDraftRestingHr(restingHr);
               setDraftMaxHr(maxHr);
+              setDraftDeviceName(deviceName);
+              setDraftCustomZones(customZones);
               setIsEditing(true);
             }}
             className="px-3.5 py-2 bg-violet-600 hover:bg-violet-700 dark:bg-violet-900 dark:hover:bg-violet-700 border-2 border-violet-400 dark:border-violet-500 text-white text-xs font-mono font-black uppercase transition-all flex items-center gap-2 shadow-[2px_2px_0px_#7c3aed] cursor-pointer"
@@ -284,6 +290,26 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
 
             {/* Inputs */}
             <div className="space-y-4">
+              {/* GPS Device Model */}
+              <div>
+                <label className="text-xs text-slate-700 dark:text-zinc-300 uppercase font-bold block mb-1.5 flex justify-between">
+                  <span>{isId ? 'MODEL JAM GPS / PERANGKAT' : 'GPS WATCH MODEL / DEVICE'}</span>
+                  <span className="text-violet-600 dark:text-violet-400 font-black">{draftDeviceName.toUpperCase()}</span>
+                </label>
+                <input
+                  type="text"
+                  value={draftDeviceName}
+                  onChange={e => setDraftDeviceName(e.target.value)}
+                  placeholder="e.g. FORERUNNER 165, COROS PACE 3, APPLE WATCH ULTRA"
+                  className="w-full bg-slate-50 dark:bg-[#070a14] border-2 border-violet-400 dark:border-violet-800/80 p-2.5 text-slate-900 dark:text-white font-mono font-bold text-sm uppercase focus:outline-none focus:border-violet-500"
+                />
+                <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
+                  {isId 
+                    ? 'Nama jam GPS / perangkat yang otomatis tampil pada kartu HR Zones & stiker Share Story.'
+                    : 'GPS watch name automatically displayed on HR Zones cards & Share Story stickers.'}
+                </span>
+              </div>
+
               {/* Max HR */}
               <div>
                 <label className="text-xs text-slate-700 dark:text-zinc-300 uppercase font-bold block mb-1.5 flex justify-between">

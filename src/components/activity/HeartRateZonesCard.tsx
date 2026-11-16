@@ -25,6 +25,7 @@ interface Props {
   };
   restingHr?: number;
   maxHr?: number;
+  deviceName?: string;
 }
 
 export default function HeartRateZonesCard({
@@ -35,6 +36,7 @@ export default function HeartRateZonesCard({
   customZones,
   restingHr,
   maxHr,
+  deviceName,
 }: Props) {
   const { language } = useLanguage();
   const isId = language === 'ID';
@@ -140,7 +142,7 @@ export default function HeartRateZonesCard({
           </h3>
         </div>
         <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-400">
-          FORERUNNER 165 // {isId ? '%KALIBRASI_HRR' : '%HRR_CALIBRATION'}
+          {(deviceName || 'FORERUNNER 165').toUpperCase()} // {isId ? '%KALIBRASI_HRR' : '%HRR_CALIBRATION'}
         </span>
       </div>
 

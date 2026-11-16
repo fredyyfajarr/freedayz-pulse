@@ -29,6 +29,7 @@ import { useLanguage } from '@/context/LanguageContext';
 interface Props {
   activity: Activity;
   polyline?: GeoPoint[];
+  deviceName?: string;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -39,6 +40,7 @@ type ColorTheme = 'coral' | 'cyan' | 'volt' | 'white';
 export default function ActivityStoryExportModal({
   activity,
   polyline = [],
+  deviceName,
   isOpen,
   onClose,
 }: Props) {
@@ -51,6 +53,8 @@ export default function ActivityStoryExportModal({
   const [bgStyle, setBgStyle] = useState<BackgroundStyle>('transparent'); // Default transparent PNG sticker!
   const [theme, setTheme] = useState<ColorTheme>('coral'); // Default vibrant athletic coral
   const [previewBg, setPreviewBg] = useState<'checker' | 'photo'>('photo'); // Preview backdrop for transparent mode
+  const [deviceTag, setDeviceTag] = useState<string>(deviceName || 'FORERUNNER 165');
+  const [isEditingDevice, setIsEditingDevice] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [downloadSuccess, setDownloadSuccess] = useState<boolean>(false);
 
@@ -62,10 +66,10 @@ export default function ActivityStoryExportModal({
 
   const calculatedCadence = activity.dynamics?.avgCadence || (durationSec && activity.steps ? Math.round(activity.steps / (durationSec / 60)) : undefined);
 
+  // Modern concise single-line date format (e.g. 16 NOV 2026) to prevent awkward multi-line text wrapping
   const dateFormatted = new Date(activity.startTime).toLocaleDateString(
     isId ? 'id-ID' : 'en-US',
     {
-      weekday: 'short',
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -206,10 +210,10 @@ export default function ActivityStoryExportModal({
             <Share2 className="w-4 h-4 text-orange-400" />
             <div>
               <h2 className="text-xs sm:text-sm font-black italic tracking-wide uppercase text-white">
-                {isId ? 'SHARE STORY // STIKER ALA STRAVA' : 'SHARE STORY // STRAVA-STYLE STICKER'}
+                {isId ? 'SHARE STORY // STIKER TRANSPARAN PRO' : 'SHARE STORY // PRO TRANSPARENT STICKER'}
               </h2>
               <span className="text-[10px] text-zinc-400 font-sans block">
-                {isId ? 'Download PNG transparan untuk ditempel di foto IG Story / WA' : 'Export transparent PNG sticker for Instagram Stories / WhatsApp'}
+                {isId ? 'Ekspor stiker PNG transparan ultra-HD untuk ditempel di foto IG Story & WhatsApp' : 'Export ultra-HD transparent PNG sticker for Instagram Stories & WhatsApp'}
               </span>
             </div>
           </div>
@@ -406,7 +410,7 @@ export default function ActivityStoryExportModal({
                     : 'w-[290px] h-[290px]'
                 }`}
               >
-                {/* Top Header: Brand & Date (Clean floating overlay) */}
+                {/* Top Header: Brand & Date (Clean, spacious, single-line) */}
                 <div className="flex items-center justify-between pb-1.5 border-b border-white/20">
                   <div className="flex items-center gap-1.5">
                     <BrandLogo size={18} />
@@ -417,14 +421,9 @@ export default function ActivityStoryExportModal({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
-                    <span className={`text-[7px] px-1.5 py-0.5 font-bold uppercase rounded tracking-wider border ${currentTheme.badgeBg} drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]`}>
-                      {activity.sportType.toUpperCase()}
-                    </span>
-                    <span data-force-zinc200="true" style={{ color: '#e4e4e7' }} className="text-[7.5px] font-mono text-zinc-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
-                      {dateFormatted}
-                    </span>
-                  </div>
+                  <span data-force-zinc300="true" style={{ color: '#d4d4d8' }} className="text-[8.5px] font-mono text-zinc-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] whitespace-nowrap tracking-wider font-semibold">
+                    {dateFormatted}
+                  </span>
                 </div>
 
                 {/* Centerpiece: GPS Route Map (Minimalist Vector Polyline) */}
@@ -492,8 +491,16 @@ export default function ActivityStoryExportModal({
                   )}
                 </div>
 
-                {/* Main Typography Metrics (Ala Strava Clean HUD — Solid White, High Contrast) */}
-                <div className="space-y-1.5 pt-0.5">
+                {/* Main Typography Metrics (Pro Clean HUD — Solid White, High Contrast) */}
+                <div className="space-y-1 pt-0.5">
+                  {/* Sport Badge Pill (Spacious, centered, aesthetic) */}
+                  <div className="flex items-center justify-center -mb-0.5">
+                    <span className={`text-[7.5px] px-2 py-0.5 font-bold uppercase rounded-full tracking-wider border ${currentTheme.badgeBg} drop-shadow-md flex items-center gap-1`}>
+                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                      {activity.sportType.toUpperCase()}
+                    </span>
+                  </div>
+
                   {/* Hero Distance (Giant & Crisp Solid White) */}
                   <div className="text-center">
                     <div className="flex items-baseline justify-center gap-1">
@@ -563,10 +570,30 @@ export default function ActivityStoryExportModal({
                   )}
                 </div>
 
-                {/* Bottom Subtle Runner Tag */}
+                {/* Bottom Subtle Runner Tag with Dynamic/Editable Device */}
                 <div className="flex items-center justify-between pt-1.5 border-t border-white/20 text-[7.5px] text-zinc-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
                   <span data-force-zinc300="true" style={{ color: '#d4d4d8' }} className="font-mono tracking-widest text-zinc-300">#FREEDAYZZPULSE</span>
-                  <span data-force-white="true" style={{ color: '#ffffff' }} className="font-mono font-bold tracking-wider text-white">FORERUNNER 165</span>
+                  {isEditingDevice ? (
+                    <input
+                      type="text"
+                      value={deviceTag}
+                      onChange={(e) => setDeviceTag(e.target.value)}
+                      onBlur={() => setIsEditingDevice(false)}
+                      onKeyDown={(e) => e.key === 'Enter' && setIsEditingDevice(false)}
+                      autoFocus
+                      className="bg-zinc-800 text-white font-mono font-bold text-[7.5px] px-1 py-0.5 rounded border border-orange-500 outline-none w-28 text-right uppercase"
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingDevice(true)}
+                      title={isId ? 'Klik untuk mengganti nama jam/perangkat' : 'Click to customize device name'}
+                      className="font-mono font-bold tracking-wider text-white hover:text-orange-400 transition-colors cursor-pointer flex items-center gap-1 group"
+                    >
+                      <span data-force-white="true" style={{ color: '#ffffff' }}>{deviceTag.toUpperCase()}</span>
+                      <span className="opacity-0 group-hover:opacity-100 text-[6px] text-orange-400">✎</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

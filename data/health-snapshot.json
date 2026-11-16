@@ -1,379 +1,316 @@
 {
   "dailySummary": {
-    "calendarDate": "2026-11-10",
-    "restingHeartRate": 55,
-    "lastSevenDaysAvgRestingHeartRate": 52,
-    "minHeartRate": 48,
-    "maxHeartRate": 190,
+    "calendarDate": "2026-11-17",
+    "restingHeartRate": 47,
+    "lastSevenDaysAvgRestingHeartRate": 51,
+    "minHeartRate": 43,
+    "maxHeartRate": 79,
     "bodyBattery": {
-      "mostRecentValue": 21,
-      "chargedValue": 24,
-      "drainedValue": 8,
-      "highestValue": 29,
+      "mostRecentValue": 61,
+      "chargedValue": 57,
+      "drainedValue": 1,
+      "highestValue": 62,
       "lowestValue": 5,
-      "duringSleepValue": 24
+      "duringSleepValue": 57
     },
     "stress": {
-      "averageLevel": 25,
-      "maxLevel": 84,
-      "stressDurationSec": 9060,
-      "restStressDurationSec": 9780,
-      "activityStressDurationSec": 3600,
+      "averageLevel": 15,
+      "maxLevel": 69,
+      "stressDurationSec": 3480,
+      "restStressDurationSec": 16620,
+      "activityStressDurationSec": 120,
       "qualifier": "UNKNOWN"
     },
     "sleep": {
-      "sleepingSeconds": 17640,
-      "measurableAsleepDurationSec": 17640,
-      "measurableAwakeDurationSec": 4800,
-      "formattedHours": "4h 54m",
-      "sleepScore": 51,
-      "sleepQuality": "POOR",
-      "restStressDurationSec": 9780,
-      "bodyBatteryChargedDuringSleep": 24
+      "sleepingSeconds": 17940,
+      "measurableAsleepDurationSec": 17880,
+      "measurableAwakeDurationSec": 2340,
+      "formattedHours": "4h 59m",
+      "sleepScore": 70,
+      "sleepQuality": "GOOD",
+      "restStressDurationSec": 16620,
+      "bodyBatteryChargedDuringSleep": 57
     },
-    "steps": 7240,
-    "activeKilocalories": 314,
-    "totalKilocalories": 815,
-    "avgWakingRespiration": 14
+    "steps": 54,
+    "activeKilocalories": 0,
+    "totalKilocalories": 430,
+    "avgWakingRespiration": 13
   },
   "dailyHistory": [
     {
-      "calendarDate": "2026-11-04",
+      "calendarDate": "2026-11-11",
       "restingHeartRate": 53,
       "lastSevenDaysAvgRestingHeartRate": 52,
-      "minHeartRate": 45,
-      "maxHeartRate": 172,
+      "minHeartRate": 47,
+      "maxHeartRate": 152,
       "bodyBattery": {
         "mostRecentValue": 5,
-        "chargedValue": 21,
-        "drainedValue": 21,
-        "highestValue": 23,
-        "lowestValue": 5,
-        "duringSleepValue": 16
-      },
-      "stress": {
-        "averageLevel": 56,
-        "maxLevel": 94,
-        "stressDurationSec": 52740,
-        "restStressDurationSec": 7920,
-        "activityStressDurationSec": 7740,
-        "qualifier": "VERY_STRESSFUL"
-      },
-      "sleep": {
-        "sleepingSeconds": 18180,
-        "measurableAsleepDurationSec": 16380,
-        "measurableAwakeDurationSec": 52020,
-        "formattedHours": "5h 3m",
-        "sleepScore": 41,
-        "sleepQuality": "POOR",
-        "restStressDurationSec": 7920,
-        "bodyBatteryChargedDuringSleep": 16
-      },
-      "steps": 11703,
-      "activeKilocalories": 399,
-      "totalKilocalories": 2219,
-      "avgWakingRespiration": 16
-    },
-    {
-      "calendarDate": "2026-11-05",
-      "restingHeartRate": 55,
-      "lastSevenDaysAvgRestingHeartRate": 52,
-      "minHeartRate": 49,
-      "maxHeartRate": 145,
-      "bodyBattery": {
-        "mostRecentValue": 5,
-        "chargedValue": 19,
-        "drainedValue": 12,
-        "highestValue": 24,
+        "chargedValue": 26,
+        "drainedValue": 26,
+        "highestValue": 31,
         "lowestValue": 5,
         "duringSleepValue": 19
       },
       "stress": {
-        "averageLevel": 42,
+        "averageLevel": 50,
         "maxLevel": 96,
-        "stressDurationSec": 23160,
-        "restStressDurationSec": 12480,
-        "activityStressDurationSec": 21300,
-        "qualifier": "STRESSFUL"
+        "stressDurationSec": 54600,
+        "restStressDurationSec": 12540,
+        "activityStressDurationSec": 8580,
+        "qualifier": "VERY_STRESSFUL"
       },
       "sleep": {
-        "sleepingSeconds": 14489,
-        "measurableAsleepDurationSec": 14340,
-        "measurableAwakeDurationSec": 42600,
-        "formattedHours": "4h 1m",
-        "sleepScore": 38,
+        "sleepingSeconds": 14880,
+        "measurableAsleepDurationSec": 14880,
+        "measurableAwakeDurationSec": 60840,
+        "formattedHours": "4h 8m",
+        "sleepScore": 39,
         "sleepQuality": "POOR",
-        "restStressDurationSec": 12480,
+        "restStressDurationSec": 12540,
         "bodyBatteryChargedDuringSleep": 19
       },
-      "steps": 18070,
-      "activeKilocalories": 357,
-      "totalKilocalories": 2177,
+      "steps": 13108,
+      "activeKilocalories": 365,
+      "totalKilocalories": 2185,
       "avgWakingRespiration": 15
     },
     {
-      "calendarDate": "2026-11-06",
-      "restingHeartRate": 50,
-      "lastSevenDaysAvgRestingHeartRate": 52,
-      "minHeartRate": 43,
-      "maxHeartRate": 111,
+      "calendarDate": "2026-11-12",
+      "restingHeartRate": 48,
+      "lastSevenDaysAvgRestingHeartRate": 51,
+      "minHeartRate": 45,
+      "maxHeartRate": 187,
       "bodyBattery": {
         "mostRecentValue": 5,
-        "chargedValue": 49,
-        "drainedValue": 49,
-        "highestValue": 54,
+        "chargedValue": 42,
+        "drainedValue": 34,
+        "highestValue": 40,
         "lowestValue": 5,
-        "duringSleepValue": 40
-      },
-      "stress": {
-        "averageLevel": 47,
-        "maxLevel": 95,
-        "stressDurationSec": 48900,
-        "restStressDurationSec": 19200,
-        "activityStressDurationSec": 4800,
-        "qualifier": "STRESSFUL"
-      },
-      "sleep": {
-        "sleepingSeconds": 19831,
-        "measurableAsleepDurationSec": 19680,
-        "measurableAwakeDurationSec": 53220,
-        "formattedHours": "5h 30m",
-        "sleepScore": 49,
-        "sleepQuality": "POOR",
-        "restStressDurationSec": 19200,
-        "bodyBatteryChargedDuringSleep": 40
-      },
-      "steps": 2491,
-      "activeKilocalories": 27,
-      "totalKilocalories": 1847,
-      "avgWakingRespiration": 15
-    },
-    {
-      "calendarDate": "2026-11-07",
-      "restingHeartRate": 51,
-      "lastSevenDaysAvgRestingHeartRate": 52,
-      "minHeartRate": 46,
-      "maxHeartRate": 189,
-      "bodyBattery": {
-        "mostRecentValue": 5,
-        "chargedValue": 38,
-        "drainedValue": 38,
-        "highestValue": 39,
-        "lowestValue": 5,
-        "duringSleepValue": 26
+        "duringSleepValue": 27
       },
       "stress": {
         "averageLevel": 38,
-        "maxLevel": 95,
-        "stressDurationSec": 38760,
-        "restStressDurationSec": 23220,
-        "activityStressDurationSec": 5940,
+        "maxLevel": 93,
+        "stressDurationSec": 42900,
+        "restStressDurationSec": 17880,
+        "activityStressDurationSec": 8100,
         "qualifier": "STRESSFUL"
       },
       "sleep": {
-        "sleepingSeconds": 16980,
-        "measurableAsleepDurationSec": 16800,
-        "measurableAwakeDurationSec": 51120,
-        "formattedHours": "4h 43m",
-        "sleepScore": 43,
+        "sleepingSeconds": 18840,
+        "measurableAsleepDurationSec": 15120,
+        "measurableAwakeDurationSec": 53760,
+        "formattedHours": "5h 14m",
+        "sleepScore": 40,
         "sleepQuality": "POOR",
-        "restStressDurationSec": 23220,
-        "bodyBatteryChargedDuringSleep": 26
+        "restStressDurationSec": 17880,
+        "bodyBatteryChargedDuringSleep": 27
       },
-      "steps": 9560,
-      "activeKilocalories": 393,
-      "totalKilocalories": 2213,
+      "steps": 18913,
+      "activeKilocalories": 626,
+      "totalKilocalories": 2446,
       "avgWakingRespiration": 15
     },
     {
-      "calendarDate": "2026-11-08",
+      "calendarDate": "2026-11-13",
       "restingHeartRate": 51,
-      "lastSevenDaysAvgRestingHeartRate": 52,
-      "minHeartRate": 47,
-      "maxHeartRate": 109,
+      "lastSevenDaysAvgRestingHeartRate": 51,
+      "minHeartRate": 46,
+      "maxHeartRate": 117,
       "bodyBattery": {
-        "mostRecentValue": 9,
-        "chargedValue": 46,
-        "drainedValue": 42,
-        "highestValue": 51,
+        "mostRecentValue": 5,
+        "chargedValue": 48,
+        "drainedValue": 16,
+        "highestValue": 53,
         "lowestValue": 5,
         "duringSleepValue": 46
       },
       "stress": {
-        "averageLevel": 40,
-        "maxLevel": 93,
-        "stressDurationSec": 46200,
-        "restStressDurationSec": 23880,
-        "activityStressDurationSec": 4800,
-        "qualifier": "STRESSFUL"
-      },
-      "sleep": {
-        "sleepingSeconds": 18780,
-        "measurableAsleepDurationSec": 18780,
-        "measurableAwakeDurationSec": 56100,
-        "formattedHours": "5h 13m",
-        "sleepScore": 51,
-        "sleepQuality": "POOR",
-        "restStressDurationSec": 23880,
-        "bodyBatteryChargedDuringSleep": 46
-      },
-      "steps": 3144,
-      "activeKilocalories": 40,
-      "totalKilocalories": 1860,
-      "avgWakingRespiration": 15
-    },
-    {
-      "calendarDate": "2026-11-09",
-      "restingHeartRate": 49,
-      "lastSevenDaysAvgRestingHeartRate": 51,
-      "minHeartRate": 45,
-      "maxHeartRate": 162,
-      "bodyBattery": {
-        "mostRecentValue": 5,
-        "chargedValue": 53,
-        "drainedValue": 57,
-        "highestValue": 60,
-        "lowestValue": 5,
-        "duringSleepValue": 50
-      },
-      "stress": {
-        "averageLevel": 49,
-        "maxLevel": 96,
-        "stressDurationSec": 49260,
-        "restStressDurationSec": 15540,
-        "activityStressDurationSec": 9000,
-        "qualifier": "STRESSFUL"
-      },
-      "sleep": {
-        "sleepingSeconds": 17640,
-        "measurableAsleepDurationSec": 17640,
-        "measurableAwakeDurationSec": 56160,
-        "formattedHours": "4h 54m",
-        "sleepScore": 47,
-        "sleepQuality": "POOR",
-        "restStressDurationSec": 15540,
-        "bodyBatteryChargedDuringSleep": 50
-      },
-      "steps": 13916,
-      "activeKilocalories": 411,
-      "totalKilocalories": 2231,
-      "avgWakingRespiration": 15
-    },
-    {
-      "calendarDate": "2026-11-10",
-      "restingHeartRate": 55,
-      "lastSevenDaysAvgRestingHeartRate": 52,
-      "minHeartRate": 48,
-      "maxHeartRate": 190,
-      "bodyBattery": {
-        "mostRecentValue": 21,
-        "chargedValue": 24,
-        "drainedValue": 8,
-        "highestValue": 29,
-        "lowestValue": 5,
-        "duringSleepValue": 24
-      },
-      "stress": {
-        "averageLevel": 25,
-        "maxLevel": 84,
-        "stressDurationSec": 9060,
-        "restStressDurationSec": 9780,
-        "activityStressDurationSec": 3600,
+        "averageLevel": 43,
+        "maxLevel": 94,
+        "stressDurationSec": 29220,
+        "restStressDurationSec": 21240,
+        "activityStressDurationSec": 3000,
         "qualifier": "UNKNOWN"
       },
       "sleep": {
-        "sleepingSeconds": 17640,
-        "measurableAsleepDurationSec": 17640,
-        "measurableAwakeDurationSec": 4800,
-        "formattedHours": "4h 54m",
-        "sleepScore": 51,
+        "sleepingSeconds": 20160,
+        "measurableAsleepDurationSec": 17820,
+        "measurableAwakeDurationSec": 35640,
+        "formattedHours": "5h 36m",
+        "sleepScore": 48,
         "sleepQuality": "POOR",
-        "restStressDurationSec": 9780,
-        "bodyBatteryChargedDuringSleep": 24
+        "restStressDurationSec": 21240,
+        "bodyBatteryChargedDuringSleep": 46
       },
-      "steps": 7240,
-      "activeKilocalories": 314,
-      "totalKilocalories": 815,
-      "avgWakingRespiration": 14
+      "steps": 2798,
+      "activeKilocalories": 53,
+      "totalKilocalories": 1873,
+      "avgWakingRespiration": 15
+    },
+    {
+      "calendarDate": "2026-11-14",
+      "restingHeartRate": 51,
+      "lastSevenDaysAvgRestingHeartRate": 51,
+      "minHeartRate": 46,
+      "maxHeartRate": 195,
+      "bodyBattery": {
+        "mostRecentValue": 7,
+        "chargedValue": 47,
+        "drainedValue": 17,
+        "highestValue": 49,
+        "lowestValue": 5,
+        "duringSleepValue": 34
+      },
+      "stress": {
+        "averageLevel": 31,
+        "maxLevel": 91,
+        "stressDurationSec": 21660,
+        "restStressDurationSec": 25260,
+        "activityStressDurationSec": 4260,
+        "qualifier": "UNKNOWN"
+      },
+      "sleep": {
+        "sleepingSeconds": 23235,
+        "measurableAsleepDurationSec": 14640,
+        "measurableAwakeDurationSec": 36540,
+        "formattedHours": "6h 27m",
+        "sleepScore": 43,
+        "sleepQuality": "POOR",
+        "restStressDurationSec": 25260,
+        "bodyBatteryChargedDuringSleep": 34
+      },
+      "steps": 8173,
+      "activeKilocalories": 389,
+      "totalKilocalories": 2209,
+      "avgWakingRespiration": 15
+    },
+    {
+      "calendarDate": "2026-11-15",
+      "restingHeartRate": 52,
+      "lastSevenDaysAvgRestingHeartRate": 51,
+      "minHeartRate": 45,
+      "maxHeartRate": 136,
+      "bodyBattery": {
+        "mostRecentValue": 5,
+        "chargedValue": 49,
+        "drainedValue": 42,
+        "highestValue": 54,
+        "lowestValue": 5,
+        "duringSleepValue": 49
+      },
+      "stress": {
+        "averageLevel": 38,
+        "maxLevel": 98,
+        "stressDurationSec": 31800,
+        "restStressDurationSec": 18660,
+        "activityStressDurationSec": 4380,
+        "qualifier": "STRESSFUL"
+      },
+      "sleep": {
+        "sleepingSeconds": 28845,
+        "measurableAsleepDurationSec": 27780,
+        "measurableAwakeDurationSec": 27060,
+        "formattedHours": "8h 0m",
+        "sleepScore": 65,
+        "sleepQuality": "FAIR",
+        "restStressDurationSec": 18660,
+        "bodyBatteryChargedDuringSleep": 49
+      },
+      "steps": 1993,
+      "activeKilocalories": 99,
+      "totalKilocalories": 1919,
+      "avgWakingRespiration": 15
+    },
+    {
+      "calendarDate": "2026-11-16",
+      "restingHeartRate": 53,
+      "lastSevenDaysAvgRestingHeartRate": 52,
+      "minHeartRate": 48,
+      "maxHeartRate": 152,
+      "bodyBattery": {
+        "mostRecentValue": 5,
+        "chargedValue": 24,
+        "drainedValue": 37,
+        "highestValue": 31,
+        "lowestValue": 5,
+        "duringSleepValue": 21
+      },
+      "stress": {
+        "averageLevel": 40,
+        "maxLevel": 90,
+        "stressDurationSec": 31560,
+        "restStressDurationSec": 13800,
+        "activityStressDurationSec": 6360,
+        "qualifier": "UNKNOWN"
+      },
+      "sleep": {
+        "sleepingSeconds": 23380,
+        "measurableAsleepDurationSec": 15960,
+        "measurableAwakeDurationSec": 35760,
+        "formattedHours": "6h 29m",
+        "sleepScore": 41,
+        "sleepQuality": "POOR",
+        "restStressDurationSec": 13800,
+        "bodyBatteryChargedDuringSleep": 21
+      },
+      "steps": 12471,
+      "activeKilocalories": 289,
+      "totalKilocalories": 2097,
+      "avgWakingRespiration": 15
+    },
+    {
+      "calendarDate": "2026-11-17",
+      "restingHeartRate": 47,
+      "lastSevenDaysAvgRestingHeartRate": 51,
+      "minHeartRate": 43,
+      "maxHeartRate": 79,
+      "bodyBattery": {
+        "mostRecentValue": 61,
+        "chargedValue": 57,
+        "drainedValue": 1,
+        "highestValue": 62,
+        "lowestValue": 5,
+        "duringSleepValue": 57
+      },
+      "stress": {
+        "averageLevel": 15,
+        "maxLevel": 69,
+        "stressDurationSec": 3480,
+        "restStressDurationSec": 16620,
+        "activityStressDurationSec": 120,
+        "qualifier": "UNKNOWN"
+      },
+      "sleep": {
+        "sleepingSeconds": 17940,
+        "measurableAsleepDurationSec": 17880,
+        "measurableAwakeDurationSec": 2340,
+        "formattedHours": "4h 59m",
+        "sleepScore": 70,
+        "sleepQuality": "GOOD",
+        "restStressDurationSec": 16620,
+        "bodyBatteryChargedDuringSleep": 57
+      },
+      "steps": 54,
+      "activeKilocalories": 0,
+      "totalKilocalories": 430,
+      "avgWakingRespiration": 13
     }
   ],
   "latestHrv": {
-    "calendarDate": "2026-11-10",
-    "weeklyAvg": 46,
-    "lastNightAvg": 47,
-    "lastNight5MinHigh": 83,
+    "calendarDate": "2026-11-17",
+    "weeklyAvg": 51,
+    "lastNightAvg": 58,
+    "lastNight5MinHigh": 95,
     "status": "BALANCED",
-    "feedbackPhrase": "HRV_BALANCED_8",
+    "feedbackPhrase": "HRV_BALANCED_7",
     "baseline": {
-      "lowUpper": 39,
-      "balancedLow": 42,
-      "balancedUpper": 58
+      "lowUpper": 40,
+      "balancedLow": 43,
+      "balancedUpper": 57
     }
   },
   "hrvHistory": [
-    {
-      "calendarDate": "2026-10-11",
-      "weeklyAvg": 45,
-      "lastNightAvg": 48,
-      "lastNight5MinHigh": 70,
-      "status": "NONE",
-      "feedbackPhrase": "ONBOARDING_1",
-      "baseline": null
-    },
-    {
-      "calendarDate": "2026-10-12",
-      "weeklyAvg": 45,
-      "lastNightAvg": 48,
-      "lastNight5MinHigh": 84,
-      "status": "NONE",
-      "feedbackPhrase": "ONBOARDING_1",
-      "baseline": null
-    },
-    {
-      "calendarDate": "2026-10-13",
-      "weeklyAvg": 46,
-      "lastNightAvg": 56,
-      "lastNight5MinHigh": 93,
-      "status": "NONE",
-      "feedbackPhrase": "ONBOARDING_1",
-      "baseline": null
-    },
-    {
-      "calendarDate": "2026-10-14",
-      "weeklyAvg": 47,
-      "lastNightAvg": 47,
-      "lastNight5MinHigh": 90,
-      "status": "NONE",
-      "feedbackPhrase": "ONBOARDING_1",
-      "baseline": null
-    },
-    {
-      "calendarDate": "2026-10-15",
-      "weeklyAvg": 50,
-      "lastNightAvg": 59,
-      "lastNight5MinHigh": 116,
-      "status": "NONE",
-      "feedbackPhrase": "ONBOARDING_1",
-      "baseline": null
-    },
-    {
-      "calendarDate": "2026-10-16",
-      "weeklyAvg": 52,
-      "lastNightAvg": 63,
-      "lastNight5MinHigh": 92,
-      "status": "NONE",
-      "feedbackPhrase": "ONBOARDING_1",
-      "baseline": null
-    },
-    {
-      "calendarDate": "2026-10-17",
-      "weeklyAvg": 52,
-      "lastNightAvg": 48,
-      "lastNight5MinHigh": 84,
-      "status": "NONE",
-      "feedbackPhrase": "ONBOARDING_1",
-      "baseline": null
-    },
     {
       "calendarDate": "2026-10-18",
       "weeklyAvg": 52,
@@ -665,6 +602,97 @@
         "balancedLow": 42,
         "balancedUpper": 58
       }
+    },
+    {
+      "calendarDate": "2026-11-11",
+      "weeklyAvg": 46,
+      "lastNightAvg": 40,
+      "lastNight5MinHigh": 84,
+      "status": "BALANCED",
+      "feedbackPhrase": "HRV_BALANCED_3",
+      "baseline": {
+        "lowUpper": 39,
+        "balancedLow": 42,
+        "balancedUpper": 57
+      }
+    },
+    {
+      "calendarDate": "2026-11-12",
+      "weeklyAvg": 46,
+      "lastNightAvg": 49,
+      "lastNight5MinHigh": 107,
+      "status": "BALANCED",
+      "feedbackPhrase": "HRV_BALANCED_6",
+      "baseline": {
+        "lowUpper": 39,
+        "balancedLow": 42,
+        "balancedUpper": 57
+      }
+    },
+    {
+      "calendarDate": "2026-11-13",
+      "weeklyAvg": 48,
+      "lastNightAvg": 56,
+      "lastNight5MinHigh": 110,
+      "status": "BALANCED",
+      "feedbackPhrase": "HRV_BALANCED_2",
+      "baseline": {
+        "lowUpper": 39,
+        "balancedLow": 42,
+        "balancedUpper": 57
+      }
+    },
+    {
+      "calendarDate": "2026-11-14",
+      "weeklyAvg": 50,
+      "lastNightAvg": 58,
+      "lastNight5MinHigh": 96,
+      "status": "BALANCED",
+      "feedbackPhrase": "HRV_BALANCED_8",
+      "baseline": {
+        "lowUpper": 39,
+        "balancedLow": 42,
+        "balancedUpper": 57
+      }
+    },
+    {
+      "calendarDate": "2026-11-15",
+      "weeklyAvg": 49,
+      "lastNightAvg": 48,
+      "lastNight5MinHigh": 93,
+      "status": "BALANCED",
+      "feedbackPhrase": "HRV_BALANCED_2",
+      "baseline": {
+        "lowUpper": 39,
+        "balancedLow": 42,
+        "balancedUpper": 57
+      }
+    },
+    {
+      "calendarDate": "2026-11-16",
+      "weeklyAvg": 49,
+      "lastNightAvg": 48,
+      "lastNight5MinHigh": 103,
+      "status": "BALANCED",
+      "feedbackPhrase": "HRV_BALANCED_2",
+      "baseline": {
+        "lowUpper": 40,
+        "balancedLow": 43,
+        "balancedUpper": 57
+      }
+    },
+    {
+      "calendarDate": "2026-11-17",
+      "weeklyAvg": 51,
+      "lastNightAvg": 58,
+      "lastNight5MinHigh": 95,
+      "status": "BALANCED",
+      "feedbackPhrase": "HRV_BALANCED_7",
+      "baseline": {
+        "lowUpper": 40,
+        "balancedLow": 43,
+        "balancedUpper": 57
+      }
     }
   ],
   "vo2MaxEstimate": {
@@ -766,5 +794,5 @@
       }
     ]
   },
-  "lastSync": "2026-11-10T02:20:45.471Z"
+  "lastSync": "2026-11-16T23:25:42.747Z"
 }
