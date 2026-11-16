@@ -659,66 +659,92 @@ export default function MonthlyTrainingCalendar({ activities }: Props) {
 
       {/* 5. Interactive Session Drawer for Selected Day */}
       {selectedDay && selectedDay.activitiesCount > 0 && (
-        <div className="p-4 bg-white dark:bg-[#070a14] border-2 border-violet-500 shadow-[4px_4px_0px_#7c3aed] animate-in fade-in duration-150 font-mono">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 mb-3 border-b border-slate-200 dark:border-zinc-800 gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black uppercase text-violet-700 dark:text-violet-300">
-                [ {new Date(selectedDay.dateStr + 'T12:00:00').toLocaleDateString(language === 'ID' ? 'id-ID' : 'en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })} ]
+        <div className="p-3.5 sm:p-4 bg-white dark:bg-[#070a14] border-2 border-violet-500 shadow-[4px_4px_0px_#7c3aed] animate-in fade-in duration-150 font-mono space-y-3">
+          {/* Header Row: Date Title + Badges + Close Button */}
+          <div className="flex items-center justify-between pb-2.5 border-b border-slate-200 dark:border-zinc-800 gap-2">
+            <div className="flex items-center gap-2 flex-wrap min-w-0">
+              <span className="text-xs font-black uppercase text-violet-700 dark:text-violet-300 tracking-wider whitespace-nowrap">
+                [ {new Date(selectedDay.dateStr + 'T12:00:00').toLocaleDateString(language === 'ID' ? 'id-ID' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()} ]
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold">
+              <span className="text-[10px] px-1.5 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold whitespace-nowrap">
                 {selectedDay.activitiesCount} {language === 'ID' ? 'SESI' : (selectedDay.activitiesCount === 1 ? 'SESSION' : 'SESSIONS')}
               </span>
-              <span className="text-[9px] px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-400 dark:border-emerald-600/60 text-emerald-800 dark:text-emerald-300 font-bold uppercase">
+              <span className="text-[9px] px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-400 dark:border-emerald-600/60 text-emerald-800 dark:text-emerald-300 font-bold uppercase whitespace-nowrap">
                 {language === 'ID' ? 'TERKUNCI' : 'LOCKED'}
               </span>
             </div>
 
-            <div className="flex items-center gap-4 text-xs text-slate-700 dark:text-zinc-300">
-              <span className="flex items-center gap-1">
-                <Route className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-                {language === 'ID' ? 'TOTAL HARI:' : 'DAY TOTAL:'} <strong className="text-slate-900 dark:text-white">{selectedDay.distanceKm.toFixed(2)} KM</strong>
-              </span>
-              {selectedDay.durationSec > 0 && (
-                <span>
-                  {language === 'ID' ? 'RATA-RATA PACE:' : 'AVG PACE:'} <strong className="text-cyan-600 dark:text-cyan-300">{PaceCalculator.formatPace(selectedDay.paceSecPerKm)}</strong>
-                </span>
-              )}
-              {selectedDay.trimpScore > 0 && (
-                <span className="flex items-center gap-1">
-                  <Flame className="w-3.5 h-3.5 text-rose-500" />
-                  {language === 'ID' ? 'BEBAN:' : 'EFFORT:'} <strong className="text-rose-600 dark:text-rose-300">{selectedDay.trimpScore} PTS</strong>
-                </span>
-              )}
+            <button
+              type="button"
+              onClick={() => setSelectedDay(null)}
+              className="px-2.5 py-1 bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-zinc-700 text-[10px] font-bold uppercase transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
+              title={language === 'ID' ? 'Tutup panel' : 'Close drawer'}
+            >
+              <span>✕</span>
+              <span>{language === 'ID' ? 'TUTUP' : 'CLOSE'}</span>
+            </button>
+          </div>
 
-              <button
-                onClick={() => setSelectedDay(null)}
-                className="px-2 py-0.5 bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-zinc-700 text-[10px] font-bold uppercase transition-colors"
-                title={language === 'ID' ? 'Tutup panel' : 'Close drawer'}
-              >
-                ✕ {language === 'ID' ? 'TUTUP' : 'CLOSE'}
-              </button>
+          {/* Telemetry Stats Strip */}
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            {/* Total Distance */}
+            <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-[#0a0e1c] border border-slate-200 dark:border-zinc-800 px-2.5 py-1 whitespace-nowrap">
+              <Route className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" />
+              <span className="text-slate-500 dark:text-zinc-400 text-[10px] uppercase font-bold">
+                {language === 'ID' ? 'JARAK HARI:' : 'DAY TOTAL:'}
+              </span>
+              <span className="text-slate-900 dark:text-white font-black">
+                {selectedDay.distanceKm.toFixed(2)} KM
+              </span>
             </div>
+
+            {/* Avg Pace */}
+            {selectedDay.durationSec > 0 && (
+              <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-[#0a0e1c] border border-slate-200 dark:border-zinc-800 px-2.5 py-1 whitespace-nowrap">
+                <TrendingUp className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
+                <span className="text-slate-500 dark:text-zinc-400 text-[10px] uppercase font-bold">
+                  {language === 'ID' ? 'PACE RATA2:' : 'AVG PACE:'}
+                </span>
+                <span className="text-cyan-600 dark:text-cyan-300 font-black">
+                  {PaceCalculator.formatPace(selectedDay.paceSecPerKm)}
+                </span>
+              </div>
+            )}
+
+            {/* TRIMP Effort */}
+            {selectedDay.trimpScore > 0 && (
+              <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-[#0a0e1c] border border-slate-200 dark:border-zinc-800 px-2.5 py-1 whitespace-nowrap">
+                <Flame className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                <span className="text-slate-500 dark:text-zinc-400 text-[10px] uppercase font-bold">
+                  {language === 'ID' ? 'BEBAN:' : 'EFFORT:'}
+                </span>
+                <span className="text-rose-600 dark:text-rose-400 font-black">
+                  {selectedDay.trimpScore} PTS
+                </span>
+              </div>
+            )}
           </div>
 
           {/* List of individual activities on this day */}
-          <div className="space-y-2">
+          <div className="space-y-2 pt-1">
             {selectedDay.sessions.map((a, i) => (
               <div
                 key={a.id || i}
-                className="flex items-center justify-between bg-slate-50 dark:bg-[#0a0e1c] border border-slate-200 dark:border-zinc-800/80 px-3 py-2.5 text-xs hover:border-violet-500 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-50 dark:bg-[#0a0e1c] border border-slate-200 dark:border-zinc-800/80 p-3 text-xs hover:border-violet-500 transition-colors gap-2"
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-slate-900 dark:text-white font-bold">{a.name}</span>
-                  <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-normal">({a.sportType})</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
+                  <span className="text-slate-900 dark:text-white font-black truncate">{a.name}</span>
+                  <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-normal shrink-0">({a.sportType})</span>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <span className="text-slate-900 dark:text-white font-black">{a.distanceKm.toFixed(2)} km</span>
-                  <span className="text-cyan-600 dark:text-cyan-400 font-bold">{a.pace}</span>
-                  <span className="text-slate-600 dark:text-zinc-400">{a.time}</span>
+                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 font-mono shrink-0">
+                  <span className="text-slate-900 dark:text-white font-black whitespace-nowrap">{a.distanceKm.toFixed(2)} km</span>
+                  <span className="text-cyan-600 dark:text-cyan-400 font-bold whitespace-nowrap">{a.pace}</span>
+                  <span className="text-slate-600 dark:text-zinc-400 whitespace-nowrap">{a.time}</span>
                   <Link
                     href={`/activities/${a.id}`}
-                    className="p-1.5 bg-violet-600 dark:bg-violet-900 hover:bg-violet-700 text-white border border-violet-400 dark:border-violet-500 transition-colors flex items-center gap-1 text-[10px] uppercase font-bold"
+                    className="px-2.5 py-1 bg-violet-600 dark:bg-violet-900 hover:bg-violet-700 text-white border border-violet-400 dark:border-violet-500 transition-colors flex items-center gap-1 text-[10px] uppercase font-black tracking-wider whitespace-nowrap shrink-0 shadow-[2px_2px_0px_#7c3aed]"
                     title={language === 'ID' ? 'Lihat Telemetri' : 'View Telemetry'}
                   >
                     <span>{language === 'ID' ? 'ANALISIS' : 'ANALYZE'}</span>
