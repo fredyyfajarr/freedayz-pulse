@@ -71,12 +71,9 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-3 shrink-0 group">
             <BrandLogo size={40} />
             <div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center">
                 <span className="font-black italic tracking-widest text-base sm:text-lg text-slate-900 dark:text-white">
                   FREEDAYZZ<span className="text-violet-600 dark:text-violet-400">.PULSE</span>
-                </span>
-                <span suppressHydrationWarning className="text-[9px] font-mono px-1.5 py-0.2 bg-violet-100 dark:bg-violet-950 border border-violet-300 dark:border-violet-600/60 text-violet-800 dark:text-violet-300 font-bold tracking-wider">
-                  {t('nav.pro')}
                 </span>
               </div>
               <p suppressHydrationWarning className="text-[8px] sm:text-[9px] font-mono tracking-widest text-slate-500 dark:text-zinc-400 uppercase">

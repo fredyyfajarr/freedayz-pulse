@@ -122,14 +122,9 @@ export default function Sidebar() {
             <Link href="/dashboard" className="flex items-center gap-2 group min-w-0">
               <BrandLogo size={32} />
               <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-1.5 whitespace-nowrap">
-                  <span className="font-black italic tracking-wider text-sm text-slate-900 dark:text-white whitespace-nowrap">
-                    FREEDAYZZ<span className="text-violet-600 dark:text-violet-400">.PULSE</span>
-                  </span>
-                  <span suppressHydrationWarning className="text-[8px] font-mono px-1 py-0.2 bg-violet-100 dark:bg-violet-950 border border-violet-300 dark:border-violet-600/60 text-violet-800 dark:text-violet-300 font-bold shrink-0">
-                    {t('nav.pro')}
-                  </span>
-                </div>
+                <span className="font-black italic tracking-wider text-sm text-slate-900 dark:text-white whitespace-nowrap">
+                  FREEDAYZZ<span className="text-violet-600 dark:text-violet-400">.PULSE</span>
+                </span>
                 <p suppressHydrationWarning className="text-[8px] font-mono tracking-widest text-slate-500 dark:text-zinc-400 uppercase truncate">
                   {t('nav.tagline')}
                 </p>
@@ -317,7 +312,7 @@ export default function Sidebar() {
                     {language === 'ID' ? 'GARMIN AKTIF' : 'GARMIN LIVE'}
                   </span>
                 </div>
-                <span className="font-mono text-slate-400 dark:text-zinc-500">v2.4 PRO</span>
+                <span className="font-mono text-slate-400 dark:text-zinc-500">v2.4</span>
               </div>
             </>
           ) : (
@@ -366,14 +361,9 @@ export default function Sidebar() {
         {/* Brand Logo & Name */}
         <Link href="/dashboard" className="flex items-center gap-2 group shrink-0">
           <BrandLogo size={28} />
-          <div className="flex items-center gap-1.5 whitespace-nowrap">
-            <span className="font-black italic tracking-wider text-sm sm:text-base text-slate-900 dark:text-white whitespace-nowrap">
-              FREEDAYZZ<span className="text-violet-600 dark:text-violet-400">.PULSE</span>
-            </span>
-            <span className="text-[8px] font-mono px-1 py-0.2 bg-violet-100 dark:bg-violet-950 border border-violet-300 dark:border-violet-600/60 text-violet-800 dark:text-violet-300 font-bold shrink-0">
-              PRO
-            </span>
-          </div>
+          <span className="font-black italic tracking-wider text-sm sm:text-base text-slate-900 dark:text-white whitespace-nowrap">
+            FREEDAYZZ<span className="text-violet-600 dark:text-violet-400">.PULSE</span>
+          </span>
         </Link>
 
         {/* Mobile Action Controls */}
