@@ -90,8 +90,8 @@ export default function UserAuthPill({ isCompact = false }: Props) {
   }
 
   // Logged In State -> Display Profile & Role
-  const displayName = profile?.full_name || user.email?.split('@')[0] || 'Athlete';
-  const role = profile?.role || 'athlete';
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user.email?.split('@')[0] || 'Athlete';
+  const role = profile?.role || user?.user_metadata?.role || 'athlete';
   const roleBadge =
     role === 'coach'
       ? (isId ? 'PELATIH // COACH' : 'COACH')
