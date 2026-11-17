@@ -32,11 +32,11 @@ export default function CompareClient({ activities, runA, runB }: Props) {
   const isId = language === 'ID';
 
   // Calculate Deltas (Run B compared to Run A)
-  const paceDeltaSec = (runB.avgPaceSecPerKm || 0) - (runA.avgPaceSecPerKm || 0); // negative = B is faster
-  const hrDelta = (runB.avgHeartRate || 0) - (runA.avgHeartRate || 0);
-  const timeDeltaSec = (runB.movingDurationSeconds || runB.durationSeconds) - (runA.movingDurationSeconds || runA.durationSeconds);
-  const cadDelta = (runB.dynamics.avgCadence || 0) - (runA.dynamics.avgCadence || 0);
-  const trimpDelta = (runB.relativeEffortScore || 0) - (runA.relativeEffortScore || 0);
+  const paceDeltaSec = Math.round((runB.avgPaceSecPerKm || 0) - (runA.avgPaceSecPerKm || 0)); // negative = B is faster
+  const hrDelta = Math.round((runB.avgHeartRate || 0) - (runA.avgHeartRate || 0));
+  const timeDeltaSec = Math.round((runB.movingDurationSeconds || runB.durationSeconds) - (runA.movingDurationSeconds || runA.durationSeconds));
+  const cadDelta = Math.round((runB.dynamics.avgCadence || 0) - (runA.dynamics.avgCadence || 0));
+  const trimpDelta = Math.round((runB.relativeEffortScore || 0) - (runA.relativeEffortScore || 0));
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6 font-mono">
