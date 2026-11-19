@@ -259,7 +259,7 @@ export default function HeartRateZonesCard({
             {isId ? 'ZONA_DETAK_JANTUNG // DISTRIBUSI_INTENSITAS' : 'HEART_RATE_ZONES // INTENSITY_DISTRIBUTION'}
           </h3>
         </div>
-        <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-400 shrink-0">
+        <span suppressHydrationWarning className="text-[10px] font-mono text-slate-500 dark:text-zinc-400 shrink-0">
           {(deviceName || 'FORERUNNER 165').toUpperCase()} // {getMethodBadgeText()}
         </span>
       </div>

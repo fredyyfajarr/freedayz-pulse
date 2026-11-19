@@ -72,22 +72,26 @@ export class HRProfileCalculator {
     { idx: 5, name: 'Maximum', code: 'ZONE_05', minP: 100, maxP: 114, minBpm: 177, maxBpm: 201, role: 'Supra-threshold, 5K race pace & VO2max.', fuel: 'Anaerobic (95%)', color: 'text-rose-400 bg-rose-500' },
   ];
 
-  public static getStoredSettings(): CustomHRSettings {
-    const fallback: CustomHRSettings = {
+  public static getFallbackSettings(restingHr = 51, maxHr = 201): CustomHRSettings {
+    return {
       method: 'HRR',
-      restingHr: 51,
-      maxHr: 201,
-      lthr: 177,
+      restingHr,
+      maxHr,
+      lthr: Math.round(maxHr * 0.88) || 177,
       hrrPercentages: this.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })),
       maxHrPercentages: this.DEFAULT_MAXHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })),
       lthrPercentages: this.DEFAULT_LTHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })),
       zonePercentages: this.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })),
       manualZoneBpms: this.DEFAULT_MAXHR_ZONES.map(z => ({ 
         idx: z.idx, 
-        minBpm: Math.round(201 * (z.minP / 100)), 
-        maxBpm: z.idx === 5 ? 201 : Math.round(201 * (z.maxP / 100)) 
+        minBpm: Math.round(maxHr * (z.minP / 100)), 
+        maxBpm: z.idx === 5 ? maxHr : Math.round(maxHr * (z.maxP / 100)) 
       })),
     };
+  }
+
+  public static getStoredSettings(): CustomHRSettings {
+    const fallback = this.getFallbackSettings();
 
     if (typeof window === 'undefined') return fallback;
 

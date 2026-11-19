@@ -93,15 +93,15 @@ export default function HRRProfileWidget() {
             {isId ? 'PROFIL_ZONA_HR_KUSTOM' : 'CUSTOM_HR_ZONE_PROFILE'}
           </span>
         </div>
-        <span className="text-[9px] px-1.5 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-300 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold shrink-0 whitespace-nowrap">
+        <span suppressHydrationWarning className="text-[9px] px-1.5 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-300 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold shrink-0 whitespace-nowrap">
           {getMethodBadge()}
         </span>
       </div>
-      <p className="text-[11px] text-slate-600 dark:text-zinc-300 font-sans leading-relaxed break-words">
+      <p suppressHydrationWarning className="text-[11px] text-slate-600 dark:text-zinc-300 font-sans leading-relaxed break-words">
         {getMethodDesc()}
       </p>
       <div className="mt-3 pt-2 border-t border-slate-200 dark:border-zinc-800/80 flex justify-between items-center text-[10px]">
-        <span className="text-slate-500 dark:text-zinc-500">{getZ2Label()}</span>
+        <span suppressHydrationWarning className="text-slate-500 dark:text-zinc-500">{getZ2Label()}</span>
         <span className="text-emerald-600 dark:text-emerald-400 font-bold">
           {pz2.minBpm} – {pz2.maxBpm} BPM
         </span>

@@ -62,31 +62,39 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
   const { language } = useLanguage();
   const isId = language === 'ID';
 
+  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [hrSettings, setHrSettings] = useState<CustomHRSettings>(() => {
-    const stored = HRProfileCalculator.getStoredSettings();
-    if (garmin7dAvgRhr && !stored.restingHr) {
-      stored.restingHr = garmin7dAvgRhr;
-    }
-    return stored;
+    return HRProfileCalculator.getFallbackSettings(
+      initialSettings?.restingHr || garmin7dAvgRhr || 51,
+      initialSettings?.maxHr || 201
+    );
   });
 
   const [deviceName, setDeviceName] = useState<string>(initialSettings?.deviceName || 'FORERUNNER 165');
 
   // Modal & Draft States
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [draftSettings, setDraftSettings] = useState<DraftHRSettings>(hrSettings);
+  const [draftSettings, setDraftSettings] = useState<DraftHRSettings>(() => hrSettings);
   const [draftDeviceName, setDraftDeviceName] = useState<string>(deviceName);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
-  // Sync listener
+  // Sync listener & Initial Load from Client Storage
   useEffect(() => {
+    setIsMounted(true);
+    const stored = HRProfileCalculator.getStoredSettings();
+    if (garmin7dAvgRhr && !stored.restingHr) {
+      stored.restingHr = garmin7dAvgRhr;
+    }
+    setHrSettings(stored);
+    setDraftSettings(stored);
+
     const handleUpdate = () => {
       setHrSettings(HRProfileCalculator.getStoredSettings());
     };
     window.addEventListener('athlete_hr_settings_updated', handleUpdate);
     return () => window.removeEventListener('athlete_hr_settings_updated', handleUpdate);
-  }, []);
+  }, [garmin7dAvgRhr]);
 
   const profile: AthleteHRProfile = HRProfileCalculator.calculateProfile(
     activities,
@@ -365,7 +373,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
               <Watch className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
               {deviceName.toUpperCase()}
             </span>
-            <span className="text-[10px] font-mono px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold uppercase tracking-wider flex items-center gap-1">
+            <span suppressHydrationWarning className="text-[10px] font-mono px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold uppercase tracking-wider flex items-center gap-1">
               <Sliders className="w-3 h-3 text-cyan-500" />
               {isId ? 'METODE DINAMIS' : 'DYNAMIC METHOD'}: {profile.methodType}
             </span>
@@ -398,7 +406,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
           <span className="text-[9px] uppercase text-slate-500 dark:text-zinc-400 block tracking-wider font-bold truncate">
             {isId ? 'METODE HITUNG HR' : 'HR METHOD'}
           </span>
-          <span className="text-xs sm:text-sm font-black text-violet-700 dark:text-violet-300 mt-0.5 block truncate">
+          <span suppressHydrationWarning className="text-xs sm:text-sm font-black text-violet-700 dark:text-violet-300 mt-0.5 block truncate">
             {profile.method}
           </span>
           <span className="text-[9px] text-emerald-600 dark:text-emerald-400 block mt-0.5 font-bold">
@@ -463,7 +471,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
             <span className="text-slate-900 dark:text-zinc-200 font-bold block text-[11px] sm:text-xs">
               {isId ? 'MESIN ZONA DETAK JANTUNG DINAMIS DIAKTIFKAN' : 'DYNAMIC HEART RATE ZONE ENGINE ACTIVE'}
             </span>
-            <span className="text-[10px] sm:text-[11px] text-slate-600 dark:text-zinc-400 font-sans block mt-0.5">
+            <span suppressHydrationWarning className="text-[10px] sm:text-[11px] text-slate-600 dark:text-zinc-400 font-sans block mt-0.5">
               {isId
                 ? `Menggunakan metode ${profile.method}. Semua 5 zona dihitung dan dikalibrasikan secara instan ke aktivitas latihan lari Anda.`
                 : `Active method: ${profile.method}. All 5 training zones automatically synchronize across telemetry charts.`}
@@ -491,7 +499,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
             </div>
 
             <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-200 dark:border-zinc-800/80">
-              <span className="text-slate-600 dark:text-zinc-400 font-bold">
+              <span suppressHydrationWarning className="text-slate-600 dark:text-zinc-400 font-bold">
                 {profile.methodType === 'MANUAL_BPM' ? 'Manual BPM' : `${z.minPercent}% – ${z.maxPercent}%`}
               </span>
               <span className="text-slate-900 dark:text-white font-black tabular-nums">
@@ -514,7 +522,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
             <tr className="border-b-2 border-slate-200 dark:border-zinc-800 text-[10px] text-slate-500 dark:text-zinc-400 uppercase tracking-widest bg-slate-50 dark:bg-[#070a14]">
               <th className="py-2.5 px-3 w-16 text-center">{isId ? 'ZONA' : 'ZONE'}</th>
               <th className="py-2.5 px-3 w-32">{isId ? 'NAMA' : 'NAME'}</th>
-              <th className="py-2.5 px-3 w-36">{profile.methodType === 'MANUAL_BPM' ? (isId ? 'METODE' : 'METHOD') : (isId ? 'RENTANG INTENSITAS' : 'INTENSITY RANGE')}</th>
+              <th suppressHydrationWarning className="py-2.5 px-3 w-36">{profile.methodType === 'MANUAL_BPM' ? (isId ? 'METODE' : 'METHOD') : (isId ? 'RENTANG INTENSITAS' : 'INTENSITY RANGE')}</th>
               <th className="py-2.5 px-3 w-40">{isId ? 'AMBANG BPM TEPAT' : 'EXACT BPM RANGE'}</th>
               <th className="py-2.5 px-3 w-auto">{isId ? 'PERAN FISIOLOGIS & MANFAAT METABOLIK' : 'PHYSIOLOGICAL ROLE & METABOLIC BENEFIT'}</th>
               <th className="py-2.5 px-3 w-44 text-right">{isId ? 'TOTAL WAKTU TERCATAT' : 'TOTAL TIME'}</th>
@@ -529,7 +537,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                   </span>
                 </td>
                 <td className="py-3 px-3 font-bold text-slate-900 dark:text-white uppercase truncate">{z.name}</td>
-                <td className="py-3 px-3 text-slate-600 dark:text-zinc-400 font-bold tabular-nums">
+                <td suppressHydrationWarning className="py-3 px-3 text-slate-600 dark:text-zinc-400 font-bold tabular-nums">
                   {profile.methodType === 'MANUAL_BPM' 
                     ? 'Manual BPM' 
                     : `${z.minPercent}% – ${z.maxPercent}%`}
