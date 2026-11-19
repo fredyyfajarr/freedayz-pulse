@@ -245,23 +245,23 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
   return (
     <div className="space-y-6 font-mono text-slate-900 dark:text-white">
       {/* 1. Coach Master Command Header */}
-      <div className="bg-gradient-to-r from-cyan-950/90 via-[#0d1224] to-[#070a14] border-2 border-cyan-500/80 p-5 sm:p-6 shadow-[4px_4px_0px_#06b6d4] text-white">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-cyan-900/60">
+      <div className="bg-white dark:bg-gradient-to-r dark:from-cyan-950/90 dark:via-[#0d1224] dark:to-[#070a14] border-2 border-cyan-500/80 p-5 sm:p-6 shadow-[4px_4px_0px_#06b6d4] text-slate-900 dark:text-white transition-colors">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-200 dark:border-cyan-900/60">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-black px-2.5 py-0.5 bg-cyan-950 border border-cyan-400 text-cyan-300 uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-[10px] font-black px-2.5 py-0.5 bg-cyan-100 dark:bg-cyan-950 border border-cyan-400 text-cyan-800 dark:text-cyan-300 uppercase tracking-widest flex items-center gap-1.5 shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
                 {isId ? 'PORTAL KEPELATIHAN // ROLE_COACH' : 'COACHING_PORTAL // HEAD_COACH'}
               </span>
-              <span className="text-[10px] px-2 py-0.5 bg-violet-950 border border-violet-600 text-violet-300 font-bold uppercase tracking-wider">
+              <span className="text-[10px] px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-600 text-violet-800 dark:text-violet-300 font-bold uppercase tracking-wider">
                 FREEDAYZZ ATHLETIC CLUB
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-black italic tracking-wide uppercase mt-2.5 text-white flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-black italic tracking-wide uppercase mt-2.5 text-slate-900 dark:text-white flex items-center gap-2">
               <span>{isId ? `PORTAL PELATIH: ${coachName.toUpperCase()}` : `COACH PORTAL: ${coachName.toUpperCase()}`}</span>
             </h1>
-            <p className="text-xs text-zinc-300 font-sans mt-0.5 max-w-2xl leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-zinc-300 font-sans mt-0.5 max-w-2xl leading-relaxed">
               {isId 
                 ? 'Pusat manajemen skuad lari, pembuatan program latihan berkala, evaluasi beban atlet, dan mitigasi risiko cedera berbasis ACWR.'
                 : 'Central running squad management hub, structured training plan builder, athlete workload evaluation, and injury prevention.'}
@@ -273,7 +273,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
             <button
               type="button"
               onClick={() => setShowInviteModal(true)}
-              className="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 border border-cyan-300 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#0891b2] cursor-pointer"
+              className="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 border border-cyan-400 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#0891b2] cursor-pointer"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>{isId ? 'UNDANG ATLET' : 'INVITE ATHLETE'}</span>
@@ -282,7 +282,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
             <button
               type="button"
               onClick={() => setShowCreatePlanModal(true)}
-              className="px-3.5 py-2 bg-violet-600 hover:bg-violet-500 border border-violet-300 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#7c3aed] cursor-pointer"
+              className="px-3.5 py-2 bg-violet-600 hover:bg-violet-500 border border-violet-400 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#7c3aed] cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>{isId ? 'BUAT PROGRAM' : 'NEW PLAN'}</span>
@@ -291,10 +291,10 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
             <button
               type="button"
               onClick={handleCopyCode}
-              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold uppercase transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="px-3.5 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white text-xs font-bold uppercase transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
               title="Salin kode pendaftaran klub untuk atlet bimbingan Anda"
             >
-              {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-zinc-400" />}
               <span>{copiedCode ? (isId ? 'KODE TERSALIN!' : 'CODE COPIED!') : clubInviteCode}</span>
             </button>
           </div>
@@ -302,59 +302,59 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
         {/* 2. Coach KPI Metrics Row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 text-xs">
-          <div className="bg-[#070a14] border border-cyan-900/60 p-3.5">
-            <span className="text-[10px] text-zinc-400 block uppercase font-bold">
+          <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-cyan-900/60 p-3.5 shadow-xs">
+            <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
               {isId ? 'ATLET BINAAN TERDAFTAR' : 'REGISTERED ATHLETES'}
             </span>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl font-black text-cyan-400">
+              <span className="text-2xl font-black text-cyan-600 dark:text-cyan-400">
                 {showDemoSquad ? DEMO_ATHLETES.length : 0}
               </span>
-              <span className="text-[10px] text-zinc-500 font-bold uppercase">
+              <span className="text-[10px] text-slate-500 dark:text-zinc-500 font-bold uppercase">
                 {showDemoSquad ? (isId ? 'Pelari (Demo)' : 'Runners (Demo)') : (isId ? 'Pelari Aktif' : 'Active')}
               </span>
             </div>
-            <span className="text-[9px] text-zinc-500 block mt-0.5">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
               {showDemoSquad ? (isId ? 'Mode simulasi aktif' : 'Demo mode active') : (isId ? 'Belum ada atlet tertaut' : 'No athletes linked')}
             </span>
           </div>
 
-          <div className="bg-[#070a14] border border-cyan-900/60 p-3.5">
-            <span className="text-[10px] text-zinc-400 block uppercase font-bold">
+          <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-cyan-900/60 p-3.5 shadow-xs">
+            <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
               {isId ? 'PROGRAM LATIHAN TERSEDIA' : 'TRAINING PLANS AVAILABLE'}
             </span>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl font-black text-white">{plans.length}</span>
-              <span className="text-[10px] text-violet-400 font-bold uppercase">{isId ? 'Modul' : 'Plans'}</span>
+              <span className="text-2xl font-black text-slate-900 dark:text-white">{plans.length}</span>
+              <span className="text-[10px] text-violet-600 dark:text-violet-400 font-bold uppercase">{isId ? 'Modul' : 'Plans'}</span>
             </div>
-            <span className="text-[9px] text-zinc-500 block mt-0.5">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
               {isId ? 'Siap ditugaskan ke pelari' : 'Ready to assign'}
             </span>
           </div>
 
-          <div className="bg-[#070a14] border border-cyan-900/60 p-3.5">
-            <span className="text-[10px] text-zinc-400 block uppercase font-bold">
+          <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-cyan-900/60 p-3.5 shadow-xs">
+            <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
               {isId ? 'KESIAPAN SKUAD (ACWR)' : 'SQUAD READINESS'}
             </span>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl font-black text-emerald-400">OPTIMAL</span>
+              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">OPTIMAL</span>
             </div>
-            <span className="text-[9px] text-zinc-500 block mt-0.5">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
               {isId ? '0 Atlet dalam Risiko Spike' : '0 Athletes in Danger Zone'}
             </span>
           </div>
 
-          <div className="bg-[#070a14] border border-cyan-900/60 p-3.5">
-            <span className="text-[10px] text-zinc-400 block uppercase font-bold">
+          <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-cyan-900/60 p-3.5 shadow-xs">
+            <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
               {isId ? 'IDENTITAS PELATIH' : 'COACH IDENTITY'}
             </span>
             <div className="flex items-center gap-1.5 mt-1">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-xs font-black text-emerald-400 uppercase truncate">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="text-xs font-black text-emerald-700 dark:text-emerald-400 uppercase truncate">
                 {coachName}
               </span>
             </div>
-            <span className="text-[9px] text-zinc-500 block mt-0.5 truncate font-sans">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5 truncate font-sans">
               {coachEmail}
             </span>
           </div>
@@ -390,7 +390,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
         >
           <BookOpen className="w-4 h-4" />
           <span>{isId ? 'PROGRAM & MENU LATIHAN' : 'TRAINING PLANS'}</span>
-          <span className="px-1.5 py-0.2 bg-violet-950 text-violet-300 border border-violet-700 text-[9px] font-black">
+          <span className="px-1.5 py-0.2 bg-violet-100 dark:bg-violet-950 text-violet-800 dark:text-violet-300 border border-violet-400 dark:border-violet-700 text-[9px] font-black">
             {plans.length}
           </span>
         </button>
@@ -419,7 +419,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
         >
           <MessageSquare className="w-4 h-4" />
           <span>{isId ? 'ARAHAN & PENGUMUMAN TIM' : 'COACH DIRECTIVES'}</span>
-          <span className="px-1.5 py-0.2 bg-amber-950 text-amber-300 border border-amber-700 text-[9px] font-black">
+          <span className="px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-400 dark:border-amber-700 text-[9px] font-black">
             {directives.length}
           </span>
         </button>
@@ -929,29 +929,29 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
       {/* MODAL 1: INVITE ATHLETE */}
       {showInviteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#0d1224] border-2 border-cyan-500 p-6 max-w-md w-full shadow-[6px_6px_0px_#06b6d4] text-white space-y-4 font-mono">
-            <div className="flex items-center justify-between pb-3 border-b border-cyan-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0d1224] border-2 border-cyan-500 p-6 max-w-md w-full shadow-[6px_6px_0px_#06b6d4] text-slate-900 dark:text-white space-y-4 font-mono">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-cyan-900">
               <div className="flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-cyan-400" />
-                <h3 className="font-black uppercase text-sm tracking-wide">
+                <UserPlus className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                <h3 className="font-black uppercase text-sm tracking-wide text-slate-900 dark:text-white">
                   {isId ? 'UNDANG ATLET KE KLUB' : 'INVITE ATHLETE TO CLUB'}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowInviteModal(false)}
-                className="text-zinc-400 hover:text-white text-sm cursor-pointer"
+                className="text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-white text-sm cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {inviteSent ? (
-              <div className="p-4 bg-emerald-950/60 border border-emerald-500 text-emerald-300 text-xs text-center space-y-1">
-                <Check className="w-6 h-6 mx-auto text-emerald-400" />
+              <div className="p-4 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500 text-emerald-800 dark:text-emerald-300 text-xs text-center space-y-1">
+                <Check className="w-6 h-6 mx-auto text-emerald-600 dark:text-emerald-400" />
                 <p className="font-bold uppercase">{isId ? 'UNDANGAN BERHASIL DIKIRIM!' : 'INVITATION SENT!'}</p>
-                <p className="text-[11px] text-emerald-400/80 font-sans">
+                <p className="text-[11px] text-emerald-700 dark:text-emerald-400/80 font-sans">
                   {isId 
                     ? `Kode akses klub telah dikirim ke ${inviteEmail}.`
                     : `Club access code has been delivered to ${inviteEmail}.`}
@@ -959,24 +959,24 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
               </div>
             ) : (
               <form onSubmit={handleSendInvite} className="space-y-3">
-                <p className="text-xs text-zinc-300 font-sans">
+                <p className="text-xs text-slate-600 dark:text-zinc-300 font-sans">
                   {isId 
                     ? 'Kirimkan tautan pendaftaran klub kepada atlet bimbingan Anda. Saat mendaftar, telemetri Garmin mereka akan otomatis terhubung ke dashboard Anda.'
                     : 'Invite athletes to your squad. Once registered, their Garmin running telemetry will appear in your roster.'}
                 </p>
 
-                <div className="p-3 bg-[#070a14] border border-cyan-900/60 space-y-1">
-                  <span className="text-[10px] text-zinc-400 block font-bold uppercase">
+                <div className="p-3 bg-cyan-50/50 dark:bg-[#070a14] border border-cyan-200 dark:border-cyan-900/60 space-y-1">
+                  <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-bold uppercase">
                     {isId ? 'KODE LISENSI KLUB ANDA:' : 'YOUR CLUB LICENSE CODE:'}
                   </span>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-base font-black text-cyan-400 tracking-wider">
+                    <span className="text-base font-black text-cyan-600 dark:text-cyan-400 tracking-wider">
                       {clubInviteCode}
                     </span>
                     <button
                       type="button"
                       onClick={handleCopyCode}
-                      className="text-[10px] px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-zinc-700 text-zinc-300 font-bold uppercase cursor-pointer"
+                      className="text-[10px] px-2 py-1 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-bold uppercase cursor-pointer"
                     >
                       {copiedCode ? 'TERSALIN' : 'SALIN'}
                     </button>
@@ -984,7 +984,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-300 uppercase">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
                     {isId ? 'Nama Atlet (Opsional)' : 'Athlete Name (Optional)'}
                   </label>
                   <input
@@ -992,12 +992,12 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                     value={inviteAthleteName}
                     onChange={(e) => setInviteAthleteName(e.target.value)}
                     placeholder="misal: Rian Pratama"
-                    className="w-full px-3 py-2 bg-[#070a14] border border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-white"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-300 uppercase">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
                     {isId ? 'Alamat Email Atlet' : 'Athlete Email'}
                   </label>
                   <input
@@ -1006,7 +1006,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="atlet@example.com"
-                    className="w-full px-3 py-2 bg-[#070a14] border border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-white"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
                   />
                 </div>
 
@@ -1014,7 +1014,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                   <button
                     type="button"
                     onClick={() => setShowInviteModal(false)}
-                    className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-zinc-300 text-xs uppercase font-bold cursor-pointer"
+                    className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 text-xs uppercase font-bold cursor-pointer"
                   >
                     Batal
                   </button>
@@ -1033,19 +1033,19 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
       {/* MODAL 2: CREATE TRAINING PLAN */}
       {showCreatePlanModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#0d1224] border-2 border-violet-500 p-6 max-w-lg w-full shadow-[6px_6px_0px_#7c3aed] text-white space-y-4 font-mono max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-violet-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0d1224] border-2 border-violet-500 p-6 max-w-lg w-full shadow-[6px_6px_0px_#7c3aed] text-slate-900 dark:text-white space-y-4 font-mono max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-violet-900">
               <div className="flex items-center gap-2">
-                <Plus className="w-5 h-5 text-violet-400" />
-                <h3 className="font-black uppercase text-sm tracking-wide">
+                <Plus className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                <h3 className="font-black uppercase text-sm tracking-wide text-slate-900 dark:text-white">
                   {isId ? 'RANCANG MODUL PROGRAM LATIHAN BARU' : 'CREATE NEW TRAINING PLAN'}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreatePlanModal(false)}
-                className="text-zinc-400 hover:text-white text-sm cursor-pointer"
+                className="text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-white text-sm cursor-pointer"
               >
                 ✕
               </button>
@@ -1053,7 +1053,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
             <form onSubmit={handleCreatePlan} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-zinc-300 uppercase">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
                   {isId ? 'Nama Modul Program' : 'Plan Title'}
                 </label>
                 <input
@@ -1062,19 +1062,19 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                   value={newPlanTitle}
                   onChange={(e) => setNewPlanTitle(e.target.value)}
                   placeholder="misal: 10K Sub-45 Speed Endurance"
-                  className="w-full px-3 py-2 bg-[#070a14] border border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-white"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-300 uppercase">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
                     {isId ? 'Kategori Jarak' : 'Category'}
                   </label>
                   <select
                     value={newPlanCategory}
                     onChange={(e) => setNewPlanCategory(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-[#070a14] border border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-white"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-slate-900 dark:text-white"
                   >
                     <option value="Base">Fondasi (Base)</option>
                     <option value="5K">5K Speed</option>
@@ -1085,7 +1085,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-300 uppercase">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
                     {isId ? 'Durasi (Minggu)' : 'Duration (Weeks)'}
                   </label>
                   <input
@@ -1094,14 +1094,14 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                     max={24}
                     value={newPlanDuration}
                     onChange={(e) => setNewPlanDuration(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-[#070a14] border border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-white"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-slate-900 dark:text-white"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-300 uppercase">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
                     {isId ? 'Target Intensitas / Pace' : 'Target Pace'}
                   </label>
                   <input
@@ -1109,12 +1109,12 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                     value={newPlanPace}
                     onChange={(e) => setNewPlanPace(e.target.value)}
                     placeholder="misal: 4:40 - 5:00 /km"
-                    className="w-full px-3 py-2 bg-[#070a14] border border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-white"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-slate-900 dark:text-white"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-300 uppercase">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
                     {isId ? 'Target Zona Detak Jantung' : 'HR Zone'}
                   </label>
                   <input
@@ -1122,13 +1122,13 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                     value={newPlanZone}
                     onChange={(e) => setNewPlanZone(e.target.value)}
                     placeholder="misal: Zona 3 / Ambang Aerobik"
-                    className="w-full px-3 py-2 bg-[#070a14] border border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-white"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-slate-900 dark:text-white"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-zinc-300 uppercase">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
                   {isId ? 'Tujuan & Deskripsi Program' : 'Description'}
                 </label>
                 <textarea
@@ -1136,12 +1136,12 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                   value={newPlanDesc}
                   onChange={(e) => setNewPlanDesc(e.target.value)}
                   placeholder="Fokus program, adaptasi fisiologis yang diharapkan..."
-                  className="w-full px-3 py-2 bg-[#070a14] border border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-white resize-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-slate-900 dark:text-white resize-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-zinc-300 uppercase">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
                   {isId ? 'Menu Latihan Mingguan' : 'Weekly Workout Menu'}
                 </label>
                 <textarea
@@ -1149,7 +1149,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                   value={newPlanStructure}
                   onChange={(e) => setNewPlanStructure(e.target.value)}
                   placeholder="misal: 1x Interval 6x800m, 1x Tempo 8km, 1x Long Run 16km, 2x Easy 40m"
-                  className="w-full px-3 py-2 bg-[#070a14] border border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-white resize-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-slate-900 dark:text-white resize-none"
                 />
               </div>
 
@@ -1157,7 +1157,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                 <button
                   type="button"
                   onClick={() => setShowCreatePlanModal(false)}
-                  className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-zinc-300 text-xs uppercase font-bold cursor-pointer"
+                  className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 text-xs uppercase font-bold cursor-pointer"
                 >
                   Batal
                 </button>

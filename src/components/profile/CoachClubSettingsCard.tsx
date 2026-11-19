@@ -80,11 +80,11 @@ export default function CoachClubSettingsCard({ initialProfile }: Props) {
   return (
     <div className="bg-white dark:bg-[#0d1224] border-2 border-cyan-500/80 p-5 sm:p-6 shadow-[4px_4px_0px_#06b6d4] space-y-6 font-mono text-slate-900 dark:text-white">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-cyan-900/40 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 dark:border-cyan-900/40 gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-cyan-500" />
-            <span className="text-[10px] font-black px-2 py-0.5 bg-cyan-950 border border-cyan-400 text-cyan-300 uppercase tracking-widest">
+            <ShieldCheck className="w-4 h-4 text-cyan-600 dark:text-cyan-500" />
+            <span className="text-[10px] font-black px-2 py-0.5 bg-cyan-100 dark:bg-cyan-950 border border-cyan-400 text-cyan-800 dark:text-cyan-300 uppercase tracking-widest">
               {isId ? 'PENGATURAN_KLUB // ROLE_COACH' : 'CLUB_SETTINGS // HEAD_COACH'}
             </span>
           </div>
