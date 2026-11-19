@@ -22,7 +22,7 @@ import {
   Plus
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { CoachTask, SquadAthlete } from '@/domain/entities/CoachingRelationship';
+import { CoachTask, SquadAthlete, AvailableCoach, AvailableCoachProgram } from '@/domain/entities/CoachingRelationship';
 import { CoachingStorage } from '@/utils/coachingStorage';
 
 interface Props {
@@ -40,7 +40,13 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
   const [reportFeedback, setReportFeedback] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
+
+  // Modal & Catalog States
   const [isJoinModalOpen, setIsJoinModalOpen] = useState<boolean>(false);
+  const [coachesDirectory] = useState<AvailableCoach[]>(() => CoachingStorage.getAvailableCoaches());
+  const [selectedCoachId, setSelectedCoachId] = useState<string>('coach-pack');
+  const [selectedProgramId, setSelectedProgramId] = useState<string>('prog-fm');
+  const [joinTab, setJoinTab] = useState<'catalog' | 'code'>('catalog');
   const [joinCoachName, setJoinCoachName] = useState<string>('');
 
   // Load tasks on mount and check squad membership
@@ -103,21 +109,58 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
 
   const handleJoinCoach = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!joinCoachName.trim()) return;
+
+    let targetCoachName = joinCoachName.trim();
+    let targetProgramTitle = 'Program Pembinaan Lari';
+    let targetCategory = 'All-Round Endurance';
+    let targetDescription = 'Program pembinaan personal oleh pelatih.';
+    let targetDist = 10;
+    let targetPace = '5:30 /km';
+
+    if (joinTab === 'catalog') {
+      const coach = coachesDirectory.find(c => c.id === selectedCoachId) || coachesDirectory[0];
+      const prog = coach?.programs.find(p => p.id === selectedProgramId) || coach?.programs[0];
+      if (coach && prog) {
+        targetCoachName = coach.name;
+        targetProgramTitle = prog.title;
+        targetCategory = prog.category;
+        targetDescription = prog.description;
+        targetDist = prog.id.includes('fm') ? 16 : prog.id.includes('hm') ? 12 : 8;
+        targetPace = prog.id.includes('10k') ? '4:50 - 5:10 /km' : '5:25 - 5:45 /km';
+      }
+    }
+
+    if (!targetCoachName) return;
 
     // Register athlete in squad
     CoachingStorage.addSquadAthlete({
       name: athleteName || 'Atlet Binaan',
-      email: `${athleteName.toLowerCase().replace(/\s+/g, '')}@athlete.local`,
-      coachId: joinCoachName.trim(),
-      targetRace: 'Half Marathon Build',
+      email: `${(athleteName || 'atlet').toLowerCase().replace(/\s+/g, '')}@athlete.local`,
+      coachId: targetCoachName,
+      targetRace: targetProgramTitle,
       acwr: 1.05,
       acwrZone: 'SWEET_SPOT',
-      weeklyMileageKm: 25,
-      targetWeeklyKm: 35,
+      weeklyMileageKm: 28,
+      targetWeeklyKm: 38,
       lastSession: 'Kemarin (Easy Run)',
       tsb: 2,
-      packageTier: 'Paket Pembinaan Skuad Klub',
+      packageTier: `${targetCategory} // ${targetCoachName}`,
+    });
+
+    // Automatically issue the first workout prescription
+    CoachingStorage.addTask({
+      athleteId: athleteName || 'ath-current',
+      athleteName: athleteName || 'Atlet Binaan',
+      coachName: targetCoachName,
+      title: `Sesi Perdana: ${targetProgramTitle}`,
+      type: targetProgramTitle.toLowerCase().includes('interval') || targetProgramTitle.toLowerCase().includes('10k') ? 'INTERVAL' : 'LONG_RUN',
+      dueDate: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
+      targetDistanceKm: targetDist,
+      targetPace: targetPace,
+      targetHrZone: 'Zona 2 / Ambang Terkontrol',
+      instructions: targetDescription,
+      status: 'PENDING',
+      adherenceScore: 100,
     });
 
     setIsJoinModalOpen(false);
@@ -427,48 +470,180 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
         )}
       </div>
 
-      {/* MODAL: CONNECT TO COACH */}
+      {/* MODAL: DIRECTORY OF COACHES & TRAINING PROGRAMS */}
       {isJoinModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0d1224] border-2 border-cyan-500 p-6 max-w-md w-full shadow-[6px_6px_0px_#06b6d4] text-slate-900 dark:text-white space-y-4 font-mono">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-[#0d1224] border-2 border-cyan-500 p-5 sm:p-6 max-w-xl w-full shadow-[6px_6px_0px_#06b6d4] text-slate-900 dark:text-white space-y-4 font-mono max-h-[90vh] overflow-y-auto">
+            {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-cyan-900">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
-                <h3 className="font-black uppercase text-sm">
-                  {isId ? 'GABUNG SKUAD / HUBUNGKAN KE PELATIH' : 'JOIN SQUAD / CONNECT COACH'}
-                </h3>
+                <div>
+                  <h3 className="font-black uppercase text-sm">
+                    {isId ? 'KATALOG & DIREKTORI PELATIH SKUAD' : 'SQUAD COACHES & PROGRAM DIRECTORY'}
+                  </h3>
+                  <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5">
+                    {isId
+                      ? 'Pilih pelatih resmi dan program spesialisasi yang Anda inginkan'
+                      : 'Choose an accredited coach and structured training program'}
+                  </p>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsJoinModalOpen(false)}
-                className="p-1 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                className="p-1 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-400 hover:text-white cursor-pointer"
               >
-                <X className="w-4 h-4 text-slate-400" />
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Mode Tabs */}
+            <div className="flex gap-2 p-1 bg-slate-100 dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setJoinTab('catalog')}
+                className={`flex-1 py-1.5 uppercase transition-all cursor-pointer ${
+                  joinTab === 'catalog'
+                    ? 'bg-cyan-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-zinc-400 hover:text-cyan-500'
+                }`}
+              >
+                {isId ? '1. KATALOG PELATIH & PROGRAM' : '1. BROWSE COACHES & PLANS'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setJoinTab('code')}
+                className={`flex-1 py-1.5 uppercase transition-all cursor-pointer ${
+                  joinTab === 'code'
+                    ? 'bg-cyan-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-zinc-400 hover:text-cyan-500'
+                }`}
+              >
+                {isId ? '2. INPUT KODE INVITE KHUSUS' : '2. PRIVATE INVITE CODE'}
               </button>
             </div>
 
             <form onSubmit={handleJoinCoach} className="space-y-4 text-xs">
-              <p className="text-slate-600 dark:text-zinc-300 font-sans">
-                {isId
-                  ? 'Masukkan nama atau ID pelatih Anda untuk menghubungkan telemetri lari Anda langsung ke dasbor pembinaan pelatih.'
-                  : 'Enter your coach’s name or club identifier to connect your running telemetry with your coaching squad.'}
-              </p>
+              {joinTab === 'catalog' ? (
+                <div className="space-y-4">
+                  {/* Select Coach */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 block">
+                      {isId ? 'PILIH PELATIH PEMBINA:' : 'SELECT HEAD COACH:'}
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {coachesDirectory.map(c => {
+                        const isSelected = selectedCoachId === c.id;
+                        return (
+                          <div
+                            key={c.id}
+                            onClick={() => {
+                              setSelectedCoachId(c.id);
+                              if (c.programs[0]) {
+                                setSelectedProgramId(c.programs[0].id);
+                              }
+                            }}
+                            className={`p-3 border-2 transition-all cursor-pointer space-y-1 ${
+                              isSelected
+                                ? 'bg-cyan-50 dark:bg-cyan-950/40 border-cyan-500 shadow-[2px_2px_0px_#06b6d4]'
+                                : 'bg-slate-50 dark:bg-zinc-900/40 border-slate-200 dark:border-zinc-800 hover:border-cyan-400'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="w-6 h-6 rounded-full bg-cyan-600 text-white flex items-center justify-center font-black text-[10px]">
+                                {c.avatarInitials}
+                              </span>
+                              <strong className="text-xs text-slate-900 dark:text-white block truncate">{c.name}</strong>
+                            </div>
+                            <span className="text-[10px] text-cyan-600 dark:text-cyan-400 block font-bold leading-tight">
+                              {c.role}
+                            </span>
+                            <span className="text-[9px] text-slate-400 block font-sans">
+                              {c.specialty}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                  {isId ? 'NAMA / KODE PELATIH:' : 'COACH NAME / SQUAD CODE:'}
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Faisal, Coach Dani, PAC-CLUB"
-                  value={joinCoachName}
-                  onChange={e => setJoinCoachName(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-black border border-slate-300 dark:border-zinc-700 p-2.5 font-bold text-sm"
-                />
-              </div>
+                  {/* Select Program from Selected Coach */}
+                  {(() => {
+                    const activeCoach = coachesDirectory.find(c => c.id === selectedCoachId) || coachesDirectory[0];
+                    if (!activeCoach) return null;
 
-              <div className="flex justify-end gap-2 pt-2">
+                    return (
+                      <div className="space-y-2 pt-1 border-t border-slate-200 dark:border-zinc-800">
+                        <label className="text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 block">
+                          {isId ? `PROGRAM TERSEDIA DARI ${activeCoach.name.toUpperCase()}:` : `PROGRAMS BY ${activeCoach.name.toUpperCase()}:`}
+                        </label>
+                        <div className="space-y-2">
+                          {activeCoach.programs.map(prog => {
+                            const isSelected = selectedProgramId === prog.id;
+                            return (
+                              <div
+                                key={prog.id}
+                                onClick={() => setSelectedProgramId(prog.id)}
+                                className={`p-3 border-2 transition-all cursor-pointer flex items-start gap-3 ${
+                                  isSelected
+                                    ? 'bg-violet-50 dark:bg-violet-950/40 border-violet-500 shadow-[2px_2px_0px_#7c3aed]'
+                                    : 'bg-slate-50 dark:bg-zinc-900/40 border-slate-200 dark:border-zinc-800 hover:border-violet-400'
+                                }`}
+                              >
+                                <input
+                                  type="radio"
+                                  name="programSelect"
+                                  checked={isSelected}
+                                  onChange={() => setSelectedProgramId(prog.id)}
+                                  className="mt-0.5 accent-violet-600 cursor-pointer"
+                                />
+                                <div className="space-y-0.5 flex-1">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <strong className="text-xs text-slate-900 dark:text-white uppercase font-black">
+                                      {prog.title}
+                                    </strong>
+                                    <span className="text-[10px] px-2 py-0.5 bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-bold border border-violet-400 shrink-0">
+                                      {prog.durationWeeks} {isId ? 'Minggu' : 'Weeks'}
+                                    </span>
+                                  </div>
+                                  <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold block">
+                                    Kategori: {prog.category}
+                                  </span>
+                                  <p className="text-[11px] text-slate-600 dark:text-zinc-400 font-sans leading-snug">
+                                    {prog.description}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              ) : (
+                /* Tab 2: Custom Code / Invite */
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    {isId ? 'MASUKKAN KODE PELATIH / ID SKUAD:' : 'ENTER COACH CODE / SQUAD ID:'}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. COACH-PACK, FAISAL-PRO, SQUAD-2026"
+                    value={joinCoachName}
+                    onChange={e => setJoinCoachName(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-black border border-slate-300 dark:border-zinc-700 p-2.5 font-bold text-sm uppercase"
+                  />
+                  <span className="text-[10px] text-slate-400 font-sans block">
+                    {isId
+                      ? 'Gunakan opsi ini bila pelatih Anda memberikan kode undangan khusus secara privat.'
+                      : 'Use this option if your coach provided you a private squad invitation code.'}
+                  </span>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-200 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsJoinModalOpen(false)}
@@ -478,9 +653,10 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase cursor-pointer shadow-xs"
+                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase cursor-pointer shadow-xs flex items-center gap-1.5"
                 >
-                  {isId ? 'HUBUNGKAN' : 'CONNECT'}
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>{isId ? 'GABUNG PROGRAM & HUBUNGKAN' : 'ENROLL & CONNECT'}</span>
                 </button>
               </div>
             </form>

@@ -2,10 +2,13 @@
 
 import { 
   CoachTask, 
-  SquadAthlete,
+  SquadAthlete, 
   RABItem, 
   CoachingPackage, 
   CommercialFinancialSummary,
+  AvailableCoach,
+  AvailableCoachProgram,
+  DIRECTORY_COACHES,
   INITIAL_COACH_TASKS,
   INITIAL_RAB_ITEMS,
   INITIAL_COACHING_PACKAGES
@@ -62,6 +65,11 @@ export class CoachingStorage {
       window.dispatchEvent(new Event('squad_athlete_updated'));
     }
     return true;
+  }
+
+  // --- COACHES DIRECTORY ---
+  public static getAvailableCoaches(): AvailableCoach[] {
+    return DIRECTORY_COACHES;
   }
   // --- COACH TASKS ---
   public static getTasks(): CoachTask[] {
