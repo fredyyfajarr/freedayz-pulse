@@ -13,6 +13,10 @@ Dokumen ini mencatat seluruh riwayat iterasi, evolusi arsitektur, perbaikan bug 
 
 | Versi | Tanggal | Milestone Utama | Status |
 | :--- | :--- | :--- | :--- |
+| **v1.0.0** | 19 Nov 2026 | **Production Release: Zero-Defect UAT, Dokumen Manajemen Proyek TI (MS Project WBS), Full Mobile Guardrails** | ✅ Selesai |
+| **v0.9.0** | 19 Nov 2026 | **Akurasi Telemetri HR Aktivitas: Sinkronisasi Stream Detik-ke-Detik, Presisi Joe Friel LTHR, Kunci Plafon Max HR (201 BPM)** | ✅ Selesai |
+| **v0.8.0** | 18 Nov 2026 | **Mesin Kalibrasi 4-Metode Zona Detak Jantung (%HRR, %LTHR, %Max HR, Manual BPM), Modal Interaktif & Tampilan Mobile Khusus** | ✅ Selesai |
+| **v0.7.0** | 12 Nov 2026 | **Arsitektur Dual-Role Pelatih & Atlet: Katalog Program Skuad, Kode Invite Klub, dan Fallback Hibrida Serverless** | ✅ Selesai |
 | **v0.6.0** | 06 Nov 2026 | **Pro-Tier Biometrics: Jack Daniels VDOT 5-Zone Paces, GCT L/R Symmetry Injury Radar, Hydration & Fueling Lab** | ✅ Selesai |
 | **v0.5.1** | 06 Nov 2026 | **Bilingual Landing Page (ID\|EN), Month Selector Export (Nov 2026), Garmin Calories & Steps, Tooltip Contrast Fix** | ✅ Selesai |
 | **v0.5.0** | 04 Nov 2026 | **SaaS Landing Page, PNG Brand Commercialization & Route Decoupling (`/` vs `/dashboard`)** | ✅ Selesai |
@@ -24,6 +28,79 @@ Dokumen ini mencatat seluruh riwayat iterasi, evolusi arsitektur, perbaikan bug 
 ---
 
 ## 🚀 Log Rinci Perubahan (Detailed Changelog)
+
+### [v1.0.0] — 2026-11-19 (Production Release: Zero-Defect UAT, Dokumen Manajemen Proyek TI, Full Mobile Viewport Guardrails)
+
+#### 🌟 Ditambahkan (Added)
+* **Dokumen Perencanaan & Tata Kelola Manajemen Proyek Informatika (MPI):**
+  * Artefak komprehensif untuk diintegrasikan langsung ke **Microsoft Project (MPP)**:
+    * Work Breakdown Structure (WBS) 5 Tahap (Inisiasi, Perencanaan Fisiologis, Eksekusi Sprint, Pengujian UAT, Penutupan & Rilis).
+    * Jadwal Proyek (*Project Schedule*), Durasi, Predecessors, dan Matriks Alokasi Sumber Daya (*Resource Sheet*).
+    * Critical Path Analysis (CPM) dan Rencana Manajemen Biaya (*Earned Value Management* / EVM).
+    * Matriks Manajemen Risiko (*Risk Assessment Matrix* 5x5).
+* **Universal Mobile Viewport Guardrails:**
+  * Penguatan `overflow-x: hidden; max-width: 100vw; width: 100%` pada `html, body` dan kontainer `main` di `AppLayoutClient.tsx`.
+  * Seluruh modul (Dashboard, Activities, Activity Detail, Compare, Fitness PMC, Recovery Hub, Records, Settings) dioptimalkan dengan padding adaptif `px-3 sm:px-6`, `min-w-0`, dan wrapping `break-words` untuk layar 393px (iPhone 16 / standar mobile).
+
+#### 🛠️ Diperbaiki (Fixed)
+* **Penyelarasan Kontras Tema Terang & Gelap di Seluruh Platform:**
+  * Komponen `FitnessClient.tsx`, `RecoveryPageClient.tsx`, dan `RecordsClient.tsx` telah disesuaikan dengan palet brutalist cyber-athletic yang adaptif 100% terhadap Light Mode dan Dark Mode.
+
+---
+
+### [v0.9.0] — 2026-11-19 (Akurasi Telemetri HR Aktivitas: Sinkronisasi Stream Detik-ke-Detik, Presisi Joe Friel LTHR, Kunci Plafon Max HR)
+
+#### 🌟 Ditambahkan (Added)
+* **Kalkulasi Ulang Waktu Zona dari Telemetri Detak Jantung (`HeartRateZonesCard.tsx`):**
+  * Kartu distribusi zona detak jantung pada halaman detail aktivitas (`/activities/[id]`) kini menerima telemetri `stream` (`MetricStreamPoint[]`).
+  * Menghitung ulang detik dan persentase di tiap zona secara dinamis berdasarkan ambang batas BPM aktif di aplikasi (menggantikan waktu zona statis bawaan Garmin jika jam merekam dengan kalibrasi berbeda).
+  * Header badge menampilkan metode kalibrasi aktif secara dinamis (`FORERUNNER 165 // %KALIBRASI_LTHR`, `%KALIBRASI_HRR`, `%KALIBRASI_MAX_HR`, atau `KALIBRASI_MANUAL_BPM`).
+* **Kunci Plafon Max HR Dinamis (201 BPM):**
+  * Batas atas Zona 5 pada seluruh model dan kartu kini secara ketat mengikuti nilai Max HR atlet aktual (201 BPM), menghilangkan anomali angka statis 200 BPM.
+
+#### 🛠️ Diperbaiki (Fixed)
+* **Presisi Kolom Input % LTHR (Joe Friel Running Zones):**
+  * Memperbaiki bug di mana input persentase LTHR terpolusi oleh nilai default 50% milik HRR. Kini kolom persentase LTHR terkalibrasi secara presisi:
+    * **Zona 1 (Warm Up):** 65% – 85% LTHR (115 – 150 BPM).
+    * **Zona 2 (Easy):** 85% – 89% LTHR (150 – 158 BPM).
+    * **Zona 3 (Aerobic):** 90% – 94% LTHR (159 – 166 BPM).
+    * **Zona 4 (Threshold):** 95% – 99% LTHR (168 – 175 BPM).
+    * **Zona 5 (Maximum):** 100% – 114% LTHR (177 – 201 BPM).
+* **Independensi State per Metode:**
+  * Array persentase dan rentang BPM untuk `% HRR`, `% MAX HR`, `% LTHR`, dan `MANUAL BPM` disimpan secara terpisah di state dan `localStorage`, sehingga perpindahan metode tidak saling merusak konfigurasi pengguna.
+
+---
+
+### [v0.8.0] — 2026-11-18 (Mesin Kalibrasi 4-Metode Zona Detak Jantung & Kartu Mobile Khusus)
+
+#### 🌟 Ditambahkan (Added)
+* **Universal Dynamic Heart Rate Zone Engine (`HRProfileCalculator.ts`):**
+  * Mendukung 4 metode sains olahraga internasional:
+    1. **% HRR (Karvonen):** Menghitung denyut cadangan ($HRR = Max - Rest$) untuk presisi latihan kardiorespirasi.
+    2. **% MAX HR:** Standar umum berbasis persentase denyut maksimal.
+    3. **% LTHR (Joe Friel):** Standar pelari kompetitif berbasis ambang laktat (*Lactate Threshold*).
+    4. **MANUAL BPM (Kustom Atlet):** Input langsung rentang BPM tiap zona dengan default proporsional dari persentase Max HR.
+* **Modal Interaktif Kalibrasi Biometrik (`AthletePersonalInfoCard.tsx`):**
+  * Input interaktif Max HR, Resting HR, dan LTHR dengan *live preview* BPM instan.
+  * Tabel konfigurasi dengan scroll horizontal aman untuk layar mobile.
+* **Dedicated Mobile Zone Cards (`md:hidden`):**
+  * Tampilan kartu vertikal khusus mobile untuk 5 zona latihan, bersanding dengan tabel 6-kolom desktop (`hidden md:block`).
+* **Endpoint API Pengaturan Biometrik (`/api/settings/biometrics`):**
+  * Persistensi konfigurasi ke `data/athlete-settings.json` dan sinkronisasi real-time via event browser `athlete_hr_settings_updated`.
+
+---
+
+### [v0.7.0] — 2026-11-12 (Arsitektur Dual-Role Pelatih & Atlet, Katalog Skuad, dan Hybrid Serverless)
+
+#### 🌟 Ditambahkan (Added)
+* **Sistem Peran Dual-Role (Pelatih / Coach vs Atlet / Athlete):**
+  * Navigasi sidebar, dashboard, dan izin halaman menyesuaikan peran pengguna secara otomatis.
+* **Katalog Program & Direktori Skuad:**
+  * Pilihan program pembinaan resmi dan aktivasi via kode undangan klub (*Invite Code*).
+* **Integrasi Autentikasi Supabase & Fallback Offline Hibrida:**
+  * Mode aman (*graceful degradation*) yang tetap berfungsi penuh menggunakan data telemetri lokal jika koneksi Supabase belum terkonfigurasi.
+
+---
 
 ### [v0.6.0] — 2026-11-06 (Pro-Tier Biometrics: Jack Daniels VDOT 5-Zone Paces, GCT Foot Symmetry, Hydration & Fueling Lab)
 

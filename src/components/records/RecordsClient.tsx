@@ -27,7 +27,7 @@ export default function RecordsClient({ prs, activities }: Props) {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-6 min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-2 border-slate-200 dark:border-violet-900/50 gap-3">
         <div>
@@ -37,7 +37,7 @@ export default function RecordsClient({ prs, activities }: Props) {
               {language === 'ID' ? 'TOLOK_UKUR_SEPANJANG_MASA // MILESTONE_KECEPATAN' : 'ALL_TIME_BENCHMARKS // SPEED_MILESTONES'}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1 break-words">
             {language === 'ID' ? 'REKOR_PRIBADI // REKOR_TERBAIK' : 'PERSONAL_RECORDS // BEST_EFFORTS'}
           </h1>
           <p className="text-xs font-mono text-slate-500 dark:text-zinc-400">

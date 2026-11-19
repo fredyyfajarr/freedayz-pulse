@@ -39,7 +39,7 @@ export default function CompareClient({ activities, runA, runB }: Props) {
   const trimpDelta = Math.round((runB.relativeEffortScore || 0) - (runA.relativeEffortScore || 0));
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6 font-mono">
+    <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-6 font-mono min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-2 border-slate-200 dark:border-violet-900/50 gap-3">
         <div>

@@ -28,7 +28,7 @@ export default function RecoveryPageClient({ snapshot }: Props) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-6 min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-2 border-slate-200 dark:border-violet-900/50 gap-3">
         <div>
@@ -38,7 +38,7 @@ export default function RecoveryPageClient({ snapshot }: Props) {
               {isId ? 'FISIOLOGI_GARMIN // KECERDASAN_BIOMETRIK' : 'GARMIN_PHYSIOLOGY // BIOMETRIC_INTELLIGENCE'}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1 break-words">
             {isId ? 'STATUS_HRV_&_PEMULIHAN_KARDIO' : 'HRV_STATUS_&_CARDIO_RECOVERY'}
           </h1>
           <p className="text-xs font-mono text-slate-600 dark:text-zinc-400">
