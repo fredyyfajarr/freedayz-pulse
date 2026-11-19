@@ -35,6 +35,9 @@ export interface CustomHRSettings {
   restingHr: number;
   maxHr: number;
   lthr: number;
+  hrrPercentages?: { idx: number; minP: number; maxP: number }[];
+  maxHrPercentages?: { idx: number; minP: number; maxP: number }[];
+  lthrPercentages?: { idx: number; minP: number; maxP: number }[];
   zonePercentages?: { idx: number; minP: number; maxP: number }[];
   manualZoneBpms?: { idx: number; minBpm: number; maxBpm: number }[];
 }
@@ -44,7 +47,7 @@ export const STORAGE_HR_SETTINGS_KEY = 'fdz_athlete_hr_settings_v1';
 export class HRProfileCalculator {
   // Default %HRR configuration
   public static readonly DEFAULT_HRR_ZONES = [
-    { idx: 1, name: 'Warm Up', code: 'ZONE_01', minP: 50, maxP: 62.5, minBpm: 126, maxBpm: 144, role: 'Warm-up, recovery & active cool-down. Metabolic flush.', fuel: 'Primary: Fat (80%), Glycogen (20%)', color: 'text-slate-300 bg-slate-400' },
+    { idx: 1, name: 'Warm Up', code: 'ZONE_01', minP: 50, maxP: 62.5, minBpm: 126, maxBpm: 144, role: 'Warm-up, recovery & active cool-down. Metabolic flush.', fuel: 'Primary: Fat (80%), Glycogen (20%)', color: 'text-white bg-slate-500' },
     { idx: 2, name: 'Easy', code: 'ZONE_02', minP: 62.5, maxP: 74.5, minBpm: 145, maxBpm: 162, role: 'Aerobic base building, mitochondrial density & fat oxidation peak.', fuel: 'Primary: Fat (65%), Glycogen (35%)', color: 'text-emerald-400 bg-emerald-500' },
     { idx: 3, name: 'Aerobic', code: 'ZONE_03', minP: 74.5, maxP: 84, minBpm: 163, maxBpm: 176, role: 'Cardiovascular endurance flow, steady-state tempo pace.', fuel: 'Balanced: Glycogen (50%), Fat (50%)', color: 'text-cyan-400 bg-cyan-500' },
     { idx: 4, name: 'Threshold', code: 'ZONE_04', minP: 84, maxP: 92, minBpm: 177, maxBpm: 188, role: 'Lactate threshold clearance, race stamina & sub-max power.', fuel: 'Primary: Glycogen (80%), Lactate turnover', color: 'text-amber-400 bg-amber-500' },
@@ -53,7 +56,7 @@ export class HRProfileCalculator {
 
   // Default % Max HR configuration
   public static readonly DEFAULT_MAXHR_ZONES = [
-    { idx: 1, name: 'Warm Up', code: 'ZONE_01', minP: 50, maxP: 60, minBpm: 100, maxBpm: 120, role: 'Recovery & active cool-down.', fuel: 'Fat (85%)', color: 'text-slate-300 bg-slate-400' },
+    { idx: 1, name: 'Warm Up', code: 'ZONE_01', minP: 50, maxP: 60, minBpm: 100, maxBpm: 120, role: 'Recovery & active cool-down.', fuel: 'Fat (85%)', color: 'text-white bg-slate-500' },
     { idx: 2, name: 'Easy', code: 'ZONE_02', minP: 60, maxP: 70, minBpm: 120, maxBpm: 140, role: 'Basic aerobic endurance.', fuel: 'Fat (70%)', color: 'text-emerald-400 bg-emerald-500' },
     { idx: 3, name: 'Aerobic', code: 'ZONE_03', minP: 70, maxP: 80, minBpm: 140, maxBpm: 160, role: 'Cardiovascular aerobic tempo.', fuel: 'Fat / Carb (50/50)', color: 'text-cyan-400 bg-cyan-500' },
     { idx: 4, name: 'Threshold', code: 'ZONE_04', minP: 80, maxP: 90, minBpm: 160, maxBpm: 180, role: 'Lactate threshold & race stamina.', fuel: 'Glycogen (80%)', color: 'text-amber-400 bg-amber-500' },
@@ -62,7 +65,7 @@ export class HRProfileCalculator {
 
   // Default % LTHR configuration (Joe Friel Running Zones)
   public static readonly DEFAULT_LTHR_ZONES = [
-    { idx: 1, name: 'Warm Up', code: 'ZONE_01', minP: 65, maxP: 85, minBpm: 115, maxBpm: 150, role: 'Active recovery below aerobic threshold.', fuel: 'Fat (80%)', color: 'text-slate-300 bg-slate-400' },
+    { idx: 1, name: 'Warm Up', code: 'ZONE_01', minP: 65, maxP: 85, minBpm: 115, maxBpm: 150, role: 'Active recovery below aerobic threshold.', fuel: 'Fat (80%)', color: 'text-white bg-slate-500' },
     { idx: 2, name: 'Easy', code: 'ZONE_02', minP: 85, maxP: 89, minBpm: 150, maxBpm: 158, role: 'Aerobic endurance base development.', fuel: 'Fat (65%)', color: 'text-emerald-400 bg-emerald-500' },
     { idx: 3, name: 'Aerobic', code: 'ZONE_03', minP: 90, maxP: 94, minBpm: 159, maxBpm: 166, role: 'Tempo & steady-state endurance.', fuel: 'Balanced (50/50)', color: 'text-cyan-400 bg-cyan-500' },
     { idx: 4, name: 'Threshold', code: 'ZONE_04', minP: 95, maxP: 99, minBpm: 168, maxBpm: 175, role: 'Sub-threshold & lactate clearance zone.', fuel: 'Glycogen (80%)', color: 'text-amber-400 bg-amber-500' },
@@ -183,11 +186,26 @@ export class HRProfileCalculator {
       let minP = defaultCfg.minP;
       let maxP = defaultCfg.maxP;
 
-      const userPct = activeSettings.zonePercentages?.find(b => b.idx === defaultCfg.idx) 
+      let methodPcts = activeSettings.zonePercentages;
+      if (method === 'LTHR') {
+        // If zonePercentages starts with 50 (from HRR), ignore it and use authentic LTHR defaults
+        methodPcts = activeSettings.lthrPercentages || 
+          (activeSettings.zonePercentages?.[0]?.minP !== 50 ? activeSettings.zonePercentages : undefined);
+      } else if (method === 'MAX_HR') {
+        methodPcts = activeSettings.maxHrPercentages || 
+          (activeSettings.zonePercentages?.[0]?.maxP !== 62.5 ? activeSettings.zonePercentages : undefined);
+      } else if (method === 'HRR') {
+        methodPcts = activeSettings.hrrPercentages || activeSettings.zonePercentages;
+      }
+
+      const userPct = methodPcts?.find(b => b.idx === defaultCfg.idx) 
         || customBrackets?.find(b => b.idx === defaultCfg.idx);
       if (userPct) {
         minP = userPct.minP;
         maxP = userPct.maxP;
+      } else if (method === 'LTHR' && defaultCfg.idx === 5) {
+        const lthrMaxP = Math.round((effectiveMaxHr / effectiveLthr) * 100);
+        maxP = Math.max(106, lthrMaxP);
       }
 
       let minBpm = 0;
@@ -195,8 +213,10 @@ export class HRProfileCalculator {
 
       if (method === 'MANUAL_BPM') {
         const manual = activeSettings.manualZoneBpms?.find(m => m.idx === defaultCfg.idx);
-        minBpm = manual?.minBpm ?? defaultCfg.minBpm;
-        maxBpm = manual?.maxBpm ?? (defaultCfg.idx === 5 ? effectiveMaxHr : defaultCfg.maxBpm);
+        const fallbackMin = Math.round(effectiveMaxHr * (defaultCfg.minP / 100));
+        const fallbackMax = defaultCfg.idx === 5 ? effectiveMaxHr : Math.round(effectiveMaxHr * (defaultCfg.maxP / 100));
+        minBpm = manual?.minBpm ?? fallbackMin;
+        maxBpm = manual?.maxBpm ?? fallbackMax;
         if (defaultCfg.idx === 5) {
           // Zone 5 ceiling reflects athlete's Max HR
           maxBpm = manual?.maxBpm ?? effectiveMaxHr;
@@ -209,7 +229,7 @@ export class HRProfileCalculator {
         maxBpm = defaultCfg.idx === 5 ? effectiveMaxHr : Math.round(effectiveMaxHr * (maxP / 100));
       } else if (method === 'LTHR') {
         minBpm = Math.round(effectiveLthr * (minP / 100));
-        maxBpm = Math.round(effectiveLthr * (maxP / 100));
+        maxBpm = defaultCfg.idx === 5 ? effectiveMaxHr : Math.round(effectiveLthr * (maxP / 100));
       } else {
         // HRR (Karvonen) Target = Resting + HRR * %
         minBpm = Math.round(effectiveResting + hrr * (minP / 100));

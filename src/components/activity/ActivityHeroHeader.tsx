@@ -216,9 +216,9 @@ export default function ActivityHeroHeader({ activity, polyline = [], deviceName
             </span>
             <Footprints className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
           </div>
-          <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0 min-w-0">
-            <span className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              {calculatedSteps ? calculatedSteps.toLocaleString() : '--'}
+          <div className="flex items-baseline gap-1.5 min-w-0">
+            <span className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight tabular-nums">
+              {calculatedSteps ? (language === 'ID' ? calculatedSteps.toLocaleString('id-ID') : calculatedSteps.toLocaleString('en-US')) : '--'}
             </span>
             <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-zinc-400 shrink-0 uppercase">
               {language === 'ID' ? 'LANGKAH' : 'STEPS'}

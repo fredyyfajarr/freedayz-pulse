@@ -79,6 +79,19 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
         z.idx === 5 ? { ...z, maxBpm: copy.maxHr } : z
       );
     }
+    // Auto-fix if LTHR had inherited HRR's 50%
+    if (copy.method === 'LTHR' && (!copy.lthrPercentages || copy.zonePercentages?.[0]?.minP === 50)) {
+      const lthrMaxP = Math.round(((copy.maxHr || 201) / (copy.lthr || 177)) * 100);
+      copy.zonePercentages = HRProfileCalculator.DEFAULT_LTHR_ZONES.map((z: any) => ({
+        idx: z.idx,
+        minP: z.minP,
+        maxP: z.idx === 5 ? Math.max(106, lthrMaxP) : z.maxP,
+      }));
+    } else if (copy.method === 'MAX_HR' && (!copy.maxHrPercentages || copy.zonePercentages?.[0]?.maxP === 62.5)) {
+      copy.zonePercentages = HRProfileCalculator.DEFAULT_MAXHR_ZONES.map((z: any) => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+    } else if (copy.method === 'HRR' && (!copy.hrrPercentages || !copy.zonePercentages)) {
+      copy.zonePercentages = HRProfileCalculator.DEFAULT_HRR_ZONES.map((z: any) => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+    }
     setDraftSettings(copy);
     setDraftDeviceName(deviceName);
     setIsEditing(true);
@@ -87,20 +100,27 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
   const handleSelectMethod = (m: HRMethod) => {
     setDraftSettings(prev => {
       const copy: CustomHRSettings = { ...prev, method: m };
-      if (m === 'MAX_HR' && (!copy.zonePercentages || copy.zonePercentages.length === 0)) {
-        copy.zonePercentages = HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
-      } else if (m === 'LTHR' && (!copy.zonePercentages || copy.zonePercentages.length === 0)) {
-        copy.zonePercentages = HRProfileCalculator.DEFAULT_LTHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
-      } else if (m === 'HRR' && (!copy.zonePercentages || copy.zonePercentages.length === 0)) {
-        copy.zonePercentages = HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+      if (m === 'MAX_HR') {
+        copy.zonePercentages = prev.maxHrPercentages || HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+      } else if (m === 'LTHR') {
+        const lthrMaxP = Math.round(((prev.maxHr || 201) / (prev.lthr || 177)) * 100);
+        copy.zonePercentages = prev.lthrPercentages || HRProfileCalculator.DEFAULT_LTHR_ZONES.map(z => ({ 
+          idx: z.idx, 
+          minP: z.minP, 
+          maxP: z.idx === 5 ? Math.max(106, lthrMaxP) : z.maxP 
+        }));
+      } else if (m === 'HRR') {
+        copy.zonePercentages = prev.hrrPercentages || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
       } else if (m === 'MANUAL_BPM') {
+        const currentMax = copy.maxHr || 201;
+        const defaultFromMaxHr = HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({
+          idx: z.idx,
+          minBpm: Math.round(currentMax * (z.minP / 100)),
+          maxBpm: z.idx === 5 ? currentMax : Math.round(currentMax * (z.maxP / 100)),
+        }));
         const currentManual = copy.manualZoneBpms && copy.manualZoneBpms.length > 0
-          ? copy.manualZoneBpms.map(z => (z.idx === 5 ? { ...z, maxBpm: copy.maxHr } : z))
-          : HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ 
-              idx: z.idx, 
-              minBpm: z.minBpm, 
-              maxBpm: z.idx === 5 ? copy.maxHr : z.maxBpm 
-            }));
+          ? copy.manualZoneBpms.map(z => (z.idx === 5 ? { ...z, maxBpm: currentMax } : z))
+          : defaultFromMaxHr;
         copy.manualZoneBpms = currentManual;
       }
       return copy;
@@ -109,12 +129,24 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
 
   const handleUpdatePercentage = (idx: number, field: 'minP' | 'maxP', val: number) => {
     setDraftSettings(prev => {
-      const pcts = [...(prev.zonePercentages || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })))];
+      const currentMethod = prev.method;
+      const defaultPcts = currentMethod === 'MAX_HR'
+        ? HRProfileCalculator.DEFAULT_MAXHR_ZONES
+        : currentMethod === 'LTHR'
+        ? HRProfileCalculator.DEFAULT_LTHR_ZONES
+        : HRProfileCalculator.DEFAULT_HRR_ZONES;
+
+      const pcts = [...(prev.zonePercentages || defaultPcts.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })))];
       const targetIdx = pcts.findIndex(p => p.idx === idx);
       if (targetIdx !== -1) {
         pcts[targetIdx] = { ...pcts[targetIdx], [field]: val };
       }
-      return { ...prev, zonePercentages: pcts };
+
+      const updated: CustomHRSettings = { ...prev, zonePercentages: pcts };
+      if (currentMethod === 'HRR') updated.hrrPercentages = pcts;
+      if (currentMethod === 'MAX_HR') updated.maxHrPercentages = pcts;
+      if (currentMethod === 'LTHR') updated.lthrPercentages = pcts;
+      return updated;
     });
   };
 
@@ -306,15 +338,15 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
 
       {/* Desktop 5-Zone Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left font-mono text-xs">
+        <table className="w-full text-left font-mono text-xs table-fixed">
           <thead>
             <tr className="border-b-2 border-slate-200 dark:border-zinc-800 text-[10px] text-slate-500 dark:text-zinc-400 uppercase tracking-widest bg-slate-50 dark:bg-[#070a14]">
-              <th className="py-2.5 px-3">{isId ? 'ZONA' : 'ZONE'}</th>
-              <th className="py-2.5 px-3">{isId ? 'NAMA' : 'NAME'}</th>
-              <th className="py-2.5 px-3">{profile.methodType === 'MANUAL_BPM' ? (isId ? 'METODE' : 'METHOD') : (isId ? 'RENTANG INTENSITAS' : 'INTENSITY RANGE')}</th>
-              <th className="py-2.5 px-3">{isId ? 'AMBANG BPM TEPAT' : 'EXACT BPM RANGE'}</th>
-              <th className="py-2.5 px-3">{isId ? 'PERAN FISIOLOGIS & MANFAAT METABOLIK' : 'PHYSIOLOGICAL ROLE & METABOLIC BENEFIT'}</th>
-              <th className="py-2.5 px-3 text-right">{isId ? 'TOTAL WAKTU TERCATAT' : 'TOTAL TIME'}</th>
+              <th className="py-2.5 px-3 w-16 text-center">{isId ? 'ZONA' : 'ZONE'}</th>
+              <th className="py-2.5 px-3 w-32">{isId ? 'NAMA' : 'NAME'}</th>
+              <th className="py-2.5 px-3 w-36">{profile.methodType === 'MANUAL_BPM' ? (isId ? 'METODE' : 'METHOD') : (isId ? 'RENTANG INTENSITAS' : 'INTENSITY RANGE')}</th>
+              <th className="py-2.5 px-3 w-40">{isId ? 'AMBANG BPM TEPAT' : 'EXACT BPM RANGE'}</th>
+              <th className="py-2.5 px-3 w-auto">{isId ? 'PERAN FISIOLOGIS & MANFAAT METABOLIK' : 'PHYSIOLOGICAL ROLE & METABOLIC BENEFIT'}</th>
+              <th className="py-2.5 px-3 w-44 text-right">{isId ? 'TOTAL WAKTU TERCATAT' : 'TOTAL TIME'}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
@@ -480,78 +512,102 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                   : (isId ? `2. SESUAIKAN PERSENTASE ZONA (${draftSettings.method}):` : `2. ADJUST ZONE PERCENTAGES (${draftSettings.method}):`)}
               </label>
 
-              <div className="space-y-2">
-                {[1, 2, 3, 4, 5].map(idx => {
-                  const previewZone = previewProfile.zones.find(z => z.zoneIndex === idx);
-                  const userPct = draftSettings.zonePercentages?.find(p => p.idx === idx);
-                  const userManual = draftSettings.manualZoneBpms?.find(m => m.idx === idx);
+              <div className="border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#070a14] overflow-hidden">
+                <table className="w-full text-left font-mono text-xs border-collapse table-fixed">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 text-[10px] text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                      <th className="py-2.5 px-3.5 w-36 text-left font-bold">{isId ? 'ZONA & NAMA' : 'ZONE & NAME'}</th>
+                      <th className="py-2.5 px-3 text-center font-bold">
+                        {draftSettings.method === 'MANUAL_BPM' 
+                          ? (isId ? 'RENTANG INPUT (MIN – MAX BPM)' : 'INPUT RANGE (MIN – MAX BPM)') 
+                          : (isId ? `RENTANG PERSENTASE % (${draftSettings.method})` : `PERCENTAGE RANGE % (${draftSettings.method})`)}
+                      </th>
+                      <th className="py-2.5 px-3.5 w-44 text-right font-bold">{isId ? 'HASIL KALIBRASI BPM' : 'RESULTING BPM'}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
+                    {[1, 2, 3, 4, 5].map(idx => {
+                      const previewZone = previewProfile.zones.find(z => z.zoneIndex === idx);
+                      const userPct = draftSettings.zonePercentages?.find(p => p.idx === idx);
+                      const userManual = draftSettings.manualZoneBpms?.find(m => m.idx === idx);
 
-                  return (
-                    <div 
-                      key={idx}
-                      className="p-2.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-                    >
-                      <div className="flex items-center gap-2 w-32 shrink-0">
-                        <span className={`px-2 py-0.5 text-[10px] font-black ${previewZone?.color}`}>
-                          Z{idx}
-                        </span>
-                        <span className="font-bold text-slate-900 dark:text-white uppercase">{previewZone?.name}</span>
-                      </div>
+                      return (
+                        <tr key={idx} className="bg-slate-50 dark:bg-[#070a14] hover:bg-slate-100/60 dark:hover:bg-zinc-900/60 transition-colors">
+                          {/* Column 1: Zone & Name */}
+                          <td className="py-2.5 px-3.5 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <span className={`w-7 text-center py-0.5 text-[10px] font-black shrink-0 ${previewZone?.color}`}>
+                                Z{idx}
+                              </span>
+                              <span className="font-bold text-slate-900 dark:text-white uppercase text-xs truncate">
+                                {previewZone?.name}
+                              </span>
+                            </div>
+                          </td>
 
-                      {draftSettings.method === 'MANUAL_BPM' ? (
-                        /* Manual BPM inputs */
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            min="60"
-                            max="230"
-                            value={userManual?.minBpm ?? previewZone?.minBpm}
-                            onChange={e => handleUpdateManualBpm(idx, 'minBpm', Number(e.target.value))}
-                            className="w-20 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
-                          />
-                          <span className="text-slate-400">–</span>
-                          <input
-                            type="number"
-                            min="60"
-                            max="230"
-                            value={idx === 5 ? draftSettings.maxHr : (userManual?.maxBpm ?? previewZone?.maxBpm)}
-                            onChange={e => handleUpdateManualBpm(idx, 'maxBpm', Number(e.target.value))}
-                            className="w-20 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
-                          />
-                          <span className="text-[10px] text-slate-500 font-bold">BPM</span>
-                        </div>
-                      ) : (
-                        /* Percentage inputs */
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            step="0.5"
-                            value={userPct?.minP ?? previewZone?.minPercent}
-                            onChange={e => handleUpdatePercentage(idx, 'minP', Number(e.target.value))}
-                            className="w-16 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
-                          />
-                          <span className="text-slate-400">% –</span>
-                          <input
-                            type="number"
-                            step="0.5"
-                            value={userPct?.maxP ?? previewZone?.maxPercent}
-                            onChange={e => handleUpdatePercentage(idx, 'maxP', Number(e.target.value))}
-                            className="w-16 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
-                          />
-                          <span className="text-slate-400">%</span>
-                        </div>
-                      )}
+                          {/* Column 2: Exact Aligned Inputs */}
+                          <td className="py-2.5 px-3">
+                            <div className="flex items-center justify-center">
+                              {draftSettings.method === 'MANUAL_BPM' ? (
+                                <div className="flex items-center gap-1.5 font-mono">
+                                  <input
+                                    type="number"
+                                    min="30"
+                                    max="230"
+                                    value={userManual?.minBpm ?? previewZone?.minBpm}
+                                    onChange={e => handleUpdateManualBpm(idx, 'minBpm', Number(e.target.value))}
+                                    className="w-16 sm:w-20 h-8 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 font-mono font-black text-center text-xs focus:border-cyan-500 outline-none"
+                                  />
+                                  <span className="w-5 text-center text-slate-400 font-bold">–</span>
+                                  <input
+                                    type="number"
+                                    min="30"
+                                    max="230"
+                                    value={idx === 5 ? draftSettings.maxHr : (userManual?.maxBpm ?? previewZone?.maxBpm)}
+                                    onChange={e => handleUpdateManualBpm(idx, 'maxBpm', Number(e.target.value))}
+                                    className="w-16 sm:w-20 h-8 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 font-mono font-black text-center text-xs focus:border-cyan-500 outline-none"
+                                  />
+                                  <span className="w-9 text-left text-[11px] text-slate-500 dark:text-zinc-400 font-bold">BPM</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-1 font-mono">
+                                  <input
+                                    type="number"
+                                    step="0.5"
+                                    min="10"
+                                    max="150"
+                                    value={userPct?.minP ?? previewZone?.minPercent}
+                                    onChange={e => handleUpdatePercentage(idx, 'minP', Number(e.target.value))}
+                                    className="w-16 h-8 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 font-mono font-black text-center text-xs focus:border-violet-500 outline-none"
+                                  />
+                                  <span className="w-8 text-center text-slate-400 font-bold">% –</span>
+                                  <input
+                                    type="number"
+                                    step="0.5"
+                                    min="10"
+                                    max="150"
+                                    value={userPct?.maxP ?? previewZone?.maxPercent}
+                                    onChange={e => handleUpdatePercentage(idx, 'maxP', Number(e.target.value))}
+                                    className="w-16 h-8 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 font-mono font-black text-center text-xs focus:border-violet-500 outline-none"
+                                  />
+                                  <span className="w-6 text-left text-slate-500 dark:text-zinc-400 font-bold text-[11px]">%</span>
+                                </div>
+                              )}
+                            </div>
+                          </td>
 
-                      {/* Resulting BPM readout */}
-                      <div className="text-right">
-                        <span className="text-[10px] text-slate-400 block font-bold">HASIL BPM</span>
-                        <span className="font-black text-cyan-600 dark:text-cyan-400">
-                          {previewZone?.minBpm} – {previewZone?.maxBpm} BPM
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                          {/* Column 3: Resulting BPM */}
+                          <td className="py-2.5 px-3.5 text-right whitespace-nowrap">
+                            <span className="font-black text-xs text-cyan-600 dark:text-cyan-400 tabular-nums">
+                              {previewZone?.minBpm} – {previewZone?.maxBpm}
+                            </span>
+                            <span className="text-[10px] text-slate-400 dark:text-zinc-500 ml-1 font-normal">BPM</span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
 
