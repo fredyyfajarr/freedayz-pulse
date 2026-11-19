@@ -33,6 +33,7 @@ import {
 import { useLanguage } from '@/context/LanguageContext';
 import { 
   CoachTask, 
+  SquadAthlete,
   CoachingPackage, 
   TaskType 
 } from '@/domain/entities/CoachingRelationship';
@@ -54,20 +55,6 @@ interface TrainingPlan {
   description: string;
   weeklyStructure: string;
   isCustom?: boolean;
-}
-
-interface DemoAthlete {
-  id: string;
-  name: string;
-  email: string;
-  targetRace: string;
-  acwr: number;
-  acwrZone: 'SWEET_SPOT' | 'WARNING' | 'DANGER';
-  weeklyMileageKm: number;
-  targetWeeklyKm: number;
-  lastSession: string;
-  tsb: number;
-  packageTier: string;
 }
 
 const DEFAULT_TRAINING_PLANS: TrainingPlan[] = [
@@ -113,35 +100,6 @@ const DEFAULT_TRAINING_PLANS: TrainingPlan[] = [
   },
 ];
 
-const DEMO_ATHLETES: DemoAthlete[] = [
-  {
-    id: 'demo-1',
-    name: 'Budi Santoso',
-    email: 'budi.runner@example.com',
-    targetRace: 'Maybank Bali Marathon Sub-4',
-    acwr: 1.05,
-    acwrZone: 'SWEET_SPOT',
-    weeklyMileageKm: 34.5,
-    targetWeeklyKm: 38.0,
-    lastSession: 'Tempo Run 8km @ 5:15 /km',
-    tsb: 6,
-    packageTier: 'Half Marathon Performance',
-  },
-  {
-    id: 'demo-2',
-    name: 'Siti Rahma',
-    email: 'siti.speed@example.com',
-    targetRace: 'Jakarta 10K Debut Sub-50',
-    acwr: 1.42,
-    acwrZone: 'WARNING',
-    weeklyMileageKm: 28.0,
-    targetWeeklyKm: 25.0,
-    lastSession: 'Track 5x1000m @ 4:52 /km',
-    tsb: -14,
-    packageTier: 'Community Squad (Base)',
-  },
-];
-
 export default function CoachDashboard({ coachName, coachEmail, userId }: Props) {
   const { language } = useLanguage();
   const isId = language === 'ID';
@@ -163,8 +121,16 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
     router.replace(`/dashboard?tab=${tab}`, { scroll: false });
   };
 
-  const [showDemoSquad, setShowDemoSquad] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+
+  // --- DYNAMIC SQUAD ATHLETES STATE ---
+  const [squadAthletes, setSquadAthletes] = useState<SquadAthlete[]>([]);
+  const [showAddAthleteModal, setShowAddAthleteModal] = useState(false);
+  const [newAthleteName, setNewAthleteName] = useState('');
+  const [newAthleteEmail, setNewAthleteEmail] = useState('');
+  const [newAthleteTargetRace, setNewAthleteTargetRace] = useState('');
+  const [newAthleteTargetKm, setNewAthleteTargetKm] = useState(30);
+  const [newAthletePackageTier, setNewAthletePackageTier] = useState('Half Marathon Performance');
 
   // --- COACH TASKS STATE ---
   const [tasks, setTasks] = useState<CoachTask[]>([]);
@@ -173,7 +139,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
   // Modal: Assign Task
   const [showAssignTaskModal, setShowAssignTaskModal] = useState(false);
-  const [assignAthleteName, setAssignAthleteName] = useState('Fredy Fajar');
+  const [assignAthleteName, setAssignAthleteName] = useState('');
   const [assignTitle, setAssignTitle] = useState('');
   const [assignType, setAssignType] = useState<TaskType>('LONG_RUN');
   const [assignDueDate, setAssignDueDate] = useState('2026-11-23');
@@ -194,17 +160,31 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
     const loadData = () => {
       setTasks(CoachingStorage.getTasks());
       setPackages(CoachingStorage.getCoachingPackages());
+      const athletes = CoachingStorage.getSquadAthletes();
+      setSquadAthletes(athletes);
+      if (athletes.length > 0 && !assignAthleteName) {
+        setAssignAthleteName(athletes[0].name);
+      }
     };
     loadData();
 
     const handleTaskUpdate = () => setTasks(CoachingStorage.getTasks());
+    const handleSquadUpdate = () => {
+      const athletes = CoachingStorage.getSquadAthletes();
+      setSquadAthletes(athletes);
+      if (athletes.length > 0 && !assignAthleteName) {
+        setAssignAthleteName(athletes[0].name);
+      }
+    };
 
     window.addEventListener('coaching_task_updated', handleTaskUpdate);
+    window.addEventListener('squad_athlete_updated', handleSquadUpdate);
 
     return () => {
       window.removeEventListener('coaching_task_updated', handleTaskUpdate);
+      window.removeEventListener('squad_athlete_updated', handleSquadUpdate);
     };
-  }, []);
+  }, [assignAthleteName]);
 
   // Invite Modal State
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -299,18 +279,15 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
   // Handler for Assigning a Task to an Athlete
   const handleAssignTask = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!assignTitle) return;
+    if (!assignTitle || !assignAthleteName) return;
 
-    const athleteId = assignAthleteName.toLowerCase().includes('fredy') 
-      ? 'ath-fredy' 
-      : assignAthleteName.toLowerCase().includes('budi') 
-      ? 'demo-1' 
-      : 'demo-2';
+    const matched = squadAthletes.find(a => a.name === assignAthleteName);
+    const athleteId = matched ? matched.id : `ath-${Date.now()}`;
 
     CoachingStorage.addTask({
       athleteId,
       athleteName: assignAthleteName,
-      coachName: coachName ? `${coachName} (Head Coach)` : 'Coach Faisal (Head Coach)',
+      coachName: coachName ? `${coachName} (Head Coach)` : 'Head Coach',
       title: assignTitle,
       type: assignType,
       dueDate: assignDueDate,
@@ -326,6 +303,39 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
     setAssignTitle('');
     setAssignInstructions('');
     setTasks(CoachingStorage.getTasks());
+  };
+
+  // Handler for Adding an Athlete to the Squad
+  const handleAddAthlete = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAthleteName) return;
+
+    const newAth = CoachingStorage.addSquadAthlete({
+      name: newAthleteName,
+      email: newAthleteEmail || `${newAthleteName.toLowerCase().replace(/\s+/g, '.')}@athlete.local`,
+      coachId: userId,
+      targetRace: newAthleteTargetRace || 'Lari Rutin Kebugaran',
+      weeklyMileageKm: 0,
+      targetWeeklyKm: Number(newAthleteTargetKm) || 25,
+      acwr: 1.05,
+      acwrZone: 'SWEET_SPOT',
+      tsb: 6,
+      lastSession: 'Belum ada sesi tercatat',
+      packageTier: newAthletePackageTier,
+    });
+
+    setShowAddAthleteModal(false);
+    setNewAthleteName('');
+    setNewAthleteEmail('');
+    setNewAthleteTargetRace('');
+    setSquadAthletes(CoachingStorage.getSquadAthletes());
+    if (!assignAthleteName) setAssignAthleteName(newAth.name);
+  };
+
+  // Handler for Deleting an Athlete
+  const handleDeleteAthlete = (id: string) => {
+    CoachingStorage.deleteSquadAthlete(id);
+    setSquadAthletes(CoachingStorage.getSquadAthletes());
   };
 
   // Handler for Coach Reviewing Completed Task
@@ -347,7 +357,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
     return true;
   });
 
-  const totalRegisteredAthletes = packages.reduce((acc, p) => acc + p.activeAthletesCount, 0);
+  const totalRegisteredAthletes = squadAthletes.length;
 
   return (
     <div className="space-y-6 font-mono text-slate-900 dark:text-white">
@@ -780,187 +790,166 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
               <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-xs">
                 <div>
                   <h3 className="font-bold text-slate-900 dark:text-white uppercase">
-                    Roster Atlet & Beban Fisiologis
+                    {isId ? 'Roster Atlet & Beban Fisiologis' : 'Squad Roster & Physiological Load'}
                   </h3>
                   <p className="text-slate-500 dark:text-zinc-400 text-[11px] font-sans">
-                    Pantau volume mingguan, target perlombaan, dan paket pembinaan masing-masing atlet.
+                    {isId 
+                      ? 'Pantau volume mingguan, target perlombaan, dan paket pembinaan masing-masing atlet.'
+                      : 'Monitor weekly volume, race targets, and coaching tier of each squad runner.'}
                   </p>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setShowDemoSquad(!showDemoSquad)}
-                  className={`px-3 py-1.5 border text-xs font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer ${
-                    showDemoSquad 
-                      ? 'bg-amber-500/20 border-amber-500 text-amber-600 dark:text-amber-400' 
-                      : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-zinc-700 text-slate-600 dark:text-zinc-400'
-                  }`}
+                  onClick={() => setShowAddAthleteModal(true)}
+                  className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#059669] cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{showDemoSquad ? 'TUTUP MODE SIMULASI' : 'SIMULASI ROSTER TAMBAHAN'}</span>
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>{isId ? '+ TAMBAH ATLET SKUAD' : '+ ADD SQUAD ATHLETE'}</span>
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* 1. Primary Registered Athlete: Fredy Fajar */}
-                <div className="bg-white dark:bg-[#0d1224] border-2 border-cyan-500 p-5 shadow-[3px_3px_0px_#06b6d4] space-y-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center text-white font-black text-sm shrink-0">
-                        FF
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-black text-sm text-slate-900 dark:text-white">
-                            Fredy Fajar
-                          </h4>
-                          <span className="text-[9px] px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 text-emerald-800 dark:text-emerald-300 font-bold">
-                            ATLET UTAMA
-                          </span>
-                        </div>
-                        <span className="text-[11px] text-slate-500 dark:text-zinc-400 block font-sans">
-                          fredyafajr46@gmail.com
-                        </span>
-                        <span className="text-[10px] text-violet-600 dark:text-violet-400 font-bold block mt-0.5">
-                          Paket: Elite Marathon Podium (1-on-1)
-                        </span>
-                      </div>
-                    </div>
-
-                    <span className="text-[10px] font-black px-2 py-0.5 uppercase bg-emerald-100 dark:bg-emerald-950 border border-emerald-500 text-emerald-700 dark:text-emerald-300">
-                      OPTIMAL LOAD
-                    </span>
+              {squadAthletes.length === 0 ? (
+                <div className="bg-white dark:bg-[#0d1224] border-2 border-dashed border-slate-300 dark:border-zinc-800 p-8 sm:p-10 text-center space-y-4">
+                  <div className="w-12 h-12 mx-auto rounded-full bg-cyan-100 dark:bg-cyan-950/60 border border-cyan-400 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+                    <Users className="w-6 h-6" />
                   </div>
-
-                  <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-[11px]">
-                    <div>
-                      <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                        BEBAN MINGGUAN
-                      </span>
-                      <span className="font-black text-slate-900 dark:text-white">
-                        27.8 / 30.0 km
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                        ACWR RATIO
-                      </span>
-                      <span className="font-black text-emerald-600 dark:text-emerald-400">
-                        1.08
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                        TSB FRESHNESS
-                      </span>
-                      <span className="font-black text-cyan-600 dark:text-cyan-400">
-                        +8
-                      </span>
-                    </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-black uppercase text-slate-900 dark:text-white">
+                      {isId ? 'BELUM ADA ATLET DALAM SKUAD BINAAN ANDA' : 'NO ATHLETES IN YOUR SQUAD YET'}
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans max-w-md mx-auto">
+                      {isId 
+                        ? 'Daftarkan atlet binaan Anda secara langsung atau bagikan kode pendaftaran klub Anda agar telemetri atlet terhubung ke dashboard Anda.'
+                        : 'Register squad athletes directly or share your club license code to link their running telemetry to your coach portal.'}
+                    </p>
                   </div>
-
-                  <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="text-[10px] text-slate-500 dark:text-zinc-400">
-                      Garmin Live Telemetry Connected
-                    </span>
+                  <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
                     <button
                       type="button"
-                      onClick={() => {
-                        setAssignAthleteName('Fredy Fajar');
-                        setShowAssignTaskModal(true);
-                      }}
-                      className="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-white text-[10px] font-black uppercase cursor-pointer transition-colors"
+                      onClick={() => setShowAddAthleteModal(true)}
+                      className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black uppercase transition-all shadow-[2px_2px_0px_#0891b2] cursor-pointer flex items-center gap-1.5"
                     >
-                      + Tugaskan Sesi
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>{isId ? '+ TAMBAH ATLET SEKARANG' : '+ ADD ATHLETE NOW'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCopyCode}
+                      className="px-4 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 text-xs font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                      {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedCode ? (isId ? 'KODE TERSALIN!' : 'COPIED!') : (isId ? 'SALIN KODE LISENSI KLUB' : 'COPY CLUB CODE')}</span>
                     </button>
                   </div>
                 </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {squadAthletes.map((athlete) => {
+                    const isWarning = athlete.acwrZone === 'WARNING' || athlete.acwr > 1.3;
+                    const isDanger = athlete.acwrZone === 'DANGER' || athlete.acwr > 1.5;
+                    const initials = athlete.name
+                      .split(' ')
+                      .map(p => p[0])
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase() || 'AT';
 
-                {/* Additional Squad Runners */}
-                {DEMO_ATHLETES.map((athlete) => {
-                  const isWarning = athlete.acwrZone === 'WARNING';
-                  return (
-                    <div
-                      key={athlete.id}
-                      className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-4 hover:border-cyan-500 transition-colors"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shrink-0">
-                            {athlete.name.slice(0, 2).toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-black text-sm text-slate-900 dark:text-white">
-                                {athlete.name}
-                              </h4>
-                              <span className="text-[9px] px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950/60 border border-amber-400 text-amber-700 dark:text-amber-300 font-bold">
-                                SQUAD
+                    return (
+                      <div
+                        key={athlete.id}
+                        className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-4 hover:border-cyan-500 transition-colors"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center text-white font-black text-sm shrink-0">
+                              {initials}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-black text-sm text-slate-900 dark:text-white">
+                                  {athlete.name}
+                                </h4>
+                                <span className="text-[9px] px-1.5 py-0.2 bg-cyan-100 dark:bg-cyan-950 border border-cyan-400 text-cyan-800 dark:text-cyan-300 font-bold uppercase">
+                                  SQUAD
+                                </span>
+                              </div>
+                              <span className="text-[11px] text-slate-500 dark:text-zinc-400 block font-sans">
+                                {athlete.email}
+                              </span>
+                              <span className="text-[10px] text-violet-600 dark:text-violet-400 font-bold block mt-0.5">
+                                Paket: {athlete.packageTier}
                               </span>
                             </div>
-                            <span className="text-[11px] text-slate-500 dark:text-zinc-400 block font-sans">
-                              {athlete.email}
+                          </div>
+
+                          <span className={`text-[10px] font-black px-2 py-0.5 uppercase ${
+                            isDanger
+                              ? 'bg-rose-100 dark:bg-rose-950 border border-rose-500 text-rose-700 dark:text-rose-300'
+                              : isWarning 
+                              ? 'bg-amber-100 dark:bg-amber-950 border border-amber-500 text-amber-700 dark:text-amber-300'
+                              : 'bg-emerald-100 dark:bg-emerald-950 border border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                          }`}>
+                            {isDanger ? 'BAHAYA SPIKE' : isWarning ? 'WASPADAI LONJAKAN' : 'OPTIMAL LOAD'}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-[11px]">
+                          <div>
+                            <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                              BEBAN MINGGUAN
                             </span>
-                            <span className="text-[10px] text-violet-600 dark:text-violet-400 font-bold block mt-0.5">
-                              Paket: {athlete.packageTier}
+                            <span className="font-black text-slate-900 dark:text-white">
+                              {athlete.weeklyMileageKm} / {athlete.targetWeeklyKm} km
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                              ACWR RATIO
+                            </span>
+                            <span className={`font-black ${isDanger ? 'text-rose-600' : isWarning ? 'text-amber-500' : 'text-emerald-500'}`}>
+                              {athlete.acwr.toFixed(2)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                              TSB FRESHNESS
+                            </span>
+                            <span className="font-black text-cyan-500">
+                              {athlete.tsb > 0 ? `+${athlete.tsb}` : athlete.tsb}
                             </span>
                           </div>
                         </div>
 
-                        <span className={`text-[10px] font-black px-2 py-0.5 uppercase ${
-                          isWarning 
-                            ? 'bg-amber-100 dark:bg-amber-950 border border-amber-500 text-amber-700 dark:text-amber-300'
-                            : 'bg-emerald-100 dark:bg-emerald-950 border border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                        }`}>
-                          {isWarning ? 'WASPADAI LONJAKAN' : 'OPTIMAL LOAD'}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-[11px]">
-                        <div>
-                          <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                            BEBAN MINGGUAN
+                        <div className="flex items-center justify-between text-xs pt-1">
+                          <span className="text-[10px] text-slate-500 dark:text-zinc-400 truncate max-w-[180px]">
+                            Target: {athlete.targetRace}
                           </span>
-                          <span className="font-black text-slate-900 dark:text-white">
-                            {athlete.weeklyMileageKm} / {athlete.targetWeeklyKm} km
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                            ACWR RATIO
-                          </span>
-                          <span className={`font-black ${isWarning ? 'text-amber-500' : 'text-emerald-500'}`}>
-                            {athlete.acwr.toFixed(2)}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                            TSB FRESHNESS
-                          </span>
-                          <span className="font-black text-cyan-500">
-                            {athlete.tsb > 0 ? `+${athlete.tsb}` : athlete.tsb}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAssignAthleteName(athlete.name);
+                                setShowAssignTaskModal(true);
+                              }}
+                              className="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-white text-[10px] font-black uppercase cursor-pointer transition-colors"
+                            >
+                              + Tugaskan Sesi
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteAthlete(athlete.id)}
+                              className="px-2 py-1 text-slate-400 hover:text-rose-500 text-[10px] uppercase cursor-pointer transition-colors"
+                              title="Hapus atlet dari roster"
+                            >
+                              Hapus
+                            </button>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="flex items-center justify-between text-xs pt-1">
-                        <span className="text-[10px] text-slate-500 dark:text-zinc-400 truncate">
-                          Target: {athlete.targetRace}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAssignAthleteName(athlete.name);
-                            setShowAssignTaskModal(true);
-                          }}
-                          className="px-2.5 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase hover:bg-slate-800 cursor-pointer"
-                        >
-                          + Tugaskan Sesi
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1278,16 +1267,23 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
-                    Pilih Atlet Binaan
+                    {isId ? 'Pilih Atlet Binaan' : 'Select Athlete'}
                   </label>
                   <select
                     value={assignAthleteName}
                     onChange={(e) => setAssignAthleteName(e.target.value)}
+                    required
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
                   >
-                    <option value="Fredy Fajar">Fredy Fajar (Elite FM)</option>
-                    <option value="Budi Santoso">Budi Santoso (HM Perf)</option>
-                    <option value="Siti Rahma">Siti Rahma (10K Base)</option>
+                    {squadAthletes.length === 0 ? (
+                      <option value="">{isId ? 'Belum ada atlet (tambahkan dahulu)' : 'No athletes in squad'}</option>
+                    ) : (
+                      squadAthletes.map(a => (
+                        <option key={a.id} value={a.name}>
+                          {a.name} ({a.targetRace})
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
 
@@ -1475,6 +1471,119 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                   className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-black uppercase transition-colors cursor-pointer shadow-sm"
                 >
                   Kirim Evaluasi ke Atlet
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ADD SQUAD ATHLETE */}
+      {showAddAthleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0d1224] border-2 border-emerald-500 p-6 max-w-md w-full shadow-[6px_6px_0px_#10b981] text-slate-900 dark:text-white space-y-4 font-mono">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-emerald-900">
+              <div className="flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="font-black uppercase text-sm tracking-wide">
+                  {isId ? 'DAFTARKAN ATLET BINAAN BARU' : 'REGISTER NEW SQUAD ATHLETE'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddAthleteModal(false)}
+                className="text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-white text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddAthlete} className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  {isId ? 'Nama Lengkap Atlet' : 'Athlete Full Name'}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newAthleteName}
+                  onChange={(e) => setNewAthleteName(e.target.value)}
+                  placeholder="misal: Dimas Anggara"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  {isId ? 'Email Atlet' : 'Athlete Email'}
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={newAthleteEmail}
+                  onChange={(e) => setNewAthleteEmail(e.target.value)}
+                  placeholder="dimas.runner@example.com"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    {isId ? 'Target Lomba / Race' : 'Target Race Goal'}
+                  </label>
+                  <input
+                    type="text"
+                    value={newAthleteTargetRace}
+                    onChange={(e) => setNewAthleteTargetRace(e.target.value)}
+                    placeholder="misal: Borobudur 21K Sub-2"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    {isId ? 'Target Km / Minggu' : 'Weekly Target Km'}
+                  </label>
+                  <input
+                    type="number"
+                    min={10}
+                    max={180}
+                    value={newAthleteTargetKm}
+                    onChange={(e) => setNewAthleteTargetKm(Number(e.target.value))}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  {isId ? 'Kategori Paket Pembinaan' : 'Coaching Tier'}
+                </label>
+                <select
+                  value={newAthletePackageTier}
+                  onChange={(e) => setNewAthletePackageTier(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                >
+                  <option value="Community Squad (Base)">Community Squad (Base)</option>
+                  <option value="Half Marathon Performance">Half Marathon Performance</option>
+                  <option value="Elite Marathon Podium (1-on-1)">Elite Marathon Podium (1-on-1)</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setShowAddAthleteModal(false)}
+                  className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 text-xs uppercase font-bold cursor-pointer"
+                >
+                  {isId ? 'Batal' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase transition-colors cursor-pointer shadow-sm"
+                >
+                  {isId ? 'Simpan ke Roster' : 'Save to Squad'}
                 </button>
               </div>
             </form>

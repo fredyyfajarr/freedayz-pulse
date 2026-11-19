@@ -26,7 +26,7 @@ interface Props {
   athleteName?: string;
 }
 
-export default function AthleteCoachTasksWidget({ athleteName = 'Fredy Fajar' }: Props) {
+export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
   const { language } = useLanguage();
   const isId = language === 'ID';
 
@@ -155,7 +155,20 @@ export default function AthleteCoachTasksWidget({ athleteName = 'Fredy Fajar' }:
           <span>{isId ? 'DAFTAR PENUGASAN MINGGU INI' : 'THIS WEEK’S ASSIGNMENTS'}</span>
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {tasks.length === 0 ? (
+          <div className="bg-slate-50 dark:bg-[#070a14] border border-dashed border-slate-300 dark:border-zinc-800 p-6 text-center space-y-2">
+            <CheckCircle2 className="w-8 h-8 text-cyan-500 mx-auto opacity-70" />
+            <h4 className="text-xs font-bold uppercase text-slate-700 dark:text-zinc-300">
+              {isId ? 'Belum Ada Penugasan Baru' : 'No Active Assignments'}
+            </h4>
+            <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-sans max-w-sm mx-auto">
+              {isId
+                ? 'Pelatih belum menugaskan sesi latihan khusus minggu ini. Anda dapat melakukan lari mandiri sesuai target mingguan.'
+                : 'Your coach has not assigned specific workouts for this week yet. You can perform easy maintenance runs according to your target.'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {tasks.map((task) => {
             const isCompleted = task.status === 'COMPLETED';
 
@@ -292,6 +305,7 @@ export default function AthleteCoachTasksWidget({ athleteName = 'Fredy Fajar' }:
             );
           })}
         </div>
+        )}
       </div>
 
       {/* 4. MODAL: LAPORAN EKSEKUSI & FEEDBACK ATLET */}

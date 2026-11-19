@@ -2,6 +2,7 @@
 
 import { 
   CoachTask, 
+  SquadAthlete,
   RABItem, 
   CoachingPackage, 
   CommercialFinancialSummary,
@@ -10,11 +11,58 @@ import {
   INITIAL_COACHING_PACKAGES
 } from '@/domain/entities/CoachingRelationship';
 
-const TASKS_STORAGE_KEY = 'fdz_pulse_coach_tasks_v2';
+const TASKS_STORAGE_KEY = 'fdz_pulse_coach_tasks_v3';
 const RAB_STORAGE_KEY = 'fdz_pulse_rab_items_v2';
 const PACKAGES_STORAGE_KEY = 'fdz_pulse_packages_v2';
+const SQUAD_ATHLETES_KEY = 'fdz_pulse_squad_athletes_v2';
 
 export class CoachingStorage {
+  // --- SQUAD ATHLETES (DYNAMIC ROSTER) ---
+  public static getSquadAthletes(coachId?: string): SquadAthlete[] {
+    if (typeof window === 'undefined') return [];
+    try {
+      const stored = localStorage.getItem(SQUAD_ATHLETES_KEY);
+      if (!stored) {
+        return [];
+      }
+      const athletes: SquadAthlete[] = JSON.parse(stored);
+      if (coachId) {
+        return athletes.filter(a => !a.coachId || a.coachId === coachId);
+      }
+      return athletes;
+    } catch {
+      return [];
+    }
+  }
+
+  public static addSquadAthlete(athleteData: Omit<SquadAthlete, 'id'>): SquadAthlete {
+    const athletes = this.getSquadAthletes();
+    const newAthlete: SquadAthlete = {
+      ...athleteData,
+      id: `ath-${Date.now()}`,
+      joinedAt: new Date().toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      }),
+    };
+    const updated = [newAthlete, ...athletes];
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SQUAD_ATHLETES_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new Event('squad_athlete_updated'));
+    }
+    return newAthlete;
+  }
+
+  public static deleteSquadAthlete(id: string): boolean {
+    const athletes = this.getSquadAthletes();
+    const filtered = athletes.filter(a => a.id !== id);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SQUAD_ATHLETES_KEY, JSON.stringify(filtered));
+      window.dispatchEvent(new Event('squad_athlete_updated'));
+    }
+    return true;
+  }
   // --- COACH TASKS ---
   public static getTasks(): CoachTask[] {
     if (typeof window === 'undefined') return INITIAL_COACH_TASKS;
@@ -32,16 +80,13 @@ export class CoachingStorage {
 
   public static getTasksForAthlete(athleteNameOrEmail: string): CoachTask[] {
     const all = this.getTasks();
+    if (!athleteNameOrEmail) return [];
     const cleanSearch = athleteNameOrEmail.toLowerCase().trim();
     
-    // If searching for Fredy or empty or default user, return tasks matching Fredy or unassigned
-    const filtered = all.filter(t => 
+    return all.filter(t => 
       t.athleteName.toLowerCase().includes(cleanSearch) || 
-      t.athleteId.toLowerCase().includes(cleanSearch) ||
-      cleanSearch.includes('fredy') && t.athleteName.toLowerCase().includes('fredy')
+      t.athleteId.toLowerCase().includes(cleanSearch)
     );
-
-    return filtered.length > 0 ? filtered : all.filter(t => t.athleteName.toLowerCase().includes('fredy'));
   }
 
   public static addTask(taskData: Omit<CoachTask, 'id'>): CoachTask {

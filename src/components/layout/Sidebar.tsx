@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { 
   Activity, 
   BarChart3, 
@@ -32,6 +32,7 @@ import { createClient } from '@/utils/supabase/client';
 export default function Sidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const currentTab = searchParams.get('tab');
 
   const { t, language, setLanguage } = useLanguage();
@@ -45,6 +46,11 @@ export default function Sidebar() {
     toggleDesktop, 
     closeMobile 
   } = useSidebar();
+
+  const handleNavigate = (href: string) => {
+    closeMobile();
+    router.push(href);
+  };
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
@@ -205,11 +211,11 @@ export default function Sidebar() {
 
   // Mobile Dock Navigation
   const coachMobileDockLinks = [
-    { href: '/dashboard', label: isId ? 'Portal' : 'Portal', icon: ShieldCheck, isActive: pathname === '/dashboard' && !currentTab },
-    { href: '/dashboard?tab=roster', label: isId ? 'Roster' : 'Roster', icon: Users, isActive: pathname === '/dashboard' && currentTab === 'roster' },
-    { href: '/dashboard?tab=plans', label: isId ? 'Program' : 'Plans', icon: BookOpen, isActive: pathname === '/dashboard' && currentTab === 'plans' },
-    { href: '/dashboard?tab=acwr', label: isId ? 'Radar' : 'Radar', icon: Activity, isActive: pathname === '/dashboard' && currentTab === 'acwr' },
-    { href: '/dashboard?tab=directives', label: isId ? 'Arahan' : 'Directives', icon: MessageSquare, isActive: pathname === '/dashboard' && currentTab === 'directives' },
+    { href: '/dashboard', label: isId ? 'Portal' : 'Portal', icon: ShieldCheck, isActive: pathname === '/dashboard' },
+    { href: '/activities', label: isId ? 'Aktivitas' : 'Activities', icon: Compass, isActive: pathname.startsWith('/activities') },
+    { href: '/fitness', label: isId ? 'Kebugaran' : 'Fitness', icon: BarChart3, isActive: pathname.startsWith('/fitness') },
+    { href: '/recovery', label: isId ? 'Pemulihan' : 'Recovery', icon: HeartPulse, isActive: pathname.startsWith('/recovery') },
+    { href: '/records', label: isId ? 'Rekor' : 'Records', icon: Award, isActive: pathname.startsWith('/records') },
   ];
 
   const athleteMobileDockLinks = [
@@ -323,7 +329,7 @@ export default function Sidebar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative flex items-center justify-between px-3 py-2.5 text-xs font-bold tracking-wider rounded-none transition-all border ${
+                className={`relative flex items-center justify-between px-3 py-2.5 text-xs font-bold tracking-wider rounded-none transition-all border cursor-pointer ${
                   isActive
                     ? isCoach
                       ? 'bg-cyan-600 text-white border-cyan-400 shadow-[2px_2px_0px_#0891b2]'
@@ -552,22 +558,22 @@ export default function Sidebar() {
           3. MOBILE SLIDE-OUT DRAWER & BACKDROP
          ========================================================================= */}
       {isMobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
+        <div className="md:hidden fixed inset-0 z-50">
           {/* Backdrop overlay */}
           <div 
             onClick={closeMobile}
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200 cursor-pointer"
           />
 
           {/* Slide-out drawer panel */}
-          <div className="relative w-72 max-w-[85vw] bg-white dark:bg-[#070a14] border-r-2 border-slate-200 dark:border-violet-900/70 shadow-2xl flex flex-col justify-between p-4 z-50 animate-in slide-in-from-left duration-200">
+          <div className="relative z-10 w-72 max-w-[85vw] h-full bg-white dark:bg-[#070a14] border-r-2 border-slate-200 dark:border-violet-900/70 shadow-2xl flex flex-col justify-between p-4 animate-in slide-in-from-left duration-200 overflow-y-auto">
             {/* Drawer Top Header with Animated X Button */}
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-violet-900/60">
-                <Link 
-                  href="/dashboard" 
-                  onClick={closeMobile}
-                  className="flex items-center gap-2.5 shrink-0"
+                <button 
+                  type="button"
+                  onClick={() => handleNavigate('/dashboard')}
+                  className="flex items-center gap-2.5 shrink-0 text-left cursor-pointer"
                 >
                   <BrandLogo size={32} />
                   <div className="flex flex-col">
@@ -578,13 +584,13 @@ export default function Sidebar() {
                       {isCoach ? 'COACH HUB' : 'TELEMETRY LAB'}
                     </p>
                   </div>
-                </Link>
+                </button>
 
                 <HamburgerButton
                   isOpen={true}
                   onClick={closeMobile}
                   title="Tutup Navigasi (Close)"
-                  className="w-8 h-8 shrink-0"
+                  className="w-8 h-8 shrink-0 cursor-pointer"
                 />
               </div>
 
@@ -594,11 +600,11 @@ export default function Sidebar() {
                   const Icon = link.icon;
                   const isActive = link.isActive;
                   return (
-                    <Link
+                    <button
                       key={link.href}
-                      href={link.href}
-                      onClick={closeMobile}
-                      className={`flex items-center justify-between px-3.5 py-3 text-xs font-bold tracking-wider border transition-all ${
+                      type="button"
+                      onClick={() => handleNavigate(link.href)}
+                      className={`w-full flex items-center justify-between px-3.5 py-3 text-xs font-bold tracking-wider border transition-all cursor-pointer text-left ${
                         isActive
                           ? isCoach
                             ? 'bg-cyan-600 text-white border-cyan-400 shadow-[2px_2px_0px_#06b6d4]'
@@ -615,7 +621,7 @@ export default function Sidebar() {
                           {language === 'ID' ? 'AKTIF' : 'ACTIVE'}
                         </span>
                       )}
-                    </Link>
+                    </button>
                   );
                 })}
               </nav>
@@ -716,10 +722,11 @@ export default function Sidebar() {
           const Icon = link.icon;
           const isActive = link.isActive;
           return (
-            <Link
+            <button
               key={link.href}
-              href={link.href}
-              className={`flex flex-col items-center justify-center min-w-[54px] py-1 px-1 transition-all rounded ${
+              type="button"
+              onClick={() => router.push(link.href)}
+              className={`flex flex-col items-center justify-center min-w-[54px] py-1 px-1 transition-all rounded cursor-pointer ${
                 isActive
                   ? isCoach
                     ? 'text-cyan-600 dark:text-cyan-400 font-black'
@@ -738,7 +745,7 @@ export default function Sidebar() {
               <span className="text-[10px] uppercase font-bold tracking-tight mt-0.5 scale-90">
                 {link.label}
               </span>
-            </Link>
+            </button>
           );
         })}
       </nav>

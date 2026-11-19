@@ -4,6 +4,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/context/SidebarContext';
 import Sidebar from '@/components/layout/Sidebar';
+import DynamicDocumentTitle from '@/components/layout/DynamicDocumentTitle';
 
 export default function AppLayoutClient({
   children,
@@ -23,6 +24,7 @@ export default function AppLayoutClient({
   if (isStandalonePage) {
     return (
       <div className="min-h-full flex flex-col w-full">
+        <DynamicDocumentTitle />
         <main className="flex-1 w-full">{children}</main>
       </div>
     );
@@ -30,6 +32,7 @@ export default function AppLayoutClient({
 
   return (
     <div className="min-h-full flex flex-col md:flex-row relative">
+      <DynamicDocumentTitle />
       {/* Sidebar (Desktop Collapsible Rail/Expanded + Mobile Header & Drawer) */}
       <Sidebar />
 

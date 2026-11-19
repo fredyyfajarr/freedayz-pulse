@@ -28,6 +28,27 @@ export interface CoachTask {
   adherenceScore?: number; // percentage (e.g. 95)
 }
 
+export interface SquadAthlete {
+  id: string;
+  coachId?: string;
+  name: string;
+  email: string;
+  targetRace: string;
+  acwr: number;
+  acwrZone: 'SWEET_SPOT' | 'WARNING' | 'DANGER';
+  weeklyMileageKm: number;
+  targetWeeklyKm: number;
+  lastSession: string;
+  tsb: number;
+  packageTier: string;
+  joinedAt?: string;
+  ctl?: number;
+  atl?: number;
+  hrvStatus?: string;
+  rhrBpm?: number;
+  sleepScore?: number;
+}
+
 export interface CoachingPackage {
   id: string;
   name: string;
@@ -68,76 +89,7 @@ export interface CommercialFinancialSummary {
 }
 
 // Initial Realistic Seed Data for Commercial Coaching Tasks
-export const INITIAL_COACH_TASKS: CoachTask[] = [
-  {
-    id: 'task-1',
-    athleteId: 'ath-fredy',
-    athleteName: 'Fredy Fajar',
-    coachName: 'Coach Faisal (Head Coach)',
-    title: 'Weekend Long Run Progresif 21K // Simulasi Marathon Pace',
-    type: 'LONG_RUN',
-    dueDate: '2026-11-22',
-    targetDistanceKm: 21.1,
-    targetPace: '5:30 - 5:45 /km',
-    targetHrZone: 'Zona 2 (142 - 158 BPM)',
-    instructions: 'Disiplin hidrasi tiap 4km (minum air + isotonik), konsumsi energy gel di KM 7 & 14. 5km terakhir boleh naik ke Marathon Pace jika HR stabil.',
-    status: 'PENDING',
-    adherenceScore: 94,
-  },
-  {
-    id: 'task-2',
-    athleteId: 'ath-fredy',
-    athleteName: 'Fredy Fajar',
-    coachName: 'Coach Faisal (Head Coach)',
-    title: 'Threshold Interval 5x1000m Trek Sintetis',
-    type: 'INTERVAL',
-    dueDate: '2026-11-18',
-    targetDistanceKm: 9.0,
-    targetPace: '4:45 - 4:55 /km',
-    targetHrZone: 'Zona 4 Ambang Laktat (168 - 176 BPM)',
-    instructions: 'Pemanasan 2km easy + ABC running drills. Lari 1000m @ 4:50, recovery jogging 200m (90 detik). Pendinginan 1.5km.',
-    status: 'COMPLETED',
-    completedAt: '2026-11-18 06:45',
-    reportedRpe: 8,
-    athleteFeedback: 'Interval tuntas 5 set, rata-rata pace 4:48/km. Kaki kanan bagian betis agak kencang di set ke-4 tapi aman setelah stretching.',
-    coachReviewNote: 'Eksekusi sangat disiplin! Ritme langkah terjaga 176 spm. Pastikan malam ini pakai foam roller pada gastrocnemius & tidur minimal 7.5 jam.',
-    adherenceScore: 98,
-  },
-  {
-    id: 'task-3',
-    athleteId: 'demo-1',
-    athleteName: 'Budi Santoso',
-    coachName: 'Coach Faisal (Head Coach)',
-    title: 'Aerobic Base Conditioning 10K',
-    type: 'RECOVERY',
-    dueDate: '2026-11-20',
-    targetDistanceKm: 10.0,
-    targetPace: '6:15 - 6:30 /km',
-    targetHrZone: 'Zona 2 Murni (< 145 BPM)',
-    instructions: 'Jaga pernapasan hidung, obrolan santai, jangan terpancing pelari lain. Fokus kadens 172 spm.',
-    status: 'PENDING',
-    adherenceScore: 92,
-  },
-  {
-    id: 'task-4',
-    athleteId: 'demo-2',
-    athleteName: 'Siti Rahma',
-    coachName: 'Coach Faisal (Head Coach)',
-    title: 'Tempo Run 7K Flat Course',
-    type: 'TEMPO',
-    dueDate: '2026-11-19',
-    targetDistanceKm: 7.0,
-    targetPace: '5:05 - 5:15 /km',
-    targetHrZone: 'Zona 3/4 (160 - 170 BPM)',
-    instructions: 'Target pace stabil, hindari lonjakan di KM 1-2. Evaluasi kesiapan race 10K.',
-    status: 'COMPLETED',
-    completedAt: '2026-11-19 06:10',
-    reportedRpe: 7,
-    athleteFeedback: 'Pace 5:08 flat rata, napas terkontrol. Heart rate stabil di 164 bpm.',
-    coachReviewNote: 'Bagus sekali! Adaptasi aerobik menunjukkan tren peningkatan yang konsisten.',
-    adherenceScore: 96,
-  },
-];
+export const INITIAL_COACH_TASKS: CoachTask[] = [];
 
 // Initial Realistic Commercial Coaching Packages
 export const INITIAL_COACHING_PACKAGES: CoachingPackage[] = [
