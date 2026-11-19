@@ -33,28 +33,35 @@ export async function login(formData: FormData) {
     return { error: error.message };
   }
 
-  // Check if athlete already connected their Garmin API key
+  // Check user role & connection status
   let targetUrl = '/dashboard';
 
   if (data?.user) {
     const meta = data.user.user_metadata;
-    const hasMetaConnection = meta?.garmin_connected === true || !!meta?.garmin_api_key;
+    const userRole = meta?.role || 'athlete';
 
-    if (!hasMetaConnection) {
-      try {
-        const { data: connection } = await supabase
-          .from('user_garmin_connections')
-          .select('id, is_active, garmin_api_key')
-          .eq('user_id', data.user.id)
-          .maybeSingle();
+    // Coaches manage athletes and NEVER need an athlete Garmin API key or onboarding
+    if (userRole === 'coach') {
+      targetUrl = '/dashboard';
+    } else {
+      const hasMetaConnection = meta?.garmin_connected === true || !!meta?.garmin_api_key;
 
-        if (!connection || (!connection.garmin_api_key && !connection.is_active)) {
-          // Only prompt for onboarding if completely new user without any connection record
-          targetUrl = '/onboarding';
+      if (!hasMetaConnection) {
+        try {
+          const { data: connection } = await supabase
+            .from('user_garmin_connections')
+            .select('id, is_active, garmin_api_key')
+            .eq('user_id', data.user.id)
+            .maybeSingle();
+
+          if (!connection || (!connection.garmin_api_key && !connection.is_active)) {
+            // Only prompt for onboarding if completely new athlete without any connection record
+            targetUrl = '/onboarding';
+          }
+        } catch {
+          // If table doesn't exist or query fails, let the user into dashboard smoothly
+          targetUrl = '/dashboard';
         }
-      } catch {
-        // If table doesn't exist or query fails, let the user into dashboard smoothly
-        targetUrl = '/dashboard';
       }
     }
   }

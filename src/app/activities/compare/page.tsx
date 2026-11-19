@@ -1,8 +1,13 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { container } from '@/infrastructure/di/container';
 import CompareClient from './CompareClient';
 import { Activity } from '@/domain/entities/Activity';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Komparasi Head-to-Head Telemetri',
+};
 
 interface Props {
   searchParams: Promise<{ a?: string; b?: string }>;

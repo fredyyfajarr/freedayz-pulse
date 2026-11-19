@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { container } from '@/infrastructure/di/container';
 import WeeklyHeroStats from '@/components/dashboard/WeeklyHeroStats';
 import MonthlyTrainingCalendar from '@/components/dashboard/MonthlyTrainingCalendar';
@@ -15,6 +16,22 @@ import CoachDashboard from '@/components/coach/CoachDashboard';
 import NewAthleteSetupCard from '@/components/dashboard/NewAthleteSetupCard';
 import { ACWRCalculator } from '@/domain/services/ACWRCalculator';
 import { createClient } from '@/utils/supabase/server';
+
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const role = user?.user_metadata?.role || 'athlete';
+    if (role === 'coach') {
+      return {
+        title: 'Portal Pelatih // Coach Hub',
+      };
+    }
+  } catch {}
+  return {
+    title: 'Dashboard Telemetri Lari',
+  };
+}
 
 export default async function DashboardPage() {
   // Auth User & Base Role Inspection

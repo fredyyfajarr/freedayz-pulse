@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { container } from '@/infrastructure/di/container';
 import { notFound } from 'next/navigation';
 import { AthleteSettingsManager } from '@/infrastructure/persistence/AthleteSettingsManager';
@@ -10,6 +11,26 @@ import SplitsTable from '@/components/activity/SplitsTable';
 import FreedayzzPerformanceLab from '@/components/activity/FreedayzzPerformanceLab';
 import PaceZonesCard from '@/components/activity/PaceZonesCard';
 import HydrationFuelingCard from '@/components/activity/HydrationFuelingCard';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const activity = await container.repository.getActivityById(id);
+    if (activity) {
+      const distKm = (activity.distanceMeters / 1000).toFixed(2);
+      return {
+        title: `${activity.name || 'Sesi Lari'} (${distKm} km)`,
+      };
+    }
+  } catch {}
+  return {
+    title: 'Detail Aktivitas Lari',
+  };
+}
 
 export default async function ActivityDetailPage({
   params,

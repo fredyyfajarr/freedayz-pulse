@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { container } from '@/infrastructure/di/container';
 import { AthleteSettingsManager } from '@/infrastructure/persistence/AthleteSettingsManager';
 import AthletePersonalInfoCard from '@/components/profile/AthletePersonalInfoCard';
@@ -7,6 +8,10 @@ import SystemPreferencesCard from '@/components/profile/SystemPreferencesCard';
 import GarminConnectionCard from '@/components/profile/GarminConnectionCard';
 import { createClient } from '@/utils/supabase/server';
 import { Settings, Watch } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Pengaturan Akun & Kalibrasi',
+};
 
 export default async function SettingsPage() {
   const activities = await container.repository.getAllActivities();

@@ -82,5 +82,21 @@ export async function updateSession(request: NextRequest) {
     return redirectResponse;
   }
 
+  // 3. If a Coach tries to access /onboarding -> redirect directly to /dashboard
+  if (user && pathname === '/onboarding') {
+    const role = user.user_metadata?.role;
+    if (role === 'coach') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/dashboard';
+      url.search = '';
+
+      const redirectResponse = NextResponse.redirect(url);
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+      });
+      return redirectResponse;
+    }
+  }
+
   return supabaseResponse;
 }

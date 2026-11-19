@@ -1,5 +1,10 @@
+import type { Metadata } from 'next';
 import { container } from '@/infrastructure/di/container';
 import PaginatedActivitiesList from '@/components/activities/PaginatedActivitiesList';
+
+export const metadata: Metadata = {
+  title: 'Log Aktivitas Lari // Feed',
+};
 
 export default async function ActivitiesPage() {
   const activities = await container.repository.getAllActivities();

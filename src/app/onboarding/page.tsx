@@ -48,6 +48,13 @@ export default function OnboardingPage() {
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
+
+        // Coaches manage the squad and NEVER configure athlete Garmin keys
+        if (user?.user_metadata?.role === 'coach') {
+          router.replace('/dashboard');
+          return;
+        }
+
         if (user?.user_metadata?.garmin_connected) {
           setIsAlreadyConnected(true);
           if (user.user_metadata.garmin_api_key) {
@@ -65,7 +72,7 @@ export default function OnboardingPage() {
       }
     }
     loadUserConnection();
-  }, []);
+  }, [router]);
 
   const handleUseEnvKey = () => {
     setGarminKey(defaultKeyFromEnv);
