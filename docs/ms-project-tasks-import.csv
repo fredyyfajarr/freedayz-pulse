@@ -1,0 +1,38 @@
+ID,WBS,Task_Name,Duration,Start_Date,Finish_Date,Predecessors,Resource_Names,Cost
+1,1.0,INISIASI & PERENCANAAN PROYEK,5d,2026-10-26,2026-10-30,,Project Manager,Rp 6.250.000
+2,1.1,Penyusunan Project Charter & Analisis Kebutuhan,2d,2026-10-26,2026-10-27,,"Project Manager, Business Analyst",Rp 2.500.000
+3,1.2,"Riset Formula Biometrik Olahraga (VDOT, LTHR, TRIMP, ACWR)",2d,2026-10-27,2026-10-28,2,Lead Sports Scientist,Rp 2.000.000
+4,1.3,Penetapan Arsitektur Clean Architecture / DDD & Tech Stack Next.js 16,2d,2026-10-29,2026-10-30,3,Lead System Architect,Rp 1.750.000
+5,1.4,Milestone 1: Project Charter & Baseline Arsitektur Disetujui,0d,2026-10-30,2026-10-30,4,"Project Sponsor, PM",Rp 0
+6,2.0,DESAIN SISTEM & REKAYASA ANTARMUKA,4d,2026-11-02,2026-11-05,5,"UI/UX Designer, Lead Architect",Rp 5.200.000
+7,2.1,Perancangan Skema Domain Model & Telemetri Pipeline Garmin,2d,2026-11-02,2026-11-03,5,Lead System Architect,Rp 2.200.000
+8,2.2,Desain Sistem Visual Cyber-Athletic & Komponen Brutalist,2d,2026-11-03,2026-11-04,7,UI/UX Designer,Rp 1.500.000
+9,2.3,Wireframe & Responsive Design Mockups (Desktop & Mobile),2d,2026-11-04,2026-11-05,8,UI/UX Designer,Rp 1.500.000
+10,2.4,Milestone 2: Design System & Wireframe UI Terverifikasi,0d,2026-11-05,2026-11-05,9,"Project Manager, Designer",Rp 0
+11,3.0,PENGEMBANGAN FITUR & SPRINT DEVELOPMENT,10d,2026-11-06,2026-11-17,10,"Fullstack Dev Team, Sports Scientist",Rp 18.500.000
+12,3.1,Sprint 1: Garmin Connect API Client & Engine Biometrik Inti,3d,2026-11-06,2026-11-08,10,Senior Fullstack Engineer,Rp 4.500.000
+13,3.1.1,"Implementasi Garmin Client, Token OAuth & File Mapper",1d,2026-11-06,2026-11-06,10,Senior Fullstack Engineer,Rp 1.500.000
+14,3.1.2,Kalkulator ACWR (Acute-to-Chronic Ratio 7D/28D) & Safe Zone,1d,2026-11-07,2026-11-07,13,"Sports Scientist, Fullstack Dev",Rp 1.500.000
+15,3.1.3,Bannister TRIMP & Karvonen Heart Rate Reserve (HRR),1d,2026-11-08,2026-11-08,14,"Sports Scientist, Fullstack Dev",Rp 1.500.000
+16,3.2,"Sprint 2: Telemetri Sesi Lari, Peta GPS & Strava-style Splits",2d,2026-11-09,2026-11-10,12,"Fullstack Dev, Frontend Dev",Rp 3.500.000
+17,3.2.1,Detail Aktivitas (`/activities/[id]`) & Leaflet Map Polyline,1d,2026-11-09,2026-11-09,12,Frontend Engineer,Rp 1.750.000
+18,3.2.2,Tabel Splits KM dengan Dynamic Pace Bar & Negative Split Detection,1d,2026-11-10,2026-11-10,17,Frontend Engineer,Rp 1.750.000
+19,3.3,"Sprint 3: Fisiologi Lanjut (Jack Daniels VDOT, GCT, Hydration)",3d,2026-11-11,2026-11-13,16,"Sports Scientist, Senior Dev",Rp 5.500.000
+20,3.3.1,Jack Daniels VDOT 5-Zone Paces System & Interactive Slider,1d,2026-11-11,2026-11-11,16,"Sports Scientist, Frontend Dev",Rp 2.000.000
+21,3.3.2,Ground Contact Time (GCT) Foot Balance L/R Injury Radar,1d,2026-11-12,2026-11-12,20,Senior Fullstack Engineer,Rp 1.750.000
+22,3.3.3,Protokol Hidrasi & Nutrisi Pasca Lari (ACSM Sweat & Glycogen Lab),1d,2026-11-13,2026-11-13,21,"Sports Scientist, Frontend Dev",Rp 1.750.000
+23,3.4,"Sprint 4: Multi-Metode Kalibrasi HR, Stream Sync & Mobile Polish",2d,2026-11-16,2026-11-17,19,"Fullstack Dev Team, UI/UX",Rp 5.000.000
+24,3.4.1,"Universal HR Zone Engine (%HRR, %LTHR, %Max HR, Manual BPM)",1d,2026-11-16,2026-11-16,19,Senior Fullstack Engineer,Rp 2.500.000
+25,3.4.2,Sinkronisasi Telemetri Stream Sesi & Kunci Plafon Max HR 201 BPM,1d,2026-11-17,2026-11-17,24,Senior Fullstack Engineer,Rp 1.500.000
+26,3.4.3,Mobile Viewport Guardrails & Dedicated Zone Cards (iPhone 16 / 393px),1d,2026-11-17,2026-11-17,24,"Frontend Engineer, UI/UX",Rp 1.000.000
+27,3.5,Milestone 3: Seluruh Fitur Telemetri & Engine Biometrik Selesai,0d,2026-11-17,2026-11-17,"25,26",Project Manager,Rp 0
+28,4.0,PENGUJIAN SISTEM & JAMINAN KUALITAS (QA / UAT),2d,2026-11-18,2026-11-18,27,"QA Engineer, Biometrics Tester",Rp 3.500.000
+29,4.1,Unit & Integration Testing Kalkulator Domain (0 Errors),1d,2026-11-18,2026-11-18,27,QA Engineer,Rp 1.500.000
+30,4.2,"Cross-Device Responsive & Viewport Testing (iOS, Android, Desktop)",1d,2026-11-18,2026-11-18,29,"QA Engineer, UI/UX",Rp 1.000.000
+31,4.3,User Acceptance Testing (UAT) dengan Atlet & Pelatih Lari,1d,2026-11-18,2026-11-18,30,"Project Manager, QA, Atlet UAT",Rp 1.000.000
+32,4.4,Milestone 4: UAT Berhasil 100% & Production Build Verifikasi,0d,2026-11-18,2026-11-18,31,"Project Manager, Sponsor",Rp 0
+33,5.0,PENUTUPAN PROYEK & DOKUMENTASI AKHIR,1d,2026-11-19,2026-11-19,32,"Project Manager, Technical Writer",Rp 2.050.000
+34,5.1,Penyusunan Laporan Manajemen Proyek Informatika (MPI) Komprehensif,1d,2026-11-19,2026-11-19,32,"Project Manager, Technical Writer",Rp 1.250.000
+35,5.2,"Ekspor Berkas MS Project (WBS, Gantt, EVM, Resource Sheet)",1d,2026-11-19,2026-11-19,34,Project Manager,Rp 500.000
+36,5.3,Update Changelog Versi v1.0.0 & Final Repository Clean,1d,2026-11-19,2026-11-19,35,Lead Developer,Rp 300.000
+37,5.4,Milestone 5: Serah Terima Final Proyek & Siap Operasional,0d,2026-11-19,2026-11-19,36,"Project Sponsor, PM, Team",Rp 0
