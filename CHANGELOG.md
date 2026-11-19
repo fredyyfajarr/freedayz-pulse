@@ -43,6 +43,11 @@ Dokumen ini mencatat seluruh riwayat iterasi, evolusi arsitektur, perbaikan bug 
   * Seluruh modul (Dashboard, Activities, Activity Detail, Compare, Fitness PMC, Recovery Hub, Records, Settings) dioptimalkan dengan padding adaptif `px-3 sm:px-6`, `min-w-0`, dan wrapping `break-words` untuk layar 393px (iPhone 16 / standar mobile).
 
 #### 🛠️ Diperbaiki (Fixed)
+* **Sanitasi Input Re-entry Angka Biometrik & Eliminasi Leading Zero:**
+  * Memperbaiki penanganan input angka pada modal kalibrasi zona (`AthletePersonalInfoCard.tsx`) dan biodata profil (`AthleteBiodataCard.tsx`).
+  * Mengeliminasi bug *leading zero* (`075`, `076`, `0195`) saat pengguna menghapus dan memasukkan ulang angka dengan regex sanitasi otomatis (`/^0+(?=\d)/`).
+  * Menambahkan fitur seleksi teks instan saat fokus (`onFocus={e => e.target.select()}`) dan mengizinkan input kosong sementara saat mengetik tanpa memaksa angka `0`.
+  * Mengganti tipe input native `type="number"` dengan `type="text" inputMode="decimal"` untuk mencegah *browser stepper arrows* yang memotong kolom dan bug rekonsiliasi DOM Chromium.
 * **Penyelarasan Kontras Tema Terang & Gelap di Seluruh Platform:**
   * Komponen `FitnessClient.tsx`, `RecoveryPageClient.tsx`, dan `RecordsClient.tsx` telah disesuaikan dengan palet brutalist cyber-athletic yang adaptif 100% terhadap Light Mode dan Dark Mode.
 

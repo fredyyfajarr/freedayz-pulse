@@ -19,6 +19,24 @@ import {
   Sparkles,
 } from 'lucide-react';
 
+const sanitizeNumericInput = (val: string, allowDecimal = true): string => {
+  if (!val) return '';
+  let cleaned = allowDecimal 
+    ? val.replace(/[^0-9.]/g, '') 
+    : val.replace(/[^0-9]/g, '');
+  
+  if (allowDecimal) {
+    const parts = cleaned.split('.');
+    if (parts.length > 2) {
+      cleaned = parts[0] + '.' + parts.slice(1).join('');
+    }
+  }
+
+  // Strip leading zeros before digits: '075' -> '75', '007' -> '7', but keep '0.' or '0'
+  cleaned = cleaned.replace(/^0+(?=\d)/, '');
+  return cleaned;
+};
+
 interface Props {
   initialProfile?: {
     fullName?: string;
@@ -291,13 +309,11 @@ export default function AthleteBiodataCard({ initialProfile }: Props) {
             </label>
             <div className="relative">
               <input
-                type="number"
-                step="0.5"
-                min="30"
-                max="250"
-                required
+                type="text"
+                inputMode="decimal"
                 value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => setWeightKg(sanitizeNumericInput(e.target.value, true))}
                 placeholder="62"
                 className="w-full p-2.5 pr-10 bg-slate-50 dark:bg-[#070a14] border-2 border-slate-300 dark:border-zinc-800 text-slate-900 dark:text-white text-xs font-bold focus:outline-none focus:border-violet-500 transition-colors"
               />
@@ -318,12 +334,11 @@ export default function AthleteBiodataCard({ initialProfile }: Props) {
             </label>
             <div className="relative">
               <input
-                type="number"
-                min="100"
-                max="250"
-                required
+                type="text"
+                inputMode="numeric"
                 value={heightCm}
-                onChange={(e) => setHeightCm(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => setHeightCm(sanitizeNumericInput(e.target.value, false))}
                 placeholder="172"
                 className="w-full p-2.5 pr-10 bg-slate-50 dark:bg-[#070a14] border-2 border-slate-300 dark:border-zinc-800 text-slate-900 dark:text-white text-xs font-bold focus:outline-none focus:border-violet-500 transition-colors"
               />
@@ -356,11 +371,11 @@ export default function AthleteBiodataCard({ initialProfile }: Props) {
             </label>
             <div className="relative">
               <input
-                type="number"
-                min="5"
-                max="250"
+                type="text"
+                inputMode="decimal"
                 value={weeklyTargetKm}
-                onChange={(e) => setWeeklyTargetKm(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => setWeeklyTargetKm(sanitizeNumericInput(e.target.value, true))}
                 placeholder="30"
                 className="w-full p-2.5 pr-10 bg-slate-50 dark:bg-[#070a14] border-2 border-slate-300 dark:border-zinc-800 text-slate-900 dark:text-white text-xs font-bold focus:outline-none focus:border-violet-500 transition-colors"
               />

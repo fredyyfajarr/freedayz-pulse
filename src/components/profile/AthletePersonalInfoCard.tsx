@@ -22,6 +22,42 @@ interface Props {
   };
 }
 
+interface DraftHRSettings {
+  method: HRMethod;
+  restingHr: number | string;
+  maxHr: number | string;
+  lthr: number | string;
+  hrrPercentages?: { idx: number; minP: number | string; maxP: number | string }[];
+  maxHrPercentages?: { idx: number; minP: number | string; maxP: number | string }[];
+  lthrPercentages?: { idx: number; minP: number | string; maxP: number | string }[];
+  zonePercentages?: { idx: number; minP: number | string; maxP: number | string }[];
+  manualZoneBpms?: { idx: number; minBpm: number | string; maxBpm: number | string }[];
+}
+
+/**
+ * Sanitizes numeric input:
+ * - Allows blank/empty string so user can clear the field to retype.
+ * - Strips leading zeros before digits (e.g. '075' -> '75', '076' -> '76', '00' -> '0').
+ * - Preserves decimals like '0.5' and '62.5'.
+ */
+const sanitizeNumericInput = (val: string, allowDecimal = true): string => {
+  if (!val) return '';
+  let cleaned = allowDecimal 
+    ? val.replace(/[^0-9.]/g, '') 
+    : val.replace(/[^0-9]/g, '');
+  
+  if (allowDecimal) {
+    const parts = cleaned.split('.');
+    if (parts.length > 2) {
+      cleaned = parts[0] + '.' + parts.slice(1).join('');
+    }
+  }
+
+  // Strip leading zeros before digits: '075' -> '75', '007' -> '7', but keep '0.' or standalone '0'
+  cleaned = cleaned.replace(/^0+(?=\d)/, '');
+  return cleaned;
+};
+
 export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, initialSettings }: Props) {
   const { language } = useLanguage();
   const isId = language === 'ID';
@@ -38,7 +74,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
 
   // Modal & Draft States
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [draftSettings, setDraftSettings] = useState<CustomHRSettings>(hrSettings);
+  const [draftSettings, setDraftSettings] = useState<DraftHRSettings>(hrSettings);
   const [draftDeviceName, setDraftDeviceName] = useState<string>(deviceName);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
@@ -61,6 +97,47 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
     hrSettings
   );
 
+  // Sanitized safe settings for preview profile calculation
+  const safeDraftSettings: CustomHRSettings = React.useMemo(() => {
+    const parseNum = (v: any, fallback: number) => {
+      const n = Number(v);
+      return isNaN(n) || v === '' ? fallback : n;
+    };
+    const maxVal = parseNum(draftSettings.maxHr, 201);
+    const restVal = parseNum(draftSettings.restingHr, 51);
+    const lthrVal = parseNum(draftSettings.lthr, 177);
+
+    const mapPcts = (arr?: { idx: number; minP: any; maxP: any }[]) => {
+      if (!arr) return undefined;
+      return arr.map(p => ({
+        idx: p.idx,
+        minP: parseNum(p.minP, 0),
+        maxP: parseNum(p.maxP, 0),
+      }));
+    };
+
+    const mapBpms = (arr?: { idx: number; minBpm: any; maxBpm: any }[]) => {
+      if (!arr) return undefined;
+      return arr.map(m => ({
+        idx: m.idx,
+        minBpm: parseNum(m.minBpm, 0),
+        maxBpm: parseNum(m.maxBpm, 0),
+      }));
+    };
+
+    return {
+      method: draftSettings.method,
+      maxHr: maxVal,
+      restingHr: restVal,
+      lthr: lthrVal,
+      zonePercentages: mapPcts(draftSettings.zonePercentages),
+      hrrPercentages: mapPcts(draftSettings.hrrPercentages),
+      maxHrPercentages: mapPcts(draftSettings.maxHrPercentages),
+      lthrPercentages: mapPcts(draftSettings.lthrPercentages),
+      manualZoneBpms: mapBpms(draftSettings.manualZoneBpms),
+    };
+  }, [draftSettings]);
+
   // Preview profile for the modal
   const previewProfile: AthleteHRProfile = HRProfileCalculator.calculateProfile(
     activities,
@@ -68,7 +145,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
     undefined,
     undefined,
     undefined,
-    draftSettings
+    safeDraftSettings
   );
 
   const handleOpenModal = () => {
@@ -116,9 +193,9 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
 
   const handleSelectMethod = (m: HRMethod) => {
     setDraftSettings(prev => {
-      const currentMax = prev.maxHr || 201;
-      const currentLthr = prev.lthr || 177;
-      const copy: CustomHRSettings = { ...prev, method: m };
+      const currentMax = Number(prev.maxHr) || 201;
+      const currentLthr = Number(prev.lthr) || 177;
+      const copy: DraftHRSettings = { ...prev, method: m };
 
       if (m === 'MAX_HR') {
         const pcts = prev.maxHrPercentages || HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
@@ -126,7 +203,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
         copy.zonePercentages = pcts;
       } else if (m === 'LTHR') {
         const lthrMaxP = Math.round((currentMax / currentLthr) * 100);
-        const pcts = (prev.lthrPercentages && prev.lthrPercentages[0]?.minP >= 60)
+        const pcts = (prev.lthrPercentages && Number(prev.lthrPercentages[0]?.minP) >= 60)
           ? prev.lthrPercentages
           : HRProfileCalculator.DEFAULT_LTHR_ZONES.map(z => ({ 
               idx: z.idx, 
@@ -154,7 +231,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
     });
   };
 
-  const handleUpdatePercentage = (idx: number, field: 'minP' | 'maxP', val: number) => {
+  const handleUpdatePercentage = (idx: number, field: 'minP' | 'maxP', val: string | number) => {
     setDraftSettings(prev => {
       const currentMethod = prev.method;
       const activePcts = currentMethod === 'LTHR'
@@ -163,13 +240,13 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
         ? (prev.maxHrPercentages || HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })))
         : (prev.hrrPercentages || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })));
 
-      const pcts = [...activePcts];
+      const pcts = activePcts.map(p => ({ ...p }));
       const targetIdx = pcts.findIndex(p => p.idx === idx);
       if (targetIdx !== -1) {
         pcts[targetIdx] = { ...pcts[targetIdx], [field]: val };
       }
 
-      const updated: CustomHRSettings = { ...prev, zonePercentages: pcts };
+      const updated: DraftHRSettings = { ...prev, zonePercentages: pcts };
       if (currentMethod === 'HRR') updated.hrrPercentages = pcts;
       if (currentMethod === 'MAX_HR') updated.maxHrPercentages = pcts;
       if (currentMethod === 'LTHR') updated.lthrPercentages = pcts;
@@ -177,14 +254,14 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
     });
   };
 
-  const handleUpdateManualBpm = (idx: number, field: 'minBpm' | 'maxBpm', val: number) => {
+  const handleUpdateManualBpm = (idx: number, field: 'minBpm' | 'maxBpm', val: string | number) => {
     setDraftSettings(prev => {
-      const currentMax = (idx === 5 && field === 'maxBpm') ? val : (prev.maxHr || 201);
+      const currentMax = (idx === 5 && field === 'maxBpm') ? (Number(val) || 201) : (Number(prev.maxHr) || 201);
       const bpms = [...(prev.manualZoneBpms || HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ 
         idx: z.idx, 
         minBpm: Math.round(currentMax * (z.minP / 100)), 
         maxBpm: z.idx === 5 ? currentMax : Math.round(currentMax * (z.maxP / 100)) 
-      })))];
+      })))].map(b => ({ ...b }));
       const targetIdx = bpms.findIndex(b => b.idx === idx);
       if (targetIdx !== -1) {
         bpms[targetIdx] = { ...bpms[targetIdx], [field]: val };
@@ -203,11 +280,40 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const finalSettings = {
-        ...draftSettings,
-        manualZoneBpms: (draftSettings.manualZoneBpms || []).map(z => 
-          z.idx === 5 ? { ...z, maxBpm: draftSettings.maxHr } : z
-        ),
+      const parsedMaxHr = Number(draftSettings.maxHr) || 201;
+      const parsedRestingHr = Number(draftSettings.restingHr) || 51;
+      const parsedLthr = Number(draftSettings.lthr) || 177;
+
+      const finalSettings: CustomHRSettings = {
+        method: draftSettings.method,
+        maxHr: parsedMaxHr,
+        restingHr: parsedRestingHr,
+        lthr: parsedLthr,
+        hrrPercentages: draftSettings.hrrPercentages?.map(p => ({
+          idx: p.idx,
+          minP: Number(p.minP) || 0,
+          maxP: Number(p.maxP) || 0,
+        })),
+        maxHrPercentages: draftSettings.maxHrPercentages?.map(p => ({
+          idx: p.idx,
+          minP: Number(p.minP) || 0,
+          maxP: Number(p.maxP) || 0,
+        })),
+        lthrPercentages: draftSettings.lthrPercentages?.map(p => ({
+          idx: p.idx,
+          minP: Number(p.minP) || 0,
+          maxP: Number(p.maxP) || 0,
+        })),
+        zonePercentages: draftSettings.zonePercentages?.map(p => ({
+          idx: p.idx,
+          minP: Number(p.minP) || 0,
+          maxP: Number(p.maxP) || 0,
+        })),
+        manualZoneBpms: (draftSettings.manualZoneBpms || []).map(z => ({
+          idx: z.idx,
+          minBpm: Number(z.minBpm) || 0,
+          maxBpm: z.idx === 5 ? parsedMaxHr : (Number(z.maxBpm) || parsedMaxHr),
+        })),
       };
 
       HRProfileCalculator.saveStoredSettings(finalSettings);
@@ -512,31 +618,36 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                   {isId ? 'MAX HR (BPM)' : 'MAX HR (BPM)'}
                 </label>
                 <input
-                  type="number"
-                  min="130"
-                  max="230"
-                  value={draftSettings.maxHr}
+                  type="text"
+                  inputMode="numeric"
+                  value={draftSettings.maxHr ?? ''}
+                  onFocus={e => e.target.select()}
                   onChange={e => {
-                    const newMax = Number(e.target.value);
+                    const clean = sanitizeNumericInput(e.target.value, false);
                     setDraftSettings(prev => {
                       const updatedManual = (prev.manualZoneBpms || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ 
                         idx: z.idx, 
                         minBpm: z.minBpm, 
-                        maxBpm: z.idx === 5 ? prev.maxHr : z.maxBpm 
+                        maxBpm: z.idx === 5 ? (Number(prev.maxHr) || 201) : z.maxBpm 
                       }))).map(m => {
                         if (m.idx === 5) {
-                          return { ...m, maxBpm: newMax };
+                          return { ...m, maxBpm: clean === '' ? 201 : clean };
                         }
                         return m;
                       });
                       return {
                         ...prev,
-                        maxHr: newMax,
+                        maxHr: clean,
                         manualZoneBpms: updatedManual,
                       };
                     });
                   }}
-                  className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm"
+                  onBlur={() => {
+                    if (!draftSettings.maxHr || Number(draftSettings.maxHr) < 120) {
+                      setDraftSettings(prev => ({ ...prev, maxHr: 201 }));
+                    }
+                  }}
+                  className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm outline-none focus:border-violet-500"
                 />
               </div>
 
@@ -545,12 +656,20 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                   {isId ? 'RESTING HR (BPM)' : 'RESTING HR (BPM)'}
                 </label>
                 <input
-                  type="number"
-                  min="35"
-                  max="100"
-                  value={draftSettings.restingHr}
-                  onChange={e => setDraftSettings(prev => ({ ...prev, restingHr: Number(e.target.value) }))}
-                  className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm"
+                  type="text"
+                  inputMode="numeric"
+                  value={draftSettings.restingHr ?? ''}
+                  onFocus={e => e.target.select()}
+                  onChange={e => {
+                    const clean = sanitizeNumericInput(e.target.value, false);
+                    setDraftSettings(prev => ({ ...prev, restingHr: clean }));
+                  }}
+                  onBlur={() => {
+                    if (!draftSettings.restingHr || Number(draftSettings.restingHr) < 30) {
+                      setDraftSettings(prev => ({ ...prev, restingHr: 51 }));
+                    }
+                  }}
+                  className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm outline-none focus:border-violet-500"
                 />
               </div>
 
@@ -559,12 +678,20 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                   {isId ? 'LTHR AMBANG (BPM)' : 'LTHR THRESHOLD (BPM)'}
                 </label>
                 <input
-                  type="number"
-                  min="120"
-                  max="210"
-                  value={draftSettings.lthr}
-                  onChange={e => setDraftSettings(prev => ({ ...prev, lthr: Number(e.target.value) }))}
-                  className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm"
+                  type="text"
+                  inputMode="numeric"
+                  value={draftSettings.lthr ?? ''}
+                  onFocus={e => e.target.select()}
+                  onChange={e => {
+                    const clean = sanitizeNumericInput(e.target.value, false);
+                    setDraftSettings(prev => ({ ...prev, lthr: clean }));
+                  }}
+                  onBlur={() => {
+                    if (!draftSettings.lthr || Number(draftSettings.lthr) < 100) {
+                      setDraftSettings(prev => ({ ...prev, lthr: 177 }));
+                    }
+                  }}
+                  className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm outline-none focus:border-violet-500"
                 />
               </div>
             </div>
@@ -621,29 +748,48 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                               {draftSettings.method === 'MANUAL_BPM' ? (
                                 <div className="flex items-center gap-1.5 font-mono">
                                   <input
-                                    type="number"
-                                    min="30"
-                                    max="230"
-                                    value={userManual?.minBpm ?? previewZone?.minBpm}
-                                    onChange={e => handleUpdateManualBpm(idx, 'minBpm', Number(e.target.value))}
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={userManual?.minBpm !== undefined ? userManual.minBpm : (previewZone?.minBpm ?? '')}
+                                    onFocus={e => e.target.select()}
+                                    onChange={e => {
+                                      const clean = sanitizeNumericInput(e.target.value, false);
+                                      handleUpdateManualBpm(idx, 'minBpm', clean);
+                                    }}
+                                    onBlur={() => {
+                                      if (!userManual?.minBpm || Number(userManual.minBpm) <= 0) {
+                                        handleUpdateManualBpm(idx, 'minBpm', previewZone?.minBpm || 100);
+                                      }
+                                    }}
                                     className="w-16 sm:w-20 h-8 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 font-mono font-black text-center text-xs focus:border-cyan-500 outline-none"
                                   />
                                   <span className="w-5 text-center text-slate-400 font-bold">–</span>
                                   <input
-                                    type="number"
-                                    min="30"
-                                    max="230"
-                                    value={idx === 5 ? (draftSettings.maxHr || 201) : (userManual?.maxBpm ?? previewZone?.maxBpm)}
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={idx === 5 ? (draftSettings.maxHr || 201) : (userManual?.maxBpm !== undefined ? userManual.maxBpm : (previewZone?.maxBpm ?? ''))}
+                                    onFocus={e => e.target.select()}
                                     onChange={e => {
-                                      const val = Number(e.target.value);
+                                      const clean = sanitizeNumericInput(e.target.value, false);
                                       if (idx === 5) {
                                         setDraftSettings(prev => ({
                                           ...prev,
-                                          maxHr: val,
-                                          manualZoneBpms: (prev.manualZoneBpms || []).map(m => m.idx === 5 ? { ...m, maxBpm: val } : m)
+                                          maxHr: clean,
+                                          manualZoneBpms: (prev.manualZoneBpms || []).map(m => m.idx === 5 ? { ...m, maxBpm: clean } : m)
                                         }));
                                       } else {
-                                        handleUpdateManualBpm(idx, 'maxBpm', val);
+                                        handleUpdateManualBpm(idx, 'maxBpm', clean);
+                                      }
+                                    }}
+                                    onBlur={() => {
+                                      if (idx === 5) {
+                                        if (!draftSettings.maxHr || Number(draftSettings.maxHr) < 120) {
+                                          setDraftSettings(prev => ({ ...prev, maxHr: 201 }));
+                                        }
+                                      } else {
+                                        if (!userManual?.maxBpm || Number(userManual.maxBpm) <= 0) {
+                                          handleUpdateManualBpm(idx, 'maxBpm', previewZone?.maxBpm || 180);
+                                        }
                                       }
                                     }}
                                     className="w-16 sm:w-20 h-8 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 font-mono font-black text-center text-xs focus:border-cyan-500 outline-none"
@@ -653,22 +799,36 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                               ) : (
                                 <div className="flex items-center gap-1 font-mono">
                                   <input
-                                    type="number"
-                                    step="0.5"
-                                    min="10"
-                                    max="150"
-                                    value={userPct?.minP ?? previewZone?.minPercent}
-                                    onChange={e => handleUpdatePercentage(idx, 'minP', Number(e.target.value))}
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={userPct?.minP !== undefined ? userPct.minP : (previewZone?.minPercent ?? '')}
+                                    onFocus={e => e.target.select()}
+                                    onChange={e => {
+                                      const clean = sanitizeNumericInput(e.target.value, true);
+                                      handleUpdatePercentage(idx, 'minP', clean);
+                                    }}
+                                    onBlur={() => {
+                                      if (!userPct?.minP || Number(userPct.minP) <= 0) {
+                                        handleUpdatePercentage(idx, 'minP', previewZone?.minPercent || 50);
+                                      }
+                                    }}
                                     className="w-16 h-8 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 font-mono font-black text-center text-xs focus:border-violet-500 outline-none"
                                   />
                                   <span className="w-8 text-center text-slate-400 font-bold">% –</span>
                                   <input
-                                    type="number"
-                                    step="0.5"
-                                    min="10"
-                                    max="150"
-                                    value={userPct?.maxP ?? previewZone?.maxPercent}
-                                    onChange={e => handleUpdatePercentage(idx, 'maxP', Number(e.target.value))}
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={userPct?.maxP !== undefined ? userPct.maxP : (previewZone?.maxPercent ?? '')}
+                                    onFocus={e => e.target.select()}
+                                    onChange={e => {
+                                      const clean = sanitizeNumericInput(e.target.value, true);
+                                      handleUpdatePercentage(idx, 'maxP', clean);
+                                    }}
+                                    onBlur={() => {
+                                      if (!userPct?.maxP || Number(userPct.maxP) <= 0) {
+                                        handleUpdatePercentage(idx, 'maxP', previewZone?.maxPercent || 100);
+                                      }
+                                    }}
                                     className="w-16 h-8 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 font-mono font-black text-center text-xs focus:border-violet-500 outline-none"
                                   />
                                   <span className="w-6 text-left text-slate-500 dark:text-zinc-400 font-bold text-[11px]">%</span>
