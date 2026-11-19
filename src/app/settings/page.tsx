@@ -6,23 +6,74 @@ import AthletePersonalInfoCard from '@/components/profile/AthletePersonalInfoCar
 import AthleteBiodataCard from '@/components/profile/AthleteBiodataCard';
 import SystemPreferencesCard from '@/components/profile/SystemPreferencesCard';
 import GarminConnectionCard from '@/components/profile/GarminConnectionCard';
+import CoachClubSettingsCard from '@/components/profile/CoachClubSettingsCard';
 import { createClient } from '@/utils/supabase/server';
-import { Settings, Watch } from 'lucide-react';
+import { Settings, Watch, ShieldCheck } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'Pengaturan Akun & Kalibrasi',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.user_metadata?.role === 'coach') {
+      return {
+        title: 'Pengaturan Klub & Pelatih',
+      };
+    }
+  } catch {}
+  return {
+    title: 'Pengaturan Akun & Kalibrasi',
+  };
+}
 
 export default async function SettingsPage() {
-  const activities = await container.repository.getAllActivities();
-  const biometrics = AthleteSettingsManager.getSettings();
-  const healthSnapshot = await container.healthUseCase.execute();
-  const garmin7dAvgRhr = healthSnapshot.dailySummary?.lastSevenDaysAvgRestingHeartRate ?? healthSnapshot.dailySummary?.restingHeartRate ?? 52;
-
   // Supabase user profile & metadata for biodata & cloud biometrics
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const userMeta = user?.user_metadata || {};
+  const isCoach = userMeta.role === 'coach';
+
+  // If Coach: Render dedicated Club & Coach Profile Settings (Zero Fredy HR zones, Zero athlete Garmin sync)
+  if (isCoach) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+        {/* Header */}
+        <div className="pb-4 border-b-2 border-cyan-900/50">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-cyan-400" />
+            <span className="text-[10px] font-mono px-2 py-0.5 bg-cyan-950 border border-cyan-700/60 text-cyan-300 font-bold uppercase tracking-wider">
+              COACH_&_CLUB_PREFERENCES
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black italic tracking-wide text-white uppercase mt-1">
+            PENGATURAN KLUB & LISENSI KEPELATIHAN
+          </h1>
+          <p className="text-xs font-mono text-zinc-400">
+            MANAJEMEN IDENTITAS KLUB, KODE AKSES PENDAFTARAN ATLET & SISTEM
+          </p>
+        </div>
+
+        {/* 1. Language & Theme System Preferences */}
+        <SystemPreferencesCard />
+
+        {/* 2. Coach Profile & Club License Settings */}
+        <CoachClubSettingsCard
+          initialProfile={{
+            fullName: userMeta.full_name || user?.email?.split('@')[0] || 'Coach',
+            email: user?.email || '',
+            runningClub: userMeta.running_club || 'Freedayzz Athletic Club',
+            userId: user?.id || '',
+            specialization: userMeta.coaching_specialization || 'Endurance & Marathon Periodization Coach',
+          }}
+        />
+      </div>
+    );
+  }
+
+  // ATHLETE SETTINGS
+  const activities = await container.repository.getAllActivities();
+  const biometrics = AthleteSettingsManager.getSettings();
+  const healthSnapshot = await container.healthUseCase.execute();
+  const garmin7dAvgRhr = healthSnapshot.dailySummary?.lastSevenDaysAvgRestingHeartRate ?? healthSnapshot.dailySummary?.restingHeartRate ?? 52;
 
   const mergedBiometrics = {
     ...biometrics,

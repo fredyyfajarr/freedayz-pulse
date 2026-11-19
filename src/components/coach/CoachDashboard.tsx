@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { 
   Users, 
   ShieldCheck, 
@@ -132,7 +133,22 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
   const { language } = useLanguage();
   const isId = language === 'ID';
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tabFromQuery = searchParams.get('tab') as 'roster' | 'plans' | 'acwr' | 'directives' | null;
+
   const [activeTab, setActiveTab] = useState<'roster' | 'plans' | 'acwr' | 'directives'>('roster');
+
+  useEffect(() => {
+    if (tabFromQuery && ['roster', 'plans', 'acwr', 'directives'].includes(tabFromQuery)) {
+      setActiveTab(tabFromQuery);
+    }
+  }, [tabFromQuery]);
+
+  const switchTab = (tab: 'roster' | 'plans' | 'acwr' | 'directives') => {
+    setActiveTab(tab);
+    router.replace(`/dashboard?tab=${tab}`, { scroll: false });
+  };
   const [showDemoSquad, setShowDemoSquad] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -349,7 +365,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
       <div className="flex items-center border-b-2 border-slate-200 dark:border-zinc-800 gap-2 overflow-x-auto pb-1 text-xs">
         <button
           type="button"
-          onClick={() => setActiveTab('roster')}
+          onClick={() => switchTab('roster')}
           className={`px-4 py-2.5 font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
             activeTab === 'roster'
               ? 'border-cyan-500 text-cyan-600 dark:text-cyan-400 bg-cyan-50/50 dark:bg-cyan-950/20'
@@ -365,7 +381,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
         <button
           type="button"
-          onClick={() => setActiveTab('plans')}
+          onClick={() => switchTab('plans')}
           className={`px-4 py-2.5 font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
             activeTab === 'plans'
               ? 'border-violet-500 text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-violet-950/20'
@@ -381,7 +397,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
         <button
           type="button"
-          onClick={() => setActiveTab('acwr')}
+          onClick={() => switchTab('acwr')}
           className={`px-4 py-2.5 font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
             activeTab === 'acwr'
               ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20'
@@ -394,7 +410,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
         <button
           type="button"
-          onClick={() => setActiveTab('directives')}
+          onClick={() => switchTab('directives')}
           className={`px-4 py-2.5 font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
             activeTab === 'directives'
               ? 'border-amber-500 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20'

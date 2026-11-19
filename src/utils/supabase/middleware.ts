@@ -82,19 +82,26 @@ export async function updateSession(request: NextRequest) {
     return redirectResponse;
   }
 
-  // 3. If a Coach tries to access /onboarding -> redirect directly to /dashboard
-  if (user && pathname === '/onboarding') {
+  // 3. If a Coach tries to access athlete-exclusive routes -> redirect directly to /dashboard
+  if (user) {
     const role = user.user_metadata?.role;
     if (role === 'coach') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/dashboard';
-      url.search = '';
+      const athleteExclusiveRoutes = ['/onboarding', '/activities', '/fitness', '/recovery', '/records'];
+      const isAthleteRoute = athleteExclusiveRoutes.some(
+        (r) => pathname === r || pathname.startsWith(`${r}/`)
+      );
 
-      const redirectResponse = NextResponse.redirect(url);
-      supabaseResponse.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
-      });
-      return redirectResponse;
+      if (isAthleteRoute) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/dashboard';
+        url.search = '';
+
+        const redirectResponse = NextResponse.redirect(url);
+        supabaseResponse.cookies.getAll().forEach((cookie) => {
+          redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+        });
+        return redirectResponse;
+      }
     }
   }
 

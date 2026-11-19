@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { 
   Activity, 
   BarChart3, 
@@ -15,6 +15,10 @@ import {
   HeartPulse,
   Globe,
   ChevronRight,
+  ShieldCheck,
+  Users,
+  BookOpen,
+  MessageSquare,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -22,11 +26,17 @@ import { useSidebar } from '@/context/SidebarContext';
 import BrandLogo from '@/components/brand/BrandLogo';
 import HamburgerButton from '@/components/layout/HamburgerButton';
 import UserAuthPill from '@/components/auth/UserAuthPill';
+import { createClient } from '@/utils/supabase/client';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get('tab');
+
   const { t, language, setLanguage } = useLanguage();
   const { theme, setTheme, toggleTheme } = useTheme();
+  const isId = language === 'ID';
+
   const { 
     isMobileOpen, 
     isDesktopOpen, 
@@ -37,6 +47,38 @@ export default function Sidebar() {
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<'athlete' | 'coach' | 'admin'>('athlete');
+
+  // Load user role dynamically from Supabase session
+  useEffect(() => {
+    async function loadUserRole() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const role = user.user_metadata?.role;
+          if (role) {
+            setUserRole(role);
+          }
+        }
+      } catch {}
+    }
+    loadUserRole();
+
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const role = session?.user?.user_metadata?.role;
+      if (role) {
+        setUserRole(role);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const isCoach = userRole === 'coach';
 
   // Close drawer on Escape key and lock body scroll when mobile drawer is open
   useEffect(() => {
@@ -65,6 +107,21 @@ export default function Sidebar() {
   const handleSync = async () => {
     setIsSyncing(true);
     setSyncMessage(null);
+
+    // If Coach: Refresh Squad Telemetry
+    if (isCoach) {
+      setTimeout(() => {
+        setIsSyncing(false);
+        setSyncMessage(isId ? 'Data skuad diperbarui' : 'Squad data refreshed');
+        setTimeout(() => {
+          setSyncMessage(null);
+          window.location.reload();
+        }, 800);
+      }, 1000);
+      return;
+    }
+
+    // If Athlete: Sync Garmin Connect API
     try {
       const res = await fetch('/api/sync', {
         method: 'POST',
@@ -87,22 +144,82 @@ export default function Sidebar() {
     }
   };
 
-  const navLinks = [
-    { href: '/dashboard', label: t('nav.dashboard'), icon: Activity, key: 'dashboard' },
-    { href: '/activities', label: t('nav.activities'), icon: Compass, key: 'activities' },
-    { href: '/fitness', label: t('nav.fitness'), icon: BarChart3, key: 'fitness' },
-    { href: '/recovery', label: t('nav.recovery'), icon: HeartPulse, key: 'recovery' },
-    { href: '/records', label: t('nav.records'), icon: Award, key: 'records' },
-    { href: '/settings', label: t('nav.settings'), icon: Settings, key: 'settings' },
+  // 1. COACH NAV LINKS: Dedicated squad management & coaching suite
+  const coachNavLinks = [
+    { 
+      href: '/dashboard', 
+      label: isId ? 'PORTAL PELATIH' : 'COACH PORTAL', 
+      icon: ShieldCheck, 
+      key: 'portal',
+      isActive: pathname === '/dashboard' && !currentTab,
+    },
+    { 
+      href: '/dashboard?tab=roster', 
+      label: isId ? 'ROSTER ATLET' : 'SQUAD ROSTER', 
+      icon: Users, 
+      key: 'roster',
+      isActive: pathname === '/dashboard' && currentTab === 'roster',
+    },
+    { 
+      href: '/dashboard?tab=plans', 
+      label: isId ? 'PROGRAM LATIHAN' : 'TRAINING PLANS', 
+      icon: BookOpen, 
+      key: 'plans',
+      isActive: pathname === '/dashboard' && currentTab === 'plans',
+    },
+    { 
+      href: '/dashboard?tab=acwr', 
+      label: isId ? 'RADAR RISIKO CEDERA' : 'INJURY RADAR', 
+      icon: Activity, 
+      key: 'acwr',
+      isActive: pathname === '/dashboard' && currentTab === 'acwr',
+    },
+    { 
+      href: '/dashboard?tab=directives', 
+      label: isId ? 'ARAHAN TIM' : 'COACH DIRECTIVES', 
+      icon: MessageSquare, 
+      key: 'directives',
+      isActive: pathname === '/dashboard' && currentTab === 'directives',
+    },
+    { 
+      href: '/settings', 
+      label: isId ? 'PENGATURAN KLUB' : 'CLUB SETTINGS', 
+      icon: Settings, 
+      key: 'settings',
+      isActive: pathname.startsWith('/settings'),
+    },
   ];
 
-  const mobileDockLinks = [
-    { href: '/dashboard', label: t('nav.dashboard'), icon: Activity },
-    { href: '/activities', label: t('nav.activities'), icon: Compass },
-    { href: '/fitness', label: t('nav.fitness'), icon: BarChart3 },
-    { href: '/recovery', label: t('nav.recovery'), icon: HeartPulse },
-    { href: '/records', label: t('nav.records'), icon: Award },
+  // 2. ATHLETE NAV LINKS: Personal telemetry & training log
+  const athleteNavLinks = [
+    { href: '/dashboard', label: t('nav.dashboard'), icon: Activity, key: 'dashboard', isActive: pathname === '/dashboard' },
+    { href: '/activities', label: t('nav.activities'), icon: Compass, key: 'activities', isActive: pathname.startsWith('/activities') },
+    { href: '/fitness', label: t('nav.fitness'), icon: BarChart3, key: 'fitness', isActive: pathname.startsWith('/fitness') },
+    { href: '/recovery', label: t('nav.recovery'), icon: HeartPulse, key: 'recovery', isActive: pathname.startsWith('/recovery') },
+    { href: '/records', label: t('nav.records'), icon: Award, key: 'records', isActive: pathname.startsWith('/records') },
+    { href: '/settings', label: t('nav.settings'), icon: Settings, key: 'settings', isActive: pathname.startsWith('/settings') },
   ];
+
+  const navLinks = isCoach ? coachNavLinks : athleteNavLinks;
+
+  // Mobile Dock Navigation
+  const coachMobileDockLinks = [
+    { href: '/dashboard', label: isId ? 'Portal' : 'Portal', icon: ShieldCheck, isActive: pathname === '/dashboard' && !currentTab },
+    { href: '/dashboard?tab=roster', label: isId ? 'Roster' : 'Roster', icon: Users, isActive: pathname === '/dashboard' && currentTab === 'roster' },
+    { href: '/dashboard?tab=plans', label: isId ? 'Program' : 'Plans', icon: BookOpen, isActive: pathname === '/dashboard' && currentTab === 'plans' },
+    { href: '/dashboard?tab=acwr', label: isId ? 'Radar' : 'Radar', icon: Activity, isActive: pathname === '/dashboard' && currentTab === 'acwr' },
+    { href: '/dashboard?tab=directives', label: isId ? 'Arahan' : 'Directives', icon: MessageSquare, isActive: pathname === '/dashboard' && currentTab === 'directives' },
+  ];
+
+  const athleteMobileDockLinks = [
+    { href: '/dashboard', label: t('nav.dashboard'), icon: Activity, isActive: pathname === '/dashboard' },
+    { href: '/activities', label: t('nav.activities'), icon: Compass, isActive: pathname.startsWith('/activities') },
+    { href: '/fitness', label: t('nav.fitness'), icon: BarChart3, isActive: pathname.startsWith('/fitness') },
+    { href: '/recovery', label: t('nav.recovery'), icon: HeartPulse, isActive: pathname.startsWith('/recovery') },
+    { href: '/records', label: t('nav.records'), icon: Award, isActive: pathname.startsWith('/records') },
+  ];
+
+  const mobileDockLinks = isCoach ? coachMobileDockLinks : athleteMobileDockLinks;
 
   return (
     <>
@@ -111,27 +228,31 @@ export default function Sidebar() {
          ========================================================================= */}
       <aside 
         suppressHydrationWarning
-        className={`hidden md:flex flex-col fixed inset-y-0 left-0 z-40 bg-white/95 dark:bg-[#070a14]/95 backdrop-blur-md border-r-2 border-slate-200 dark:border-violet-900/60 shadow-[4px_0_24px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_24px_rgba(124,58,237,0.08)] select-none transition-all duration-300 ease-in-out ${
+        className={`hidden md:flex flex-col fixed inset-y-0 left-0 z-40 bg-white/95 dark:bg-[#070a14]/95 backdrop-blur-md border-r-2 ${
+          isCoach 
+            ? 'border-cyan-500/70 shadow-[4px_0_24px_rgba(6,182,212,0.08)]' 
+            : 'border-slate-200 dark:border-violet-900/60 shadow-[4px_0_24px_rgba(124,58,237,0.08)]'
+        } select-none transition-all duration-300 ease-in-out ${
           isDesktopOpen ? 'w-72' : 'w-16'
         }`}
       >
         {/* Brand Header */}
         {isDesktopOpen ? (
-          /* EXPANDED HEADER: Brand logo, title, and close button (never offside) */
+          /* EXPANDED HEADER */
           <div className="h-16 px-3.5 border-b-2 border-slate-200 dark:border-violet-900/60 bg-slate-50/50 dark:bg-[#090d1c]/50 flex items-center justify-between gap-2 overflow-hidden">
             <Link href="/dashboard" className="flex items-center gap-2 group min-w-0">
               <BrandLogo size={32} />
               <div className="flex flex-col min-w-0">
                 <span className="font-black italic tracking-wider text-sm text-slate-900 dark:text-white whitespace-nowrap">
-                  FREEDAYZZ<span className="text-violet-600 dark:text-violet-400">.PULSE</span>
+                  FREEDAYZZ<span className={isCoach ? 'text-cyan-500' : 'text-violet-600 dark:text-violet-400'}>.PULSE</span>
                 </span>
                 <p suppressHydrationWarning className="text-[8px] font-mono tracking-widest text-slate-500 dark:text-zinc-400 uppercase truncate">
-                  {t('nav.tagline')}
+                  {isCoach ? (isId ? 'PUSAT KEPELATIHAN TIM' : 'COACH COMMAND LAB') : t('nav.tagline')}
                 </p>
               </div>
             </Link>
 
-            {/* Desktop Animated Close Button (X) - comfortably inside the header */}
+            {/* Desktop Animated Close Button (X) */}
             <HamburgerButton
               isOpen={true}
               onClick={toggleDesktop}
@@ -140,7 +261,7 @@ export default function Sidebar() {
             />
           </div>
         ) : (
-          /* COLLAPSED MINI-RAIL HEADER: Centered Hamburger button to expand */
+          /* COLLAPSED MINI-RAIL HEADER */
           <div className="h-16 border-b-2 border-slate-200 dark:border-violet-900/60 bg-slate-50/50 dark:bg-[#090d1c]/50 flex flex-col items-center justify-center">
             <HamburgerButton
               isOpen={false}
@@ -154,19 +275,24 @@ export default function Sidebar() {
         {/* Navigation Links Area */}
         <div className={`flex-1 overflow-y-auto py-3 space-y-1 font-mono ${isDesktopOpen ? 'px-3' : 'px-2'}`}>
           {isDesktopOpen && (
-            <div className="px-3 pb-2 flex items-center justify-between text-[10px] font-black tracking-widest text-slate-400 dark:text-zinc-500 uppercase">
-              <span>{language === 'ID' ? 'NAVIGASI_TELEMETRI' : 'TELEMETRY_NAV'}</span>
-              <span className="text-[9px] text-violet-600 dark:text-violet-400">
-                {language === 'ID' ? '// SISTEM_AKTIF' : '// SYS_ACTIVE'}
-              </span>
+            <div className="px-3 pb-2 flex items-center justify-between text-[10px] font-black tracking-widest uppercase">
+              {isCoach ? (
+                <>
+                  <span className="text-cyan-600 dark:text-cyan-400">COACH_HUB</span>
+                  <span className="text-[9px] text-zinc-500">// SQUAD_ACTIVE</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-slate-400 dark:text-zinc-500">TELEMETRY_NAV</span>
+                  <span className="text-[9px] text-violet-600 dark:text-violet-400">// SYS_ACTIVE</span>
+                </>
+              )}
             </div>
           )}
 
           {navLinks.map(link => {
             const Icon = link.icon;
-            const isActive = link.href === '/dashboard' 
-              ? pathname === '/dashboard' 
-              : pathname.startsWith(link.href);
+            const isActive = link.isActive;
 
             if (!isDesktopOpen) {
               /* Collapsed Mini-Rail Icon Link */
@@ -177,13 +303,15 @@ export default function Sidebar() {
                   title={link.label}
                   className={`relative w-10 h-10 mx-auto flex items-center justify-center transition-all border ${
                     isActive
-                      ? 'bg-violet-600 dark:bg-violet-900/90 text-white border-violet-500 shadow-[2px_2px_0px_#7c3aed]'
-                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-violet-950/40 border-transparent hover:border-slate-300 dark:hover:border-violet-900/50'
+                      ? isCoach
+                        ? 'bg-cyan-600 text-white border-cyan-400 shadow-[2px_2px_0px_#06b6d4]'
+                        : 'bg-violet-600 dark:bg-violet-900/90 text-white border-violet-500 shadow-[2px_2px_0px_#7c3aed]'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800/60 border-transparent hover:border-slate-300 dark:hover:border-zinc-700'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500 dark:text-zinc-400'}`} />
+                  <Icon className="w-4 h-4" />
                   {isActive && (
-                    <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-5 bg-cyan-400 rounded-r" />
+                    <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse" />
                   )}
                 </Link>
               );
@@ -196,16 +324,20 @@ export default function Sidebar() {
                 href={link.href}
                 className={`relative flex items-center justify-between px-3 py-2.5 text-xs font-bold tracking-wider rounded-none transition-all border ${
                   isActive
-                    ? 'bg-violet-600 dark:bg-violet-900/90 text-white border-violet-500 shadow-[2px_2px_0px_#7c3aed] dark:shadow-[2px_2px_0px_#4c1d95]'
-                    : 'text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-violet-950/40 border-transparent hover:border-slate-300 dark:hover:border-violet-900/50'
+                    ? isCoach
+                      ? 'bg-cyan-600 text-white border-cyan-400 shadow-[2px_2px_0px_#0891b2]'
+                      : 'bg-violet-600 dark:bg-violet-900/90 text-white border-violet-500 shadow-[2px_2px_0px_#7c3aed] dark:shadow-[2px_2px_0px_#4c1d95]'
+                    : isCoach
+                      ? 'text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-cyan-50/50 dark:hover:bg-cyan-950/20 border-transparent hover:border-cyan-300 dark:hover:border-cyan-900/40'
+                      : 'text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-violet-950/40 border-transparent hover:border-slate-300 dark:hover:border-violet-900/50'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-violet-200' : 'text-slate-500 dark:text-zinc-400'}`} />
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : isCoach ? 'text-cyan-500' : 'text-slate-500 dark:text-zinc-400'}`} />
                   <span className="truncate">{link.label}</span>
                 </div>
                 {isActive ? (
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse shrink-0" />
                 ) : (
                   <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-zinc-700 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                 )}
@@ -224,9 +356,9 @@ export default function Sidebar() {
               {/* User Profile & Auth Pill */}
               <UserAuthPill />
 
-              {/* Quick Controls: Segmented Theme & Language Switches (Crystal Clear Status) */}
+              {/* Quick Controls: Segmented Theme & Language Switches */}
               <div className="grid grid-cols-2 gap-2">
-                {/* Theme Segmented Switch */}
+                {/* Theme Switch */}
                 <div className="flex items-center p-0.5 bg-slate-100 dark:bg-[#070a14] border border-slate-300 dark:border-violet-900/70">
                   <button
                     type="button"
@@ -236,7 +368,6 @@ export default function Sidebar() {
                         ? 'bg-amber-400 text-slate-900 shadow-sm'
                         : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
-                    title={language === 'ID' ? 'Aktifkan Mode Terang' : 'Switch to Light Mode'}
                   >
                     <Sun className="w-3 h-3" />
                     <span>{language === 'ID' ? 'TERANG' : 'LIGHT'}</span>
@@ -246,27 +377,25 @@ export default function Sidebar() {
                     onClick={() => setTheme('dark')}
                     className={`flex-1 flex items-center justify-center gap-1 py-1 px-1 text-[10px] font-black transition-all cursor-pointer ${
                       theme === 'dark'
-                        ? 'bg-violet-600 text-white shadow-sm'
+                        ? isCoach ? 'bg-cyan-600 text-white shadow-sm' : 'bg-violet-600 text-white shadow-sm'
                         : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
-                    title={language === 'ID' ? 'Aktifkan Mode Gelap' : 'Switch to Dark Mode'}
                   >
                     <Moon className="w-3 h-3" />
                     <span>{language === 'ID' ? 'GELAP' : 'DARK'}</span>
                   </button>
                 </div>
 
-                {/* Language Segmented Switch */}
+                {/* Language Switch */}
                 <div className="flex items-center p-0.5 bg-slate-100 dark:bg-[#070a14] border border-slate-300 dark:border-violet-900/70">
                   <button
                     type="button"
                     onClick={() => setLanguage('ID')}
                     className={`flex-1 flex items-center justify-center gap-1 py-1 px-1 text-[10px] font-black transition-all cursor-pointer ${
                       language === 'ID'
-                        ? 'bg-violet-600 text-white shadow-sm'
+                        ? isCoach ? 'bg-cyan-600 text-white shadow-sm' : 'bg-violet-600 text-white shadow-sm'
                         : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
-                    title="Gunakan Bahasa Indonesia"
                   >
                     <Globe className="w-3 h-3 text-cyan-400" />
                     <span>ID</span>
@@ -276,30 +405,41 @@ export default function Sidebar() {
                     onClick={() => setLanguage('EN')}
                     className={`flex-1 flex items-center justify-center gap-1 py-1 px-1 text-[10px] font-black transition-all cursor-pointer ${
                       language === 'EN'
-                        ? 'bg-violet-600 text-white shadow-sm'
+                        ? isCoach ? 'bg-cyan-600 text-white shadow-sm' : 'bg-violet-600 text-white shadow-sm'
                         : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
-                    title="Switch to English"
                   >
                     <span>EN</span>
                   </button>
                 </div>
               </div>
 
-              {/* Sync Button */}
-              <button
-                onClick={handleSync}
-                disabled={isSyncing}
-                className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider border border-violet-400 shadow-[2px_2px_0px_#cbd5e1] dark:shadow-[2px_2px_0px_#1e1b4b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 cursor-pointer"
-                title={language === 'ID' ? 'Sinkronkan dengan Garmin Connect' : 'Sync with Garmin Connect'}
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>{isSyncing ? t('nav.syncing') : t('nav.sync')}</span>
-              </button>
+              {/* Sync / Refresh Action Button */}
+              {isCoach ? (
+                <button
+                  onClick={handleSync}
+                  disabled={isSyncing}
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black text-xs uppercase tracking-wider border border-cyan-400 shadow-[2px_2px_0px_#0891b2] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 cursor-pointer"
+                  title="Perbarui telemetri & kesiapan skuad atlet"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                  <span>{isSyncing ? (isId ? 'MEMPERBARUI...' : 'REFRESHING...') : (isId ? 'PERBARUI TIM' : 'REFRESH SQUAD')}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleSync}
+                  disabled={isSyncing}
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider border border-violet-400 shadow-[2px_2px_0px_#cbd5e1] dark:shadow-[2px_2px_0px_#1e1b4b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 cursor-pointer"
+                  title={language === 'ID' ? 'Sinkronkan dengan Garmin Connect' : 'Sync with Garmin Connect'}
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                  <span>{isSyncing ? t('nav.syncing') : t('nav.sync')}</span>
+                </button>
+              )}
 
               {/* Sync Feedback Message */}
               {syncMessage && (
-                <div className="text-center text-[10px] uppercase text-violet-600 dark:text-violet-300 font-bold animate-pulse bg-violet-100/70 dark:bg-violet-950/70 py-1 border border-violet-300 dark:border-violet-800">
+                <div className="text-center text-[10px] uppercase text-cyan-600 dark:text-cyan-300 font-bold animate-pulse bg-cyan-100/70 dark:bg-cyan-950/70 py-1 border border-cyan-300 dark:border-cyan-800">
                   {syncMessage}
                 </div>
               )}
@@ -308,8 +448,8 @@ export default function Sidebar() {
               <div className="pt-1 flex items-center justify-between text-[9px] text-slate-500 dark:text-zinc-400 border-t border-slate-200 dark:border-violet-900/40">
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="font-bold tracking-wider">
-                    {language === 'ID' ? 'GARMIN AKTIF' : 'GARMIN LIVE'}
+                  <span className="font-bold tracking-wider uppercase">
+                    {isCoach ? 'COACH PORTAL // SQUAD LIVE' : (language === 'ID' ? 'GARMIN AKTIF' : 'GARMIN LIVE')}
                   </span>
                 </div>
                 <span className="font-mono text-slate-400 dark:text-zinc-500">v2.4</span>
@@ -339,14 +479,16 @@ export default function Sidebar() {
               <button
                 onClick={handleSync}
                 disabled={isSyncing}
-                className="w-9 h-9 flex items-center justify-center bg-gradient-to-r from-violet-600 to-indigo-600 text-white border border-violet-400 shadow-sm transition-all disabled:opacity-50 cursor-pointer"
-                title="Sync Garmin Data"
+                className={`w-9 h-9 flex items-center justify-center text-white border shadow-sm transition-all disabled:opacity-50 cursor-pointer ${
+                  isCoach ? 'bg-cyan-600 border-cyan-400' : 'bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-400'
+                }`}
+                title={isCoach ? 'Refresh Squad Data' : 'Sync Garmin Data'}
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               </button>
 
               {/* Live Dot */}
-              <div className="pt-1 flex items-center justify-center" title="Garmin Connected // Live">
+              <div className="pt-1 flex items-center justify-center" title={isCoach ? 'Squad Portal // Online' : 'Garmin Connected // Live'}>
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
             </>
@@ -362,7 +504,7 @@ export default function Sidebar() {
         <Link href="/dashboard" className="flex items-center gap-2 group shrink-0">
           <BrandLogo size={28} />
           <span className="font-black italic tracking-wider text-sm sm:text-base text-slate-900 dark:text-white whitespace-nowrap">
-            FREEDAYZZ<span className="text-violet-600 dark:text-violet-400">.PULSE</span>
+            FREEDAYZZ<span className={isCoach ? 'text-cyan-500' : 'text-violet-600 dark:text-violet-400'}>.PULSE</span>
           </span>
         </Link>
 
@@ -372,7 +514,7 @@ export default function Sidebar() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="p-1.5 bg-slate-100 dark:bg-[#090d1c] border border-slate-300 dark:border-violet-900/70 text-slate-700 dark:text-zinc-300 hover:text-violet-600 dark:hover:text-violet-300 shadow-[1px_1px_0px_#cbd5e1] dark:shadow-[1px_1px_0px_#1e1b4b] cursor-pointer"
+            className="p-1.5 bg-slate-100 dark:bg-[#090d1c] border border-slate-300 dark:border-violet-900/70 text-slate-700 dark:text-zinc-300 hover:text-violet-600 dark:hover:text-violet-300 shadow-sm cursor-pointer"
             title="Toggle Light / Dark"
           >
             {theme === 'dark' ? (
@@ -382,12 +524,14 @@ export default function Sidebar() {
             )}
           </button>
 
-          {/* Quick Sync */}
+          {/* Quick Refresh/Sync */}
           <button
             onClick={handleSync}
             disabled={isSyncing}
-            className="p-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white border border-violet-400 shadow-[1px_1px_0px_#cbd5e1] dark:shadow-[1px_1px_0px_#1e1b4b] cursor-pointer disabled:opacity-50"
-            title="Sync Garmin Data"
+            className={`p-1.5 text-white border shadow-sm cursor-pointer disabled:opacity-50 ${
+              isCoach ? 'bg-cyan-600 border-cyan-400' : 'bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-400'
+            }`}
+            title={isCoach ? 'Refresh Squad' : 'Sync Garmin Data'}
           >
             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
           </button>
@@ -427,15 +571,14 @@ export default function Sidebar() {
                   <BrandLogo size={32} />
                   <div className="flex flex-col">
                     <span className="font-black italic tracking-wider text-sm sm:text-base text-slate-900 dark:text-white whitespace-nowrap">
-                      FREEDAYZZ<span className="text-violet-600 dark:text-violet-400">.PULSE</span>
+                      FREEDAYZZ<span className={isCoach ? 'text-cyan-500' : 'text-violet-600 dark:text-violet-400'}>.PULSE</span>
                     </span>
                     <p className="text-[8px] font-mono text-slate-500 dark:text-zinc-400 uppercase tracking-widest whitespace-nowrap">
-                      TELEMETRY LAB
+                      {isCoach ? 'COACH HUB' : 'TELEMETRY LAB'}
                     </p>
                   </div>
                 </Link>
 
-                {/* Animated X Button in Drawer Header - comfortably positioned */}
                 <HamburgerButton
                   isOpen={true}
                   onClick={closeMobile}
@@ -448,9 +591,7 @@ export default function Sidebar() {
               <nav className="mt-4 space-y-1.5 font-mono">
                 {navLinks.map(link => {
                   const Icon = link.icon;
-                  const isActive = link.href === '/dashboard' 
-              ? pathname === '/dashboard' 
-              : pathname.startsWith(link.href);
+                  const isActive = link.isActive;
                   return (
                     <Link
                       key={link.href}
@@ -458,16 +599,18 @@ export default function Sidebar() {
                       onClick={closeMobile}
                       className={`flex items-center justify-between px-3.5 py-3 text-xs font-bold tracking-wider border transition-all ${
                         isActive
-                          ? 'bg-violet-600 text-white border-violet-500 shadow-[2px_2px_0px_#7c3aed]'
+                          ? isCoach
+                            ? 'bg-cyan-600 text-white border-cyan-400 shadow-[2px_2px_0px_#06b6d4]'
+                            : 'bg-violet-600 text-white border-violet-500 shadow-[2px_2px_0px_#7c3aed]'
                           : 'text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-[#090d1c] border-slate-200 dark:border-zinc-800'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-violet-200' : 'text-slate-500 dark:text-zinc-400'}`} />
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isCoach ? 'text-cyan-500' : 'text-slate-500 dark:text-zinc-400'}`} />
                         <span>{link.label}</span>
                       </div>
                       {isActive && (
-                        <span className="text-[9px] text-violet-200 font-bold uppercase">
+                        <span className="text-[9px] text-cyan-200 font-bold uppercase">
                           {language === 'ID' ? 'AKTIF' : 'ACTIVE'}
                         </span>
                       )}
@@ -502,7 +645,7 @@ export default function Sidebar() {
                     onClick={() => setTheme('dark')}
                     className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-1 text-xs font-black transition-all cursor-pointer ${
                       theme === 'dark'
-                        ? 'bg-violet-600 text-white shadow-sm'
+                        ? isCoach ? 'bg-cyan-600 text-white shadow-sm' : 'bg-violet-600 text-white shadow-sm'
                         : 'text-slate-500 dark:text-zinc-400'
                     }`}
                   >
@@ -518,7 +661,7 @@ export default function Sidebar() {
                     onClick={() => setLanguage('ID')}
                     className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-1 text-xs font-black transition-all cursor-pointer ${
                       language === 'ID'
-                        ? 'bg-violet-600 text-white shadow-sm'
+                        ? isCoach ? 'bg-cyan-600 text-white shadow-sm' : 'bg-violet-600 text-white shadow-sm'
                         : 'text-slate-500 dark:text-zinc-400'
                     }`}
                   >
@@ -530,7 +673,7 @@ export default function Sidebar() {
                     onClick={() => setLanguage('EN')}
                     className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-1 text-xs font-black transition-all cursor-pointer ${
                       language === 'EN'
-                        ? 'bg-violet-600 text-white shadow-sm'
+                        ? isCoach ? 'bg-cyan-600 text-white shadow-sm' : 'bg-violet-600 text-white shadow-sm'
                         : 'text-slate-500 dark:text-zinc-400'
                     }`}
                   >
@@ -539,21 +682,23 @@ export default function Sidebar() {
                 </div>
               </div>
 
-              {/* Sync Button */}
+              {/* Sync / Refresh Button */}
               <button
                 onClick={handleSync}
                 disabled={isSyncing}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-black text-xs uppercase tracking-wider border border-violet-400 shadow-[2px_2px_0px_#cbd5e1] dark:shadow-[2px_2px_0px_#1e1b4b] disabled:opacity-50"
+                className={`w-full flex items-center justify-center gap-2 py-2.5 px-3 text-white font-black text-xs uppercase tracking-wider border shadow-sm disabled:opacity-50 ${
+                  isCoach ? 'bg-cyan-600 border-cyan-400' : 'bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-400'
+                }`}
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>{isSyncing ? t('nav.syncing') : t('nav.sync')}</span>
+                <span>{isSyncing ? (isId ? 'MEMPERBARUI...' : 'REFRESHING...') : (isCoach ? (isId ? 'PERBARUI TIM' : 'REFRESH SQUAD') : t('nav.sync'))}</span>
               </button>
 
               {/* Status */}
               <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-zinc-400 pt-1">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  ONLINE
+                  {isCoach ? 'COACH ONLINE' : 'ONLINE'}
                 </span>
                 <span>FREEDAYZZ LAB v2.4</span>
               </div>
@@ -568,24 +713,28 @@ export default function Sidebar() {
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-[#070a14]/95 backdrop-blur-md border-t-2 border-slate-200 dark:border-violet-900/60 flex items-center justify-around px-1 py-1.5 shadow-[0_-2px_12px_rgba(0,0,0,0.06)] font-mono select-none">
         {mobileDockLinks.map(link => {
           const Icon = link.icon;
-          const isActive = link.href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(link.href);
+          const isActive = link.isActive;
           return (
             <Link
               key={link.href}
               href={link.href}
               className={`flex flex-col items-center justify-center min-w-[54px] py-1 px-1 transition-all rounded ${
                 isActive
-                  ? 'text-violet-600 dark:text-violet-400 font-black'
+                  ? isCoach
+                    ? 'text-cyan-600 dark:text-cyan-400 font-black'
+                    : 'text-violet-600 dark:text-violet-400 font-black'
                   : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
               }`}
             >
               <div className="relative">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-violet-600 dark:text-violet-400 scale-110' : ''} transition-transform`} />
+                <Icon className="w-5 h-5" />
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-violet-600 dark:bg-violet-400 rounded-full" />
+                  <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse ${
+                    isCoach ? 'bg-cyan-500' : 'bg-violet-500'
+                  }`} />
                 )}
               </div>
-              <span className="text-[9px] tracking-wider mt-1 truncate max-w-[62px]">
+              <span className="text-[10px] uppercase font-bold tracking-tight mt-0.5 scale-90">
                 {link.label}
               </span>
             </Link>
