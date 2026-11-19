@@ -72,7 +72,14 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
   );
 
   const handleOpenModal = () => {
-    setDraftSettings(JSON.parse(JSON.stringify(hrSettings)));
+    const stored = HRProfileCalculator.getStoredSettings();
+    const copy = JSON.parse(JSON.stringify(stored));
+    if (copy.manualZoneBpms && copy.maxHr) {
+      copy.manualZoneBpms = copy.manualZoneBpms.map((z: any) => 
+        z.idx === 5 ? { ...z, maxBpm: copy.maxHr } : z
+      );
+    }
+    setDraftSettings(copy);
     setDraftDeviceName(deviceName);
     setIsEditing(true);
   };
@@ -113,6 +120,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
 
   const handleUpdateManualBpm = (idx: number, field: 'minBpm' | 'maxBpm', val: number) => {
     setDraftSettings(prev => {
+      const currentMax = (idx === 5 && field === 'maxBpm') ? val : prev.maxHr;
       const bpms = [...(prev.manualZoneBpms || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ 
         idx: z.idx, 
         minBpm: z.minBpm, 
@@ -123,12 +131,12 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
         bpms[targetIdx] = { ...bpms[targetIdx], [field]: val };
       }
       
-      const newMaxHr = (idx === 5 && field === 'maxBpm') ? val : prev.maxHr;
+      const syncedBpms = bpms.map(b => b.idx === 5 ? { ...b, maxBpm: currentMax } : b);
 
       return { 
         ...prev, 
-        maxHr: newMaxHr,
-        manualZoneBpms: bpms 
+        maxHr: currentMax,
+        manualZoneBpms: syncedBpms 
       };
     });
   };
@@ -136,17 +144,36 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      HRProfileCalculator.saveStoredSettings(draftSettings);
-      setHrSettings(draftSettings);
+      const finalSettings = {
+        ...draftSettings,
+        manualZoneBpms: (draftSettings.manualZoneBpms || []).map(z => 
+          z.idx === 5 ? { ...z, maxBpm: draftSettings.maxHr } : z
+        ),
+      };
+
+      HRProfileCalculator.saveStoredSettings(finalSettings);
+      setHrSettings(finalSettings);
       setDeviceName(draftDeviceName.trim() || 'FORERUNNER 165');
 
-      // Also sync to biometrics endpoint
+      // Map manual zones to customZones payload for /api/settings/biometrics
+      const customZonesPayload: any = {};
+      if (finalSettings.manualZoneBpms) {
+        finalSettings.manualZoneBpms.forEach(z => {
+          if (z.idx === 1) { customZonesPayload.zone1Min = z.minBpm; customZonesPayload.zone1Max = z.maxBpm; }
+          if (z.idx === 2) { customZonesPayload.zone2Min = z.minBpm; customZonesPayload.zone2Max = z.maxBpm; }
+          if (z.idx === 3) { customZonesPayload.zone3Min = z.minBpm; customZonesPayload.zone3Max = z.maxBpm; }
+          if (z.idx === 4) { customZonesPayload.zone4Min = z.minBpm; customZonesPayload.zone4Max = z.maxBpm; }
+          if (z.idx === 5) { customZonesPayload.zone5Min = z.minBpm; customZonesPayload.zone5Max = finalSettings.maxHr; }
+        });
+      }
+
       await fetch('/api/settings/biometrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          maxHr: draftSettings.maxHr,
-          restingHr: draftSettings.restingHr,
+          maxHr: finalSettings.maxHr,
+          restingHr: finalSettings.restingHr,
+          customZones: Object.keys(customZonesPayload).length > 0 ? customZonesPayload : undefined,
           deviceName: draftDeviceName.trim() || 'FORERUNNER 165',
         }),
       });
@@ -487,7 +514,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                             type="number"
                             min="60"
                             max="230"
-                            value={idx === 5 ? (userManual?.maxBpm ?? draftSettings.maxHr ?? previewZone?.maxBpm) : (userManual?.maxBpm ?? previewZone?.maxBpm)}
+                            value={idx === 5 ? draftSettings.maxHr : (userManual?.maxBpm ?? previewZone?.maxBpm)}
                             onChange={e => handleUpdateManualBpm(idx, 'maxBpm', Number(e.target.value))}
                             className="w-20 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
                           />

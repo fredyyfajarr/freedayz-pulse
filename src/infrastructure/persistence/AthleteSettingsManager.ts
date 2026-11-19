@@ -59,11 +59,15 @@ export class AthleteSettingsManager {
 
   public static updateSettings(newSettings: Partial<AthleteBiometricSettings>): AthleteBiometricSettings {
     const current = this.getSettings();
+    const resolvedMaxHr = newSettings.maxHr && newSettings.maxHr > 100 && newSettings.maxHr < 250 ? Math.round(newSettings.maxHr) : current.maxHr;
+    const mergedZones = newSettings.customZones ? { ...(current.customZones || DEFAULT_CUSTOM_ZONES), ...newSettings.customZones } : { ...(current.customZones || DEFAULT_CUSTOM_ZONES) };
+    mergedZones.zone5Max = resolvedMaxHr;
+
     const updated: AthleteBiometricSettings = {
-      maxHr: newSettings.maxHr && newSettings.maxHr > 100 && newSettings.maxHr < 250 ? Math.round(newSettings.maxHr) : current.maxHr,
+      maxHr: resolvedMaxHr,
       restingHr: newSettings.restingHr && newSettings.restingHr > 30 && newSettings.restingHr < 120 ? Math.round(newSettings.restingHr) : current.restingHr,
       dailySleepScores: newSettings.dailySleepScores !== undefined ? { ...current.dailySleepScores, ...newSettings.dailySleepScores } : current.dailySleepScores,
-      customZones: newSettings.customZones ? { ...(current.customZones || DEFAULT_CUSTOM_ZONES), ...newSettings.customZones } : (current.customZones || DEFAULT_CUSTOM_ZONES),
+      customZones: mergedZones,
       deviceName: newSettings.deviceName !== undefined ? newSettings.deviceName.trim() : (current.deviceName || 'FORERUNNER 165'),
       lastUpdated: new Date().toISOString(),
     };

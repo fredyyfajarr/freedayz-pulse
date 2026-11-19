@@ -84,7 +84,13 @@ export class HRProfileCalculator {
     try {
       const stored = localStorage.getItem(STORAGE_HR_SETTINGS_KEY);
       if (!stored) return fallback;
-      return { ...fallback, ...JSON.parse(stored) };
+      const parsed = { ...fallback, ...JSON.parse(stored) };
+      if (parsed.manualZoneBpms && parsed.maxHr) {
+        parsed.manualZoneBpms = parsed.manualZoneBpms.map((z: any) => 
+          z.idx === 5 ? { ...z, maxBpm: parsed.maxHr } : z
+        );
+      }
+      return parsed;
     } catch {
       return fallback;
     }
@@ -93,7 +99,13 @@ export class HRProfileCalculator {
   public static saveStoredSettings(settings: CustomHRSettings): void {
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem(STORAGE_HR_SETTINGS_KEY, JSON.stringify(settings));
+      const toSave = { ...settings };
+      if (toSave.manualZoneBpms && toSave.maxHr) {
+        toSave.manualZoneBpms = toSave.manualZoneBpms.map(z => 
+          z.idx === 5 ? { ...z, maxBpm: toSave.maxHr } : z
+        );
+      }
+      localStorage.setItem(STORAGE_HR_SETTINGS_KEY, JSON.stringify(toSave));
       window.dispatchEvent(new Event('athlete_hr_settings_updated'));
     } catch {}
   }
