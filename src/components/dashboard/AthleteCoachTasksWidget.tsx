@@ -19,7 +19,8 @@ import {
   Info,
   UserCheck,
   Compass,
-  Plus
+  Plus,
+  Users
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { CoachTask, SquadAthlete, AvailableCoach, AvailableCoachProgram } from '@/domain/entities/CoachingRelationship';
@@ -43,9 +44,9 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
 
   // Modal & Catalog States
   const [isJoinModalOpen, setIsJoinModalOpen] = useState<boolean>(false);
-  const [coachesDirectory] = useState<AvailableCoach[]>(() => CoachingStorage.getAvailableCoaches());
-  const [selectedCoachId, setSelectedCoachId] = useState<string>('coach-pack');
-  const [selectedProgramId, setSelectedProgramId] = useState<string>('prog-fm');
+  const [coachesDirectory, setCoachesDirectory] = useState<AvailableCoach[]>([]);
+  const [selectedCoachId, setSelectedCoachId] = useState<string>('');
+  const [selectedProgramId, setSelectedProgramId] = useState<string>('');
   const [joinTab, setJoinTab] = useState<'catalog' | 'code'>('catalog');
   const [joinCoachName, setJoinCoachName] = useState<string>('');
 
@@ -66,6 +67,19 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
     } else {
       setSquadAthlete(null);
     }
+
+    // Load available registered coaches dynamically
+    const coaches = CoachingStorage.getAvailableCoaches();
+    setCoachesDirectory(coaches);
+    if (coaches.length > 0) {
+      setSelectedCoachId(prev => prev && coaches.some(c => c.id === prev) ? prev : coaches[0].id);
+      const active = coaches.find(c => c.id === selectedCoachId) || coaches[0];
+      if (active.programs && active.programs.length > 0) {
+        setSelectedProgramId(prev => prev && active.programs.some(p => p.id === prev) ? prev : active.programs[0].id);
+      } else {
+        setSelectedProgramId('');
+      }
+    }
   };
 
   useEffect(() => {
@@ -73,9 +87,13 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
     const handleUpdate = () => loadData();
     window.addEventListener('coaching_task_updated', handleUpdate);
     window.addEventListener('squad_athlete_updated', handleUpdate);
+    window.addEventListener('coach_registered', handleUpdate);
+    window.addEventListener('coach_programs_updated', handleUpdate);
     return () => {
       window.removeEventListener('coaching_task_updated', handleUpdate);
       window.removeEventListener('squad_athlete_updated', handleUpdate);
+      window.removeEventListener('coach_registered', handleUpdate);
+      window.removeEventListener('coach_programs_updated', handleUpdate);
     };
   }, [athleteName]);
 
@@ -107,36 +125,51 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
     }, 600);
   };
 
+  const handleDisconnectCoach = () => {
+    if (confirm(isId ? 'Apakah Anda yakin ingin memutuskan hubungan dengan pelatih dan beralih ke mode lari mandiri?' : 'Are you sure you want to disconnect from this coach and switch to self-coached mode?')) {
+      CoachingStorage.disconnectAthlete(athleteName);
+      loadData();
+    }
+  };
+
   const handleJoinCoach = (e: React.FormEvent) => {
     e.preventDefault();
 
-    let targetCoachName = joinCoachName.trim();
-    let targetProgramTitle = 'Program Pembinaan Lari';
+    let targetCoach: AvailableCoach | null = null;
+    let targetProgramTitle = 'Pembinaan Telemetri Personal';
     let targetCategory = 'All-Round Endurance';
-    let targetDescription = 'Program pembinaan personal oleh pelatih.';
+    let targetDescription = 'Program pembinaan personal dan arahan latihan harian dari pelatih.';
     let targetDist = 10;
     let targetPace = '5:30 /km';
 
     if (joinTab === 'catalog') {
-      const coach = coachesDirectory.find(c => c.id === selectedCoachId) || coachesDirectory[0];
-      const prog = coach?.programs.find(p => p.id === selectedProgramId) || coach?.programs[0];
-      if (coach && prog) {
-        targetCoachName = coach.name;
-        targetProgramTitle = prog.title;
-        targetCategory = prog.category;
-        targetDescription = prog.description;
-        targetDist = prog.id.includes('fm') ? 16 : prog.id.includes('hm') ? 12 : 8;
-        targetPace = prog.id.includes('10k') ? '4:50 - 5:10 /km' : '5:25 - 5:45 /km';
+      targetCoach = coachesDirectory.find(c => c.id === selectedCoachId) || (coachesDirectory.length > 0 ? coachesDirectory[0] : null);
+      if (targetCoach) {
+        const prog = targetCoach.programs.find(p => p.id === selectedProgramId) || (targetCoach.programs.length > 0 ? targetCoach.programs[0] : null);
+        if (prog) {
+          targetProgramTitle = prog.title;
+          targetCategory = prog.category;
+          targetDescription = prog.description;
+          targetDist = prog.id.includes('fm') ? 16 : prog.id.includes('hm') ? 12 : 8;
+          targetPace = prog.targetPace || '5:20 - 5:45 /km';
+        }
       }
+    } else {
+      const query = joinCoachName.trim();
+      if (!query) return;
+      targetCoach = CoachingStorage.findCoachByQuery(query);
     }
 
-    if (!targetCoachName) return;
+    if (!targetCoach) {
+      alert(isId ? 'Pelatih tidak ditemukan. Silakan periksa kembali kode invite atau email pelatih resmi Anda.' : 'Coach not found. Please verify the invite code or registered coach email.');
+      return;
+    }
 
     // Register athlete in squad
     CoachingStorage.addSquadAthlete({
       name: athleteName || 'Atlet Binaan',
       email: `${(athleteName || 'atlet').toLowerCase().replace(/\s+/g, '')}@athlete.local`,
-      coachId: targetCoachName,
+      coachId: targetCoach.name,
       targetRace: targetProgramTitle,
       acwr: 1.05,
       acwrZone: 'SWEET_SPOT',
@@ -144,23 +177,7 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
       targetWeeklyKm: 38,
       lastSession: 'Kemarin (Easy Run)',
       tsb: 2,
-      packageTier: `${targetCategory} // ${targetCoachName}`,
-    });
-
-    // Automatically issue the first workout prescription
-    CoachingStorage.addTask({
-      athleteId: athleteName || 'ath-current',
-      athleteName: athleteName || 'Atlet Binaan',
-      coachName: targetCoachName,
-      title: `Sesi Perdana: ${targetProgramTitle}`,
-      type: targetProgramTitle.toLowerCase().includes('interval') || targetProgramTitle.toLowerCase().includes('10k') ? 'INTERVAL' : 'LONG_RUN',
-      dueDate: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
-      targetDistanceKm: targetDist,
-      targetPace: targetPace,
-      targetHrZone: 'Zona 2 / Ambang Terkontrol',
-      instructions: targetDescription,
-      status: 'PENDING',
-      adherenceScore: 100,
+      packageTier: `${targetCategory} // ${targetCoach.name}`,
     });
 
     setIsJoinModalOpen(false);
@@ -225,7 +242,7 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
                   {isId ? 'PELATIH PEMBINA:' : 'ASSIGNED COACH:'}
                 </span>
                 <span className="font-black text-cyan-600 dark:text-cyan-400">
-                  {squadAthlete?.coachId ? `Coach ${squadAthlete.coachId}` : (tasks[0]?.coachName || 'Head Coach Skuad')}
+                  {squadAthlete?.coachId ? (squadAthlete.coachId.startsWith('Coach') ? squadAthlete.coachId : `Coach ${squadAthlete.coachId}`) : (tasks[0]?.coachName || 'Pelatih Skuad')}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-2 mt-1 pt-1 border-t border-slate-200 dark:border-zinc-800 text-[11px]">
@@ -235,6 +252,23 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
                 <span className="font-bold text-violet-600 dark:text-violet-400">
                   {squadAthlete?.packageTier || 'Program Pembinaan Klub'}
                 </span>
+              </div>
+              <div className="flex items-center justify-end gap-2 mt-2 pt-1.5 border-t border-slate-200 dark:border-zinc-800 text-[10px]">
+                <button
+                  type="button"
+                  onClick={() => setIsJoinModalOpen(true)}
+                  className="font-bold text-cyan-600 dark:text-cyan-400 hover:underline uppercase cursor-pointer"
+                >
+                  {isId ? 'GANTI PELATIH' : 'CHANGE COACH'}
+                </button>
+                <span className="text-slate-400">•</span>
+                <button
+                  type="button"
+                  onClick={handleDisconnectCoach}
+                  className="font-bold text-rose-500 hover:text-rose-600 hover:underline uppercase cursor-pointer"
+                >
+                  {isId ? 'PUTUSKAN HUBUNGAN' : 'DISCONNECT'}
+                </button>
               </div>
             </>
           ) : (
@@ -527,118 +561,163 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
             <form onSubmit={handleJoinCoach} className="space-y-4 text-xs">
               {joinTab === 'catalog' ? (
                 <div className="space-y-4">
-                  {/* Select Coach */}
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 block">
-                      {isId ? 'PILIH PELATIH PEMBINA:' : 'SELECT HEAD COACH:'}
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      {coachesDirectory.map(c => {
-                        const isSelected = selectedCoachId === c.id;
-                        return (
-                          <div
-                            key={c.id}
-                            onClick={() => {
-                              setSelectedCoachId(c.id);
-                              if (c.programs[0]) {
-                                setSelectedProgramId(c.programs[0].id);
-                              }
-                            }}
-                            className={`p-3 border-2 transition-all cursor-pointer space-y-1 ${
-                              isSelected
-                                ? 'bg-cyan-50 dark:bg-cyan-950/40 border-cyan-500 shadow-[2px_2px_0px_#06b6d4]'
-                                : 'bg-slate-50 dark:bg-zinc-900/40 border-slate-200 dark:border-zinc-800 hover:border-cyan-400'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="w-6 h-6 rounded-full bg-cyan-600 text-white flex items-center justify-center font-black text-[10px]">
-                                {c.avatarInitials}
-                              </span>
-                              <strong className="text-xs text-slate-900 dark:text-white block truncate">{c.name}</strong>
-                            </div>
-                            <span className="text-[10px] text-cyan-600 dark:text-cyan-400 block font-bold leading-tight">
-                              {c.role}
-                            </span>
-                            <span className="text-[9px] text-slate-400 block font-sans">
-                              {c.specialty}
-                            </span>
-                          </div>
-                        );
-                      })}
+                  {coachesDirectory.length === 0 ? (
+                    <div className="p-6 text-center border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-black/30 space-y-3 font-mono">
+                      <Users className="w-8 h-8 text-slate-400 mx-auto" />
+                      <h4 className="font-bold text-xs uppercase text-slate-800 dark:text-zinc-200">
+                        {isId ? 'BELUM ADA PELATIH SKUAD TERDAFTAR' : 'NO SQUAD COACHES REGISTERED YET'}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-sans max-w-sm mx-auto">
+                        {isId
+                          ? 'Belum ada akun pelatih yang mempublikasikan profil skuad ke direktori. Bila pelatih Anda telah memberikan Kode Invite atau Email, silakan hubungkan via Tab 2.'
+                          : 'No coach account has registered a public squad yet. Use an official invite code or coach email in Tab 2 below.'}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setJoinTab('code')}
+                        className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs uppercase cursor-pointer shadow-xs inline-flex items-center gap-1.5"
+                      >
+                        <span>{isId ? 'PINDAH KE INPUT KODE INVITE' : 'SWITCH TO INVITE CODE'}</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                  </div>
-
-                  {/* Select Program from Selected Coach */}
-                  {(() => {
-                    const activeCoach = coachesDirectory.find(c => c.id === selectedCoachId) || coachesDirectory[0];
-                    if (!activeCoach) return null;
-
-                    return (
-                      <div className="space-y-2 pt-1 border-t border-slate-200 dark:border-zinc-800">
+                  ) : (
+                    <>
+                      {/* Select Coach */}
+                      <div className="space-y-2">
                         <label className="text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 block">
-                          {isId ? `PROGRAM TERSEDIA DARI ${activeCoach.name.toUpperCase()}:` : `PROGRAMS BY ${activeCoach.name.toUpperCase()}:`}
+                          {isId ? 'PILIH PELATIH PEMBINA TERDAFTAR:' : 'SELECT REGISTERED HEAD COACH:'}
                         </label>
-                        <div className="space-y-2">
-                          {activeCoach.programs.map(prog => {
-                            const isSelected = selectedProgramId === prog.id;
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {coachesDirectory.map(c => {
+                            const isSelected = selectedCoachId === c.id;
                             return (
                               <div
-                                key={prog.id}
-                                onClick={() => setSelectedProgramId(prog.id)}
-                                className={`p-3 border-2 transition-all cursor-pointer flex items-start gap-3 ${
+                                key={c.id}
+                                onClick={() => {
+                                  setSelectedCoachId(c.id);
+                                  if (c.programs && c.programs[0]) {
+                                    setSelectedProgramId(c.programs[0].id);
+                                  } else {
+                                    setSelectedProgramId('');
+                                  }
+                                }}
+                                className={`p-3 border-2 transition-all cursor-pointer space-y-1 ${
                                   isSelected
-                                    ? 'bg-violet-50 dark:bg-violet-950/40 border-violet-500 shadow-[2px_2px_0px_#7c3aed]'
-                                    : 'bg-slate-50 dark:bg-zinc-900/40 border-slate-200 dark:border-zinc-800 hover:border-violet-400'
+                                    ? 'bg-cyan-50 dark:bg-cyan-950/40 border-cyan-500 shadow-[2px_2px_0px_#06b6d4]'
+                                    : 'bg-slate-50 dark:bg-zinc-900/40 border-slate-200 dark:border-zinc-800 hover:border-cyan-400'
                                 }`}
                               >
-                                <input
-                                  type="radio"
-                                  name="programSelect"
-                                  checked={isSelected}
-                                  onChange={() => setSelectedProgramId(prog.id)}
-                                  className="mt-0.5 accent-violet-600 cursor-pointer"
-                                />
-                                <div className="space-y-0.5 flex-1">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <strong className="text-xs text-slate-900 dark:text-white uppercase font-black">
-                                      {prog.title}
-                                    </strong>
-                                    <span className="text-[10px] px-2 py-0.5 bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-bold border border-violet-400 shrink-0">
-                                      {prog.durationWeeks} {isId ? 'Minggu' : 'Weeks'}
-                                    </span>
-                                  </div>
-                                  <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold block">
-                                    Kategori: {prog.category}
+                                <div className="flex items-center gap-2">
+                                  <span className="w-6 h-6 rounded-full bg-cyan-600 text-white flex items-center justify-center font-black text-[10px]">
+                                    {c.avatarInitials || 'CO'}
                                   </span>
-                                  <p className="text-[11px] text-slate-600 dark:text-zinc-400 font-sans leading-snug">
-                                    {prog.description}
-                                  </p>
+                                  <strong className="text-xs text-slate-900 dark:text-white block truncate">{c.name}</strong>
                                 </div>
+                                <span className="text-[10px] text-cyan-600 dark:text-cyan-400 block font-bold leading-tight">
+                                  {c.role} • {c.club}
+                                </span>
+                                {c.email && (
+                                  <span className="text-[9px] text-slate-500 dark:text-zinc-400 block font-mono">
+                                    {c.email}
+                                  </span>
+                                )}
+                                <span className="text-[9px] text-slate-400 block font-sans">
+                                  {c.specialty}
+                                </span>
                               </div>
                             );
                           })}
                         </div>
                       </div>
-                    );
-                  })()}
+
+                      {/* Select Program from Selected Coach */}
+                      {(() => {
+                        const activeCoach = coachesDirectory.find(c => c.id === selectedCoachId) || coachesDirectory[0];
+                        if (!activeCoach) return null;
+
+                        return (
+                          <div className="space-y-2 pt-1 border-t border-slate-200 dark:border-zinc-800">
+                            <label className="text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 block">
+                              {isId ? `PROGRAM TERSEDIA DARI ${activeCoach.name.toUpperCase()}:` : `PROGRAMS BY ${activeCoach.name.toUpperCase()}:`}
+                            </label>
+                            
+                            {activeCoach.programs && activeCoach.programs.length > 0 ? (
+                              <div className="space-y-2">
+                                {activeCoach.programs.map(prog => {
+                                  const isSelected = selectedProgramId === prog.id;
+                                  return (
+                                    <div
+                                      key={prog.id}
+                                      onClick={() => setSelectedProgramId(prog.id)}
+                                      className={`p-3 border-2 transition-all cursor-pointer flex items-start gap-3 ${
+                                        isSelected
+                                          ? 'bg-violet-50 dark:bg-violet-950/40 border-violet-500 shadow-[2px_2px_0px_#7c3aed]'
+                                          : 'bg-slate-50 dark:bg-zinc-900/40 border-slate-200 dark:border-zinc-800 hover:border-violet-400'
+                                      }`}
+                                    >
+                                      <input
+                                        type="radio"
+                                        name="programSelect"
+                                        checked={isSelected}
+                                        onChange={() => setSelectedProgramId(prog.id)}
+                                        className="mt-0.5 accent-violet-600 cursor-pointer"
+                                      />
+                                      <div className="space-y-0.5 flex-1">
+                                        <div className="flex items-center justify-between gap-2">
+                                          <strong className="text-xs text-slate-900 dark:text-white uppercase font-black">
+                                            {prog.title}
+                                          </strong>
+                                          <span className="text-[10px] px-2 py-0.5 bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-bold border border-violet-400 shrink-0">
+                                            {prog.durationWeeks} {isId ? 'Minggu' : 'Weeks'}
+                                          </span>
+                                        </div>
+                                        <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold block">
+                                          Kategori: {prog.category}
+                                        </span>
+                                        <p className="text-[11px] text-slate-600 dark:text-zinc-400 font-sans leading-snug">
+                                          {prog.description}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <div className="p-4 border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-black/20 text-center space-y-1">
+                                <span className="text-[11px] font-bold text-slate-700 dark:text-zinc-300 block">
+                                  {isId ? 'PELATIH BELUM MEMPUBLIKASIKAN MODUL PROGRAM SPESIFIK' : 'COACH HAS NOT PUBLISHED SPECIFIC MODULES YET'}
+                                </span>
+                                <p className="text-[10px] text-slate-500 font-sans">
+                                  {isId
+                                    ? 'Anda tetap dapat langsung menghubungkan telemetri ke pelatih ini untuk arahan latihan harian dan review performa personal.'
+                                    : 'You can still connect to this coach for weekly workouts and personal telemetry reviews.'}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
+                    </>
+                  )}
                 </div>
               ) : (
                 /* Tab 2: Custom Code / Invite */
                 <div className="space-y-2">
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    {isId ? 'MASUKKAN KODE PELATIH / ID SKUAD:' : 'ENTER COACH CODE / SQUAD ID:'}
+                    {isId ? 'KODE INVITE ATAU ALAMAT EMAIL RESMI PELATIH:' : 'COACH INVITE CODE OR OFFICIAL EMAIL:'}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. COACH-PACK, FAISAL-PRO, SQUAD-2026"
+                    placeholder={isId ? 'Misal: FDZ-PACK-7821 atau packdorez4@gmail.com' : 'e.g. FDZ-PACK-7821 or coach@email.com'}
                     value={joinCoachName}
                     onChange={e => setJoinCoachName(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-black border border-slate-300 dark:border-zinc-700 p-2.5 font-bold text-sm uppercase"
+                    className="w-full bg-slate-50 dark:bg-black border border-slate-300 dark:border-zinc-700 p-2.5 font-bold text-sm uppercase outline-none focus:border-cyan-500"
                   />
                   <span className="text-[10px] text-slate-400 font-sans block">
                     {isId
-                      ? 'Gunakan opsi ini bila pelatih Anda memberikan kode undangan khusus secara privat.'
-                      : 'Use this option if your coach provided you a private squad invitation code.'}
+                      ? 'Ketik kode invite skuad (contoh: FDZ-PACK-7821) atau alamat email resmi akun pelatih terdaftar Anda.'
+                      : 'Type your coach squad invite code (e.g. FDZ-PACK-7821) or their registered email address.'}
                   </span>
                 </div>
               )}
@@ -656,7 +735,7 @@ export default function AthleteCoachTasksWidget({ athleteName = '' }: Props) {
                   className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase cursor-pointer shadow-xs flex items-center gap-1.5"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>{isId ? 'GABUNG PROGRAM & HUBUNGKAN' : 'ENROLL & CONNECT'}</span>
+                  <span>{isId ? 'HUBUNGKAN KE PELATIH' : 'CONNECT TO COACH'}</span>
                 </button>
               </div>
             </form>

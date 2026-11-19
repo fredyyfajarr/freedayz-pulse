@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { createClient } from '@/utils/supabase/client';
+import { CoachingStorage } from '@/utils/coachingStorage';
 import { 
   ShieldCheck, 
   Users, 
@@ -10,9 +11,9 @@ import {
   Check, 
   Save, 
   Award, 
-  Sparkles,
-  CheckCircle2,
-  AlertCircle
+  Sparkles, 
+  CheckCircle2, 
+  AlertCircle 
 } from 'lucide-react';
 
 interface Props {
@@ -41,6 +42,20 @@ export default function CoachClubSettingsCard({ initialProfile }: Props) {
   const cleanName = fullName ? fullName.replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase() : 'COACH';
   const clubInviteCode = `FDZ-${cleanName}-${cleanId}`;
 
+  // Automatically register this coach profile into persistent dynamic directory
+  useEffect(() => {
+    if (initialProfile.fullName || initialProfile.email) {
+      CoachingStorage.registerCoachProfile({
+        id: initialProfile.userId,
+        name: initialProfile.fullName || fullName,
+        email: initialProfile.email,
+        club: initialProfile.runningClub || runningClub,
+        specialty: initialProfile.specialization || specialization,
+        inviteCode: clubInviteCode,
+      });
+    }
+  }, [initialProfile.fullName, initialProfile.email, initialProfile.userId, clubInviteCode]);
+
   const handleCopyCode = () => {
     navigator.clipboard.writeText(clubInviteCode);
     setCopied(true);
@@ -67,6 +82,16 @@ export default function CoachClubSettingsCard({ initialProfile }: Props) {
       if (error) {
         setErrorMsg(error.message);
       } else {
+        // Sync to dynamic coaches storage
+        CoachingStorage.registerCoachProfile({
+          id: initialProfile.userId,
+          name: fullName,
+          email: initialProfile.email,
+          club: runningClub,
+          specialty: specialization,
+          inviteCode: clubInviteCode,
+        });
+
         setSuccessMsg(isId ? 'Profil klub dan lisensi pelatih berhasil diperbarui!' : 'Coach profile & club settings saved successfully!');
         setTimeout(() => setSuccessMsg(null), 3000);
       }

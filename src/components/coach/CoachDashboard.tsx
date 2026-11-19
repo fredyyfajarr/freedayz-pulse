@@ -28,7 +28,8 @@ import {
   CheckCircle2,
   Clock,
   ClipboardList,
-  Filter
+  Filter,
+  Trash2
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { 
@@ -57,48 +58,7 @@ interface TrainingPlan {
   isCustom?: boolean;
 }
 
-const DEFAULT_TRAINING_PLANS: TrainingPlan[] = [
-  {
-    id: 'plan-base',
-    title: 'Fondasi Aerobik & Engine Builder',
-    category: 'Base',
-    durationWeeks: 6,
-    targetPace: 'Zona 2 (Easy Conversational)',
-    hrZone: '65% - 75% Max HR',
-    description: 'Fokus adaptasi kardiovaskular, peningkatan densitas kapiler otot, dan efisiensi biomekanika lari.',
-    weeklyStructure: '3x Easy Run 45m, 1x Strides 6x100m, 1x Weekend Long Run 12-14km @ Zona 2',
-  },
-  {
-    id: 'plan-10k',
-    title: '10K Lactate Threshold & Speed Sharpening',
-    category: '10K',
-    durationWeeks: 8,
-    targetPace: '4:45 - 5:15 /km (T-Pace)',
-    hrZone: '85% - 90% Max HR',
-    description: 'Peningkatan kecepatan ambang laktat dan kapasitas anaerobik untuk memecahkan PB 10K.',
-    weeklyStructure: '1x Interval Trek (5x1000m @ T-Pace), 1x Tempo Run 7km, 1x Recovery 6km, 1x Long Run 15km',
-  },
-  {
-    id: 'plan-hm',
-    title: 'Half-Marathon Progressive Build',
-    category: 'HM',
-    durationWeeks: 10,
-    targetPace: '5:20 - 5:45 /km (HM Pace)',
-    hrZone: '78% - 85% Max HR',
-    description: 'Membangun daya tahan lari jarak menengah dengan simulasi race pace dan latihan negative split.',
-    weeklyStructure: 'Volume 40-52 km/minggu, 1x Long Run Progresif 15-18km, 1x Hill Repeat, 2x Easy Run',
-  },
-  {
-    id: 'plan-fm',
-    title: 'Marathon Sub-4 Periodization & Taper',
-    category: 'FM',
-    durationWeeks: 12,
-    targetPace: '5:35 - 5:40 /km (Marathon Pace)',
-    hrZone: '75% - 82% Max HR',
-    description: 'Periodisasi makrosiklus maraton: 3 minggu pembebanan + 1 minggu deload, simulasi nutrisi & hidrasi.',
-    weeklyStructure: 'Volume 55-68 km/minggu, Peak Long Run 32km pada minggu ke-9, 3-week scientific taper',
-  },
-];
+
 
 export default function CoachDashboard({ coachName, coachEmail, userId }: Props) {
   const { language } = useLanguage();
@@ -155,8 +115,57 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
   const [packages, setPackages] = useState<CoachingPackage[]>([]);
 
+  // Generated Club Code based on coach
+  const cleanId = userId ? userId.replace(/-/g, '').slice(0, 4).toUpperCase() : '7821';
+  const cleanName = coachName ? coachName.replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase() : 'COACH';
+  const clubInviteCode = `FDZ-${cleanName}-${cleanId}`;
+  const coachKey = coachEmail || userId || cleanName;
+
+  // Training Plans State (100% Dynamic, Loaded per Coach)
+  const [plans, setPlans] = useState<TrainingPlan[]>([]);
+  const [showCreatePlanModal, setShowCreatePlanModal] = useState(false);
+  const [newPlanTitle, setNewPlanTitle] = useState('');
+  const [newPlanCategory, setNewPlanCategory] = useState<'Base' | '5K' | '10K' | 'HM' | 'FM'>('10K');
+  const [newPlanDuration, setNewPlanDuration] = useState(6);
+  const [newPlanPace, setNewPlanPace] = useState('5:00 - 5:30 /km');
+  const [newPlanZone, setNewPlanZone] = useState('Zona 3 / Ambang Aerobik');
+  const [newPlanDesc, setNewPlanDesc] = useState('');
+  const [newPlanStructure, setNewPlanStructure] = useState('');
+
   // Sync data on load and on custom events
   useEffect(() => {
+    // 1. Register current coach dynamically in the system directory
+    if (coachName || coachEmail) {
+      CoachingStorage.registerCoachProfile({
+        id: userId || `coach-${cleanName.toLowerCase()}`,
+        name: coachName,
+        email: coachEmail,
+        role: 'Head of Squad Performance',
+        club: 'Freedayzz Athletic Club',
+        inviteCode: clubInviteCode,
+        specialty: 'Marathon Periodization & Aerobic Engine Building',
+        avatarInitials: cleanName.slice(0, 2).toUpperCase() || 'PA',
+      });
+    }
+
+    // 2. Load dynamic plans created by this coach
+    const loadPlans = () => {
+      const stored = CoachingStorage.getCoachPrograms(coachKey);
+      setPlans(stored.map(p => ({
+        id: p.id,
+        title: p.title,
+        category: p.category as any,
+        durationWeeks: p.durationWeeks,
+        targetPace: p.targetPace || '5:00 - 5:30 /km',
+        hrZone: p.targetHrZone || 'Zona 2 / Ambang Aerobik',
+        description: p.description,
+        weeklyStructure: 'Struktur mingguan ditentukan oleh pelatih.',
+        isCustom: true,
+      })));
+    };
+    loadPlans();
+
+    // 3. Load tasks, packages & athletes
     const loadData = () => {
       setTasks(CoachingStorage.getTasks());
       setPackages(CoachingStorage.getCoachingPackages());
@@ -176,32 +185,24 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
         setAssignAthleteName(athletes[0].name);
       }
     };
+    const handleProgramsUpdate = () => loadPlans();
 
     window.addEventListener('coaching_task_updated', handleTaskUpdate);
     window.addEventListener('squad_athlete_updated', handleSquadUpdate);
+    window.addEventListener('coach_programs_updated', handleProgramsUpdate);
 
     return () => {
       window.removeEventListener('coaching_task_updated', handleTaskUpdate);
       window.removeEventListener('squad_athlete_updated', handleSquadUpdate);
+      window.removeEventListener('coach_programs_updated', handleProgramsUpdate);
     };
-  }, [assignAthleteName]);
+  }, [assignAthleteName, coachName, coachEmail, userId, cleanName, clubInviteCode, coachKey]);
 
   // Invite Modal State
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteAthleteName, setInviteAthleteName] = useState('');
   const [inviteSent, setInviteSent] = useState(false);
-
-  // Training Plans State
-  const [plans, setPlans] = useState<TrainingPlan[]>(DEFAULT_TRAINING_PLANS);
-  const [showCreatePlanModal, setShowCreatePlanModal] = useState(false);
-  const [newPlanTitle, setNewPlanTitle] = useState('');
-  const [newPlanCategory, setNewPlanCategory] = useState<'Base' | '5K' | '10K' | 'HM' | 'FM'>('10K');
-  const [newPlanDuration, setNewPlanDuration] = useState(6);
-  const [newPlanPace, setNewPlanPace] = useState('5:00 - 5:30 /km');
-  const [newPlanZone, setNewPlanZone] = useState('Zona 3 / Ambang Aerobik');
-  const [newPlanDesc, setNewPlanDesc] = useState('');
-  const [newPlanStructure, setNewPlanStructure] = useState('');
 
   // Coach Directives State
   const [directives, setDirectives] = useState<Array<{ id: string; title: string; category: string; message: string; date: string }>>([
@@ -216,11 +217,6 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
   const [newDirectiveTitle, setNewDirectiveTitle] = useState('');
   const [newDirectiveCategory, setNewDirectiveCategory] = useState('Arahan Taktis');
   const [newDirectiveMsg, setNewDirectiveMsg] = useState('');
-
-  // Generated Club Code based on coach
-  const cleanId = userId ? userId.replace(/-/g, '').slice(0, 4).toUpperCase() : '7821';
-  const cleanName = coachName ? coachName.replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase() : 'COACH';
-  const clubInviteCode = `FDZ-${cleanName}-${cleanId}`;
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(clubInviteCode);
@@ -254,11 +250,91 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
       weeklyStructure: newPlanStructure || 'Jadwal mingguan ditentukan oleh pelatih.',
       isCustom: true,
     };
+
+    // Save to dynamic coach programs storage
+    CoachingStorage.addCoachProgram(coachKey, {
+      id: newPlan.id,
+      title: newPlan.title,
+      category: newPlan.category,
+      durationWeeks: newPlan.durationWeeks,
+      description: newPlan.description,
+      targetPace: newPlan.targetPace,
+      targetHrZone: newPlan.hrZone,
+    });
+
     setPlans([newPlan, ...plans]);
     setShowCreatePlanModal(false);
     setNewPlanTitle('');
     setNewPlanDesc('');
     setNewPlanStructure('');
+  };
+
+  const handleDeletePlan = (planId: string) => {
+    CoachingStorage.deleteCoachProgram(coachKey, planId);
+    setPlans(plans.filter(p => p.id !== planId));
+  };
+
+  const handleImportTemplates = () => {
+    const templates: TrainingPlan[] = [
+      {
+        id: `plan-base-${Date.now()}`,
+        title: 'Fondasi Aerobik & Engine Builder',
+        category: 'Base',
+        durationWeeks: 6,
+        targetPace: 'Zona 2 (Easy Conversational)',
+        hrZone: '65% - 75% Max HR',
+        description: 'Fokus adaptasi kardiovaskular, peningkatan densitas kapiler otot, dan efisiensi biomekanika lari.',
+        weeklyStructure: '3x Easy Run 45m, 1x Strides 6x100m, 1x Weekend Long Run 12-14km @ Zona 2',
+        isCustom: true,
+      },
+      {
+        id: `plan-10k-${Date.now()}`,
+        title: '10K Lactate Threshold & Speed Sharpening',
+        category: '10K',
+        durationWeeks: 8,
+        targetPace: '4:45 - 5:15 /km (T-Pace)',
+        hrZone: '85% - 90% Max HR',
+        description: 'Peningkatan kecepatan ambang laktat dan kapasitas anaerobik untuk memecahkan PB 10K.',
+        weeklyStructure: '1x Interval Trek (5x1000m @ T-Pace), 1x Tempo Run 7km, 1x Recovery 6km, 1x Long Run 15km',
+        isCustom: true,
+      },
+      {
+        id: `plan-hm-${Date.now()}`,
+        title: 'Half-Marathon Progressive Build',
+        category: 'HM',
+        durationWeeks: 10,
+        targetPace: '5:20 - 5:45 /km (HM Pace)',
+        hrZone: '78% - 85% Max HR',
+        description: 'Membangun daya tahan lari jarak menengah dengan simulasi race pace dan latihan negative split.',
+        weeklyStructure: 'Volume 40-52 km/minggu, 1x Long Run Progresif 15-18km, 1x Hill Repeat, 2x Easy Run',
+        isCustom: true,
+      },
+      {
+        id: `plan-fm-${Date.now()}`,
+        title: 'Marathon Sub-4 Periodization & Taper',
+        category: 'FM',
+        durationWeeks: 12,
+        targetPace: '5:35 - 5:40 /km (Marathon Pace)',
+        hrZone: '75% - 82% Max HR',
+        description: 'Periodisasi makrosiklus maraton: 3 minggu pembebanan + 1 minggu deload, simulasi nutrisi & hidrasi.',
+        weeklyStructure: 'Volume 55-68 km/minggu, Peak Long Run 32km pada minggu ke-9, 3-week scientific taper',
+        isCustom: true,
+      },
+    ];
+
+    templates.forEach(t => {
+      CoachingStorage.addCoachProgram(coachKey, {
+        id: t.id,
+        title: t.title,
+        category: t.category,
+        durationWeeks: t.durationWeeks,
+        description: t.description,
+        targetPace: t.targetPace,
+        targetHrZone: t.hrZone,
+      });
+    });
+
+    setPlans([...templates, ...plans]);
   };
 
   const handlePostDirective = (e: React.FormEvent) => {
@@ -971,103 +1047,157 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setShowCreatePlanModal(true)}
-              className="px-3.5 py-2 bg-violet-600 hover:bg-violet-500 border border-violet-400 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#7c3aed]"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>{isId ? '+ RANCANG PROGRAM BARU' : '+ CREATE NEW PLAN'}</span>
-            </button>
+            <div className="flex items-center gap-2">
+              {plans.length === 0 && (
+                <button
+                  type="button"
+                  onClick={handleImportTemplates}
+                  className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-slate-300 dark:border-zinc-700 text-slate-800 dark:text-zinc-200 text-xs font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-violet-500" />
+                  <span>{isId ? '+ TEMPLATE STANDAR' : '+ IMPORT TEMPLATES'}</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowCreatePlanModal(true)}
+                className="px-3.5 py-2 bg-violet-600 hover:bg-violet-500 border border-violet-400 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#7c3aed]"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>{isId ? '+ RANCANG PROGRAM BARU' : '+ CREATE NEW PLAN'}</span>
+              </button>
+            </div>
           </div>
 
-          {/* Plans Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {plans.map((plan) => (
-              <div
-                key={plan.id}
-                className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-4 relative group hover:border-violet-500 transition-colors"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 text-violet-800 dark:text-violet-300 uppercase">
-                        {plan.category}
-                      </span>
-                      <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-bold uppercase">
-                        {plan.durationWeeks} {isId ? 'Minggu' : 'Weeks'}
-                      </span>
-                      {plan.isCustom && (
-                        <span className="text-[9px] px-1.5 py-0.2 bg-cyan-100 dark:bg-cyan-950 border border-cyan-400 text-cyan-700 dark:text-cyan-300 font-black">
-                          KUSTOM PELATIH
+          {/* Plans Grid or Dynamic Empty State */}
+          {plans.length === 0 ? (
+            <div className="p-8 text-center bg-white dark:bg-[#0d1224] border-2 border-dashed border-slate-300 dark:border-zinc-800 space-y-3">
+              <BookOpen className="w-10 h-10 text-slate-400 mx-auto" />
+              <h3 className="font-bold text-sm text-slate-700 dark:text-zinc-300 uppercase">
+                {isId ? 'BELUM ADA MODUL PROGRAM LATIHAN YANG DIBUAT' : 'NO TRAINING PLANS CREATED YET'}
+              </h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto font-sans">
+                {isId 
+                  ? 'Anda belum memiliki modul program lari resmi. Buat program kustom baru atau impor template standar (Base, 10K, HM, FM) untuk langsung dibagikan ke atlet binaan.' 
+                  : 'You have not created any structured modules yet. Create a new plan or import standard templates.'}
+              </p>
+              <div className="flex justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleImportTemplates}
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-slate-300 dark:border-zinc-700 text-slate-800 dark:text-zinc-200 text-xs font-bold uppercase cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-violet-500" />
+                  <span>{isId ? 'IMPOR TEMPLATE STANDAR' : 'IMPORT TEMPLATES'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCreatePlanModal(true)}
+                  className="px-3.5 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-black uppercase cursor-pointer shadow-[2px_2px_0px_#7c3aed] flex items-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>{isId ? 'RANCANG PROGRAM BARU' : 'CREATE NEW PLAN'}</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {plans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-4 relative group hover:border-violet-500 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 text-violet-800 dark:text-violet-300 uppercase">
+                          {plan.category}
                         </span>
-                      )}
+                        <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-bold uppercase">
+                          {plan.durationWeeks} {isId ? 'Minggu' : 'Weeks'}
+                        </span>
+                        {plan.isCustom && (
+                          <span className="text-[9px] px-1.5 py-0.2 bg-cyan-100 dark:bg-cyan-950 border border-cyan-400 text-cyan-700 dark:text-cyan-300 font-black">
+                            KUSTOM PELATIH
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="font-black text-base text-slate-900 dark:text-white mt-1.5">
+                        {plan.title}
+                      </h3>
                     </div>
 
-                    <h3 className="font-black text-base text-slate-900 dark:text-white mt-1.5">
-                      {plan.title}
-                    </h3>
+                    <Award className="w-5 h-5 text-violet-500 shrink-0" />
                   </div>
 
-                  <Award className="w-5 h-5 text-violet-500 shrink-0" />
-                </div>
-
-                <p className="text-xs text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
-                  {plan.description}
-                </p>
-
-                {/* Training Parameters */}
-                <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-[11px]">
-                  <div>
-                    <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                      TARGET INTENSITAS / PACE
-                    </span>
-                    <span className="font-bold text-slate-900 dark:text-white">
-                      {plan.targetPace}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                      ZONA DETAK JANTUNG
-                    </span>
-                    <span className="font-bold text-violet-600 dark:text-violet-400">
-                      {plan.hrZone}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Weekly Structure */}
-                <div className="p-3 bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-900/60 text-xs">
-                  <span className="text-[10px] text-violet-700 dark:text-violet-300 font-bold block uppercase mb-1">
-                    {isId ? 'STRUKTUR MINGGUAN MENU LATIHAN:' : 'WEEKLY STRUCTURE:'}
-                  </span>
-                  <p className="text-[11px] font-mono text-slate-800 dark:text-zinc-200">
-                    {plan.weeklyStructure}
+                  <p className="text-xs text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
+                    {plan.description}
                   </p>
-                </div>
 
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] text-slate-500 dark:text-zinc-400">
-                    ID Modul: {plan.id}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAssignTitle(plan.title);
-                      setAssignTargetPace(plan.targetPace);
-                      setAssignTargetHrZone(plan.hrZone);
-                      setAssignInstructions(plan.weeklyStructure);
-                      setShowAssignTaskModal(true);
-                    }}
-                    className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-black uppercase transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>{isId ? 'Tugaskan ke Atlet' : 'Assign to Athlete'}</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
+                  {/* Training Parameters */}
+                  <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-[11px]">
+                    <div>
+                      <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                        TARGET INTENSITAS / PACE
+                      </span>
+                      <span className="font-bold text-slate-900 dark:text-white">
+                        {plan.targetPace}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                        ZONA DETAK JANTUNG
+                      </span>
+                      <span className="font-bold text-violet-600 dark:text-violet-400">
+                        {plan.hrZone}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Weekly Structure */}
+                  <div className="p-3 bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-900/60 text-xs">
+                    <span className="text-[10px] text-violet-700 dark:text-violet-300 font-bold block uppercase mb-1">
+                      {isId ? 'STRUKTUR MINGGUAN MENU LATIHAN:' : 'WEEKLY STRUCTURE:'}
+                    </span>
+                    <p className="text-[11px] font-mono text-slate-800 dark:text-zinc-200">
+                      {plan.weeklyStructure}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+                      ID Modul: {plan.id}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleDeletePlan(plan.id)}
+                        title={isId ? 'Hapus Modul' : 'Delete Module'}
+                        className="p-1.5 text-slate-400 hover:text-rose-500 border border-transparent hover:border-rose-400 dark:hover:border-rose-900 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAssignTitle(plan.title);
+                          setAssignTargetPace(plan.targetPace);
+                          setAssignTargetHrZone(plan.hrZone);
+                          setAssignInstructions(plan.weeklyStructure);
+                          setShowAssignTaskModal(true);
+                        }}
+                        className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-black uppercase transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>{isId ? 'Tugaskan ke Atlet' : 'Assign to Athlete'}</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

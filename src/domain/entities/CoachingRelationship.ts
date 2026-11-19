@@ -65,6 +65,8 @@ export interface AvailableCoachProgram {
   category: string;
   durationWeeks: number;
   description: string;
+  targetPace?: string;
+  targetHrZone?: string;
 }
 
 export interface AvailableCoach {
@@ -73,81 +75,13 @@ export interface AvailableCoach {
   email?: string;
   role: string;
   club: string;
+  inviteCode?: string;
   specialty: string;
   avatarInitials: string;
   programs: AvailableCoachProgram[];
 }
 
-export const DIRECTORY_COACHES: AvailableCoach[] = [
-  {
-    id: 'coach-pack',
-    name: 'Coach Pack',
-    email: 'packdorez4@gmail.com',
-    role: 'Head of Squad Performance',
-    club: 'Freedayzz Athletic Club',
-    specialty: 'Marathon Periodization & Aerobic Engine Building',
-    avatarInitials: 'PA',
-    programs: [
-      {
-        id: 'prog-fm',
-        title: 'Marathon Sub-4 Periodization & Taper',
-        category: 'Full Marathon (FM)',
-        durationWeeks: 12,
-        description: 'Blok makrosiklus maraton: 3 minggu pembebanan + 1 minggu deload, simulasi nutrisi & hidrasi balapan.',
-      },
-      {
-        id: 'prog-hm',
-        title: 'Half-Marathon Progressive Build',
-        category: 'Half Marathon (HM)',
-        durationWeeks: 10,
-        description: 'Membangun daya tahan lari jarak menengah dengan simulasi race pace dan negative split.',
-      },
-    ],
-  },
-  {
-    id: 'coach-faisal',
-    name: 'Coach Faisal',
-    email: 'faisal@freedayzz.run',
-    role: 'Lactate Threshold & Track Specialist',
-    club: 'Endurance Performance Lab',
-    specialty: '10K Lactate Clearance & VO2Max Interval Training',
-    avatarInitials: 'FA',
-    programs: [
-      {
-        id: 'prog-10k',
-        title: '10K Lactate Threshold & Speed Sharpening',
-        category: '10K Road Race',
-        durationWeeks: 8,
-        description: 'Peningkatan kecepatan ambang laktat dan kapasitas anaerobik untuk memecahkan Personal Best 10K.',
-      },
-      {
-        id: 'prog-base',
-        title: 'Fondasi Aerobik & Engine Builder',
-        category: 'Base Conditioning',
-        durationWeeks: 6,
-        description: 'Fokus adaptasi kardiovaskular Zona 2 murni, densitas kapiler, dan efisiensi biomekanika lari.',
-      },
-    ],
-  },
-  {
-    id: 'coach-dani',
-    name: 'Coach Dani',
-    email: 'dani@freedayzz.run',
-    role: 'Biomechanics & Running Form Coach',
-    club: 'Track & Biomechanics Clinic',
-    specialty: 'Cadence (SPM), Ground Contact Time, and Injury Prevention',
-    avatarInitials: 'DA',
-    programs: [
-      {
-        id: 'prog-biomech',
-        title: 'Running Economy & Form Optimization',
-        category: 'Biomekanika & Form',
-        durationWeeks: 4,
-        description: 'Koreksi kadensi (target 175-180 SPM), meminimalkan pantulan vertikal, dan optimasi fase dorongan langkah.',
-      },
-    ],
-  },
-];
+export const DIRECTORY_COACHES: AvailableCoach[] = [];
 
 export type RABCategory = 
   | 'VENUE_TRACK' 

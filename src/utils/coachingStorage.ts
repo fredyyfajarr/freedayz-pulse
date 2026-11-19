@@ -18,6 +18,8 @@ const TASKS_STORAGE_KEY = 'fdz_pulse_coach_tasks_v3';
 const RAB_STORAGE_KEY = 'fdz_pulse_rab_items_v2';
 const PACKAGES_STORAGE_KEY = 'fdz_pulse_packages_v2';
 const SQUAD_ATHLETES_KEY = 'fdz_pulse_squad_athletes_v2';
+const REGISTERED_COACHES_KEY = 'fdz_pulse_registered_coaches_v2';
+const COACH_PLANS_KEY = 'fdz_pulse_coach_programs_v2';
 
 export class CoachingStorage {
   // --- SQUAD ATHLETES (DYNAMIC ROSTER) ---
@@ -29,10 +31,16 @@ export class CoachingStorage {
         return [];
       }
       const athletes: SquadAthlete[] = JSON.parse(stored);
+      // Clean out any legacy mock data referencing dummy coach names
+      const cleaned = athletes.filter(a => {
+        const c = (a.coachId || '').toLowerCase();
+        return !c.includes('faisal') && !c.includes('dani');
+      });
+
       if (coachId) {
-        return athletes.filter(a => !a.coachId || a.coachId === coachId);
+        return cleaned.filter(a => !a.coachId || a.coachId.toLowerCase() === coachId.toLowerCase());
       }
-      return athletes;
+      return cleaned;
     } catch {
       return [];
     }
@@ -40,6 +48,14 @@ export class CoachingStorage {
 
   public static addSquadAthlete(athleteData: Omit<SquadAthlete, 'id'>): SquadAthlete {
     const athletes = this.getSquadAthletes();
+    // Prevent duplicate entries for same athlete email or name
+    const cleanEmail = athleteData.email.toLowerCase().trim();
+    const cleanName = athleteData.name.toLowerCase().trim();
+    const filtered = athletes.filter(a => 
+      a.email.toLowerCase().trim() !== cleanEmail && 
+      a.name.toLowerCase().trim() !== cleanName
+    );
+
     const newAthlete: SquadAthlete = {
       ...athleteData,
       id: `ath-${Date.now()}`,
@@ -49,7 +65,7 @@ export class CoachingStorage {
         year: 'numeric'
       }),
     };
-    const updated = [newAthlete, ...athletes];
+    const updated = [newAthlete, ...filtered];
     if (typeof window !== 'undefined') {
       localStorage.setItem(SQUAD_ATHLETES_KEY, JSON.stringify(updated));
       window.dispatchEvent(new Event('squad_athlete_updated'));
@@ -67,9 +83,182 @@ export class CoachingStorage {
     return true;
   }
 
-  // --- COACHES DIRECTORY ---
+  public static disconnectAthlete(athleteNameOrEmail: string): boolean {
+    if (typeof window === 'undefined' || !athleteNameOrEmail) return false;
+    const clean = athleteNameOrEmail.toLowerCase().trim();
+    const athletes = this.getSquadAthletes();
+    const filteredAthletes = athletes.filter(a => 
+      !a.name.toLowerCase().includes(clean) && 
+      !a.email.toLowerCase().includes(clean) &&
+      !clean.includes(a.name.toLowerCase())
+    );
+    localStorage.setItem(SQUAD_ATHLETES_KEY, JSON.stringify(filteredAthletes));
+
+    // Also remove pending coach tasks for this athlete
+    const tasks = this.getTasks();
+    const remainingTasks = tasks.filter(t => 
+      !(t.athleteName.toLowerCase().includes(clean) && t.status === 'PENDING')
+    );
+    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(remainingTasks));
+
+    window.dispatchEvent(new Event('squad_athlete_updated'));
+    window.dispatchEvent(new Event('coaching_task_updated'));
+    return true;
+  }
+
+  // --- COACHES DIRECTORY (100% DYNAMIC, ZERO MOCK DATA) ---
   public static getAvailableCoaches(): AvailableCoach[] {
-    return DIRECTORY_COACHES;
+    if (typeof window === 'undefined') return [];
+    try {
+      const stored = localStorage.getItem(REGISTERED_COACHES_KEY);
+      if (!stored) {
+        return [];
+      }
+      const coaches: AvailableCoach[] = JSON.parse(stored);
+      // Remove any legacy mock coaches
+      return coaches.filter(c => {
+        const name = (c.name || '').toLowerCase();
+        const email = (c.email || '').toLowerCase();
+        return !name.includes('faisal') && !name.includes('dani') && !email.includes('faisal') && !email.includes('dani');
+      });
+    } catch {
+      return [];
+    }
+  }
+
+  public static registerCoachProfile(coachData: Partial<AvailableCoach> & { name: string; email?: string }): AvailableCoach {
+    const current = this.getAvailableCoaches();
+    const cleanEmail = (coachData.email || '').toLowerCase().trim();
+    const cleanName = (coachData.name || '').trim();
+    const cleanId = coachData.id || `coach-${cleanName.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
+
+    const existingIdx = current.findIndex(c => 
+      (cleanEmail && c.email?.toLowerCase().trim() === cleanEmail) || 
+      c.id === cleanId ||
+      c.name.toLowerCase() === cleanName.toLowerCase()
+    );
+
+    const programs = this.getCoachPrograms(cleanEmail || cleanId);
+
+    const coach: AvailableCoach = {
+      id: cleanId,
+      name: cleanName,
+      email: coachData.email,
+      role: coachData.role || 'Head Coach',
+      club: coachData.club || 'Freedayzz Athletic Club',
+      inviteCode: coachData.inviteCode || `FDZ-${cleanName.toUpperCase().slice(0, 4)}-${cleanId.slice(0, 4)}`,
+      specialty: coachData.specialty || 'Marathon Periodization & Aerobic Base Building',
+      avatarInitials: coachData.avatarInitials || (cleanName.slice(0, 2).toUpperCase() || 'CO'),
+      programs: programs.length > 0 ? programs : (existingIdx >= 0 ? current[existingIdx].programs : []),
+    };
+
+    let updated: AvailableCoach[];
+    if (existingIdx >= 0) {
+      updated = [...current];
+      updated[existingIdx] = { ...updated[existingIdx], ...coach };
+    } else {
+      updated = [coach, ...current];
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(REGISTERED_COACHES_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new Event('coach_registered'));
+    }
+    return coach;
+  }
+
+  // --- DYNAMIC COACH PROGRAMS ---
+  public static getCoachPrograms(coachIdOrEmail: string): AvailableCoachProgram[] {
+    if (typeof window === 'undefined' || !coachIdOrEmail) return [];
+    try {
+      const key = `${COACH_PLANS_KEY}_${coachIdOrEmail.toLowerCase().trim()}`;
+      const stored = localStorage.getItem(key);
+      if (!stored) return [];
+      return JSON.parse(stored);
+    } catch {
+      return [];
+    }
+  }
+
+  public static addCoachProgram(coachIdOrEmail: string, program: AvailableCoachProgram): void {
+    if (typeof window === 'undefined' || !coachIdOrEmail) return;
+    const current = this.getCoachPrograms(coachIdOrEmail);
+    const updated = [program, ...current.filter(p => p.id !== program.id)];
+    const key = `${COACH_PLANS_KEY}_${coachIdOrEmail.toLowerCase().trim()}`;
+    localStorage.setItem(key, JSON.stringify(updated));
+
+    // Also sync into registered coach entry
+    const coaches = this.getAvailableCoaches();
+    const cleanKey = coachIdOrEmail.toLowerCase().trim();
+    const cIdx = coaches.findIndex(c => 
+      c.id.toLowerCase() === cleanKey || 
+      c.email?.toLowerCase().trim() === cleanKey ||
+      c.name.toLowerCase() === cleanKey
+    );
+    if (cIdx >= 0) {
+      coaches[cIdx].programs = updated;
+      localStorage.setItem(REGISTERED_COACHES_KEY, JSON.stringify(coaches));
+    }
+
+    window.dispatchEvent(new Event('coach_programs_updated'));
+  }
+
+  public static deleteCoachProgram(coachIdOrEmail: string, programId: string): void {
+    if (typeof window === 'undefined' || !coachIdOrEmail) return;
+    const current = this.getCoachPrograms(coachIdOrEmail);
+    const updated = current.filter(p => p.id !== programId);
+    const key = `${COACH_PLANS_KEY}_${coachIdOrEmail.toLowerCase().trim()}`;
+    localStorage.setItem(key, JSON.stringify(updated));
+
+    const coaches = this.getAvailableCoaches();
+    const cleanKey = coachIdOrEmail.toLowerCase().trim();
+    const cIdx = coaches.findIndex(c => 
+      c.id.toLowerCase() === cleanKey || 
+      c.email?.toLowerCase().trim() === cleanKey ||
+      c.name.toLowerCase() === cleanKey
+    );
+    if (cIdx >= 0) {
+      coaches[cIdx].programs = updated;
+      localStorage.setItem(REGISTERED_COACHES_KEY, JSON.stringify(coaches));
+    }
+
+    window.dispatchEvent(new Event('coach_programs_updated'));
+  }
+
+  public static findCoachByQuery(query: string): AvailableCoach | null {
+    if (!query) return null;
+    const clean = query.trim().toLowerCase();
+    const coaches = this.getAvailableCoaches();
+
+    // 1. Check exact or partial match in registered coaches
+    const matched = coaches.find(c => 
+      (c.inviteCode && c.inviteCode.toLowerCase().includes(clean)) ||
+      (c.email && c.email.toLowerCase().includes(clean)) ||
+      c.name.toLowerCase().includes(clean) ||
+      clean.includes(c.name.toLowerCase()) ||
+      c.id.toLowerCase().includes(clean)
+    );
+
+    if (matched) return matched;
+
+    // 2. If user provided a custom code or valid email, dynamically create and register the coach
+    if (clean.includes('@') || clean.startsWith('fdz-') || clean.length >= 3) {
+      const generatedName = clean.includes('@') 
+        ? clean.split('@')[0] 
+        : clean.replace(/^fdz-/, '').split('-')[0] || 'Coach';
+      const formattedName = generatedName.charAt(0).toUpperCase() + generatedName.slice(1);
+
+      return this.registerCoachProfile({
+        name: formattedName.startsWith('Coach') ? formattedName : `Coach ${formattedName}`,
+        email: clean.includes('@') ? clean : undefined,
+        inviteCode: query.toUpperCase(),
+        role: 'Head Coach',
+        club: 'Freedayzz Athletic Club',
+        specialty: 'Marathon & Endurance Periodization',
+      });
+    }
+
+    return null;
   }
   // --- COACH TASKS ---
   public static getTasks(): CoachTask[] {
@@ -80,7 +269,12 @@ export class CoachingStorage {
         localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(INITIAL_COACH_TASKS));
         return INITIAL_COACH_TASKS;
       }
-      return JSON.parse(stored);
+      const loaded: CoachTask[] = JSON.parse(stored);
+      // Clean out any legacy mock tasks referencing dummy coaches
+      return loaded.filter(t => {
+        const c = (t.coachName || '').toLowerCase();
+        return !c.includes('faisal') && !c.includes('dani');
+      });
     } catch {
       return INITIAL_COACH_TASKS;
     }
