@@ -86,8 +86,15 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
         copy.zonePercentages = HRProfileCalculator.DEFAULT_LTHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
       } else if (m === 'HRR' && (!copy.zonePercentages || copy.zonePercentages.length === 0)) {
         copy.zonePercentages = HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
-      } else if (m === 'MANUAL_BPM' && (!copy.manualZoneBpms || copy.manualZoneBpms.length === 0)) {
-        copy.manualZoneBpms = HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minBpm: z.minBpm, maxBpm: z.maxBpm }));
+      } else if (m === 'MANUAL_BPM') {
+        const currentManual = copy.manualZoneBpms && copy.manualZoneBpms.length > 0
+          ? copy.manualZoneBpms.map(z => (z.idx === 5 ? { ...z, maxBpm: copy.maxHr } : z))
+          : HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ 
+              idx: z.idx, 
+              minBpm: z.minBpm, 
+              maxBpm: z.idx === 5 ? copy.maxHr : z.maxBpm 
+            }));
+        copy.manualZoneBpms = currentManual;
       }
       return copy;
     });
@@ -106,12 +113,23 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
 
   const handleUpdateManualBpm = (idx: number, field: 'minBpm' | 'maxBpm', val: number) => {
     setDraftSettings(prev => {
-      const bpms = [...(prev.manualZoneBpms || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minBpm: z.minBpm, maxBpm: z.maxBpm })))];
+      const bpms = [...(prev.manualZoneBpms || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ 
+        idx: z.idx, 
+        minBpm: z.minBpm, 
+        maxBpm: z.idx === 5 ? prev.maxHr : z.maxBpm 
+      })))];
       const targetIdx = bpms.findIndex(b => b.idx === idx);
       if (targetIdx !== -1) {
         bpms[targetIdx] = { ...bpms[targetIdx], [field]: val };
       }
-      return { ...prev, manualZoneBpms: bpms };
+      
+      const newMaxHr = (idx === 5 && field === 'maxBpm') ? val : prev.maxHr;
+
+      return { 
+        ...prev, 
+        maxHr: newMaxHr,
+        manualZoneBpms: bpms 
+      };
     });
   };
 
@@ -374,7 +392,26 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                   min="130"
                   max="230"
                   value={draftSettings.maxHr}
-                  onChange={e => setDraftSettings(prev => ({ ...prev, maxHr: Number(e.target.value) }))}
+                  onChange={e => {
+                    const newMax = Number(e.target.value);
+                    setDraftSettings(prev => {
+                      const updatedManual = (prev.manualZoneBpms || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ 
+                        idx: z.idx, 
+                        minBpm: z.minBpm, 
+                        maxBpm: z.idx === 5 ? prev.maxHr : z.maxBpm 
+                      }))).map(m => {
+                        if (m.idx === 5) {
+                          return { ...m, maxBpm: newMax };
+                        }
+                        return m;
+                      });
+                      return {
+                        ...prev,
+                        maxHr: newMax,
+                        manualZoneBpms: updatedManual,
+                      };
+                    });
+                  }}
                   className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm"
                 />
               </div>
@@ -450,7 +487,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                             type="number"
                             min="60"
                             max="230"
-                            value={userManual?.maxBpm ?? previewZone?.maxBpm}
+                            value={idx === 5 ? (userManual?.maxBpm ?? draftSettings.maxHr ?? previewZone?.maxBpm) : (userManual?.maxBpm ?? previewZone?.maxBpm)}
                             onChange={e => handleUpdateManualBpm(idx, 'maxBpm', Number(e.target.value))}
                             className="w-20 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
                           />

@@ -184,7 +184,14 @@ export class HRProfileCalculator {
       if (method === 'MANUAL_BPM') {
         const manual = activeSettings.manualZoneBpms?.find(m => m.idx === defaultCfg.idx);
         minBpm = manual?.minBpm ?? defaultCfg.minBpm;
-        maxBpm = manual?.maxBpm ?? defaultCfg.maxBpm;
+        maxBpm = manual?.maxBpm ?? (defaultCfg.idx === 5 ? effectiveMaxHr : defaultCfg.maxBpm);
+        if (defaultCfg.idx === 5) {
+          // Zone 5 ceiling reflects athlete's Max HR
+          maxBpm = manual?.maxBpm ?? effectiveMaxHr;
+          if (effectiveMaxHr && manual?.maxBpm === 200 && effectiveMaxHr !== 200) {
+            maxBpm = effectiveMaxHr;
+          }
+        }
       } else if (method === 'MAX_HR') {
         minBpm = Math.round(effectiveMaxHr * (minP / 100));
         maxBpm = defaultCfg.idx === 5 ? effectiveMaxHr : Math.round(effectiveMaxHr * (maxP / 100));
