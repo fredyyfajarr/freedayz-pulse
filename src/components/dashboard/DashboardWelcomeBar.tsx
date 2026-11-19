@@ -20,7 +20,7 @@ export default function DashboardWelcomeBar({ lastSync }: Props) {
           </span>
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block"></span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1">
+        <h1 className="text-lg sm:text-2xl lg:text-3xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1 break-words">
           {t('dashboard.title')}
         </h1>
         <p className="text-xs font-mono text-slate-500 dark:text-zinc-400">

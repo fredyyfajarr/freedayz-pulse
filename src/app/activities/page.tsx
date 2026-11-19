@@ -26,7 +26,7 @@ export default async function ActivitiesPage() {
 
   if (role === 'coach') {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 space-y-6">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
         <CoachActivitiesHub />
       </div>
     );
@@ -35,7 +35,7 @@ export default async function ActivitiesPage() {
   const activities = await container.repository.getAllActivities();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-4 sm:space-y-6 min-w-0">
       {/* Paginated Activities Client Component with Interactive Bilingual Header */}
       <PaginatedActivitiesList activities={activities} />
     </div>

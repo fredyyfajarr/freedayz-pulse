@@ -215,7 +215,7 @@ export default function Sidebar() {
     { href: '/activities', label: isId ? 'Aktivitas' : 'Activities', icon: Compass, isActive: pathname.startsWith('/activities') },
     { href: '/fitness', label: isId ? 'Kebugaran' : 'Fitness', icon: BarChart3, isActive: pathname.startsWith('/fitness') },
     { href: '/recovery', label: isId ? 'Pemulihan' : 'Recovery', icon: HeartPulse, isActive: pathname.startsWith('/recovery') },
-    { href: '/records', label: isId ? 'Rekor' : 'Records', icon: Award, isActive: pathname.startsWith('/records') },
+    { href: '/settings', label: isId ? 'Klub' : 'Club', icon: Settings, isActive: pathname.startsWith('/settings') },
   ];
 
   const athleteMobileDockLinks = [
@@ -223,7 +223,7 @@ export default function Sidebar() {
     { href: '/activities', label: t('nav.activities'), icon: Compass, isActive: pathname.startsWith('/activities') },
     { href: '/fitness', label: t('nav.fitness'), icon: BarChart3, isActive: pathname.startsWith('/fitness') },
     { href: '/recovery', label: t('nav.recovery'), icon: HeartPulse, isActive: pathname.startsWith('/recovery') },
-    { href: '/records', label: t('nav.records'), icon: Award, isActive: pathname.startsWith('/records') },
+    { href: '/settings', label: isId ? 'Pengaturan' : 'Settings', icon: Settings, isActive: pathname.startsWith('/settings') },
   ];
 
   const mobileDockLinks = isCoach ? coachMobileDockLinks : athleteMobileDockLinks;

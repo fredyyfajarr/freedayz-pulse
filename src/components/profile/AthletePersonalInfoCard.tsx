@@ -223,22 +223,22 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
   };
 
   return (
-    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-5 sm:p-6 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] space-y-6 transition-colors">
+    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-4 sm:p-6 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] space-y-4 sm:space-y-6 transition-colors w-full min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-2 border-slate-200 dark:border-zinc-800 gap-3">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-100 dark:bg-blue-950 border border-blue-400 dark:border-blue-600/60 text-blue-800 dark:text-blue-300 font-bold uppercase tracking-wider flex items-center gap-1">
               <Watch className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
               {deviceName.toUpperCase()}
             </span>
             <span className="text-[10px] font-mono px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold uppercase tracking-wider flex items-center gap-1">
               <Sliders className="w-3 h-3 text-cyan-500" />
-              {isId ? 'METODE_DINAMIS' : 'DYNAMIC_METHOD'}: {profile.methodType}
+              {isId ? 'METODE DINAMIS' : 'DYNAMIC METHOD'}: {profile.methodType}
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1">
-            {isId ? 'ZONA_DETAK_JANTUNG_ATLET // PROFIL_BIOMETRIK' : 'ATHLETE_HEART_RATE_ZONES // BIOMETRIC_PROFILE'}
+          <h2 className="text-lg sm:text-xl lg:text-2xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1 break-words">
+            {isId ? 'ZONA DETAK JANTUNG // PROFIL BIOMETRIK' : 'HEART RATE ZONES // BIOMETRIC PROFILE'}
           </h2>
           <p className="text-xs font-mono text-slate-500 dark:text-zinc-400">
             {isId 
@@ -251,7 +251,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
           <button
             type="button"
             onClick={handleOpenModal}
-            className="px-3.5 py-2 bg-violet-600 hover:bg-violet-700 dark:bg-violet-900 dark:hover:bg-violet-700 border-2 border-violet-400 dark:border-violet-500 text-white text-xs font-mono font-black uppercase transition-all flex items-center gap-2 shadow-[2px_2px_0px_#7c3aed] cursor-pointer"
+            className="w-full sm:w-auto px-3.5 py-2 bg-violet-600 hover:bg-violet-700 dark:bg-violet-900 dark:hover:bg-violet-700 border-2 border-violet-400 dark:border-violet-500 text-white text-xs font-mono font-black uppercase transition-all flex items-center justify-center gap-2 shadow-[2px_2px_0px_#7c3aed] cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5 text-cyan-300" />
             <span>{isId ? 'ATUR ZONA MANUAL / PERSEN' : 'CONFIG ZONES & METHOD'}</span>
@@ -260,12 +260,12 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
       </div>
 
       {/* Top 4 KPI Cards: Method, Rest HR, Max HR, LTHR */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
-        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-slate-200 dark:border-violet-800/60 p-3 shadow-sm dark:shadow-[2px_2px_0px_#7c3aed]">
-          <span className="text-[9px] uppercase text-slate-500 dark:text-zinc-400 block tracking-wider font-bold">
-            {isId ? 'METODE HITUNG HR' : 'HR CALCULATION METHOD'}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 font-mono">
+        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-slate-200 dark:border-violet-800/60 p-2.5 sm:p-3 shadow-xs">
+          <span className="text-[9px] uppercase text-slate-500 dark:text-zinc-400 block tracking-wider font-bold truncate">
+            {isId ? 'METODE HITUNG HR' : 'HR METHOD'}
           </span>
-          <span className="text-sm font-black text-violet-700 dark:text-violet-300 mt-1 block truncate">
+          <span className="text-xs sm:text-sm font-black text-violet-700 dark:text-violet-300 mt-0.5 block truncate">
             {profile.method}
           </span>
           <span className="text-[9px] text-emerald-600 dark:text-emerald-400 block mt-0.5 font-bold">
@@ -273,61 +273,64 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
           </span>
         </div>
 
-        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-slate-200 dark:border-cyan-800/60 p-3 shadow-sm dark:shadow-[2px_2px_0px_#06b6d4]">
+        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-slate-200 dark:border-cyan-800/60 p-2.5 sm:p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[9px] uppercase text-slate-500 dark:text-zinc-400 block tracking-wider font-bold">
-              {isId ? 'DETAK JANTUNG ISTIRAHAT' : 'RESTING HR (RHR)'}
+              {isId ? 'HR ISTIRAHAT' : 'RESTING HR'}
             </span>
-            <Heart className="w-3 h-3 text-cyan-500 dark:text-cyan-400" />
+            <Heart className="w-3 h-3 text-cyan-500 dark:text-cyan-400 shrink-0" />
           </div>
-          <div className="flex items-baseline gap-1 mt-1">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">{profile.restingHr}</span>
-            <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold">BPM</span>
+          <div className="flex items-baseline gap-1 mt-0.5">
+            <span className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">{profile.restingHr}</span>
+            <span className="text-[9px] text-cyan-600 dark:text-cyan-400 font-bold">BPM</span>
           </div>
-          <span className="text-[9px] text-slate-500 dark:text-zinc-400 block mt-0.5">
-            {garmin7dAvgRhr ? `${isId ? 'SINKRON GARMIN 7H' : 'GARMIN 7D'} (${garmin7dAvgRhr} BPM)` : (isId ? 'DIKALIBRASI ATLET' : 'CALIBRATED')}
+          <span className="text-[8px] sm:text-[9px] text-slate-500 dark:text-zinc-400 block truncate mt-0.5">
+            {garmin7dAvgRhr ? `${isId ? 'SINKRON 7H' : '7D'}: ${garmin7dAvgRhr} BPM` : (isId ? 'DIKALIBRASI' : 'CALIBRATED')}
           </span>
         </div>
 
-        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-slate-200 dark:border-rose-800/60 p-3 shadow-sm dark:shadow-[2px_2px_0px_#e11d48]">
+        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-slate-200 dark:border-rose-800/60 p-2.5 sm:p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[9px] uppercase text-slate-500 dark:text-zinc-400 block tracking-wider font-bold">
-              {isId ? 'DETAK JANTUNG MAKSIMAL' : 'MAX HEART RATE'}
+              {isId ? 'HR MAKSIMAL' : 'MAX HR'}
             </span>
-            <Zap className="w-3 h-3 text-rose-500 dark:text-rose-400" />
+            <Zap className="w-3 h-3 text-rose-500 dark:text-rose-400 shrink-0" />
           </div>
-          <div className="flex items-baseline gap-1 mt-1">
-            <span className="text-2xl font-black text-rose-600 dark:text-rose-400">{profile.maxHr}</span>
-            <span className="text-[10px] text-slate-500 dark:text-zinc-400">BPM</span>
+          <div className="flex items-baseline gap-1 mt-0.5">
+            <span className="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-400">{profile.maxHr}</span>
+            <span className="text-[9px] text-slate-500 dark:text-zinc-400">BPM</span>
           </div>
-          <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
+          <span className="text-[8px] sm:text-[9px] text-slate-400 dark:text-zinc-500 block truncate mt-0.5">
             HRR = {profile.heartRateReserve} BPM
           </span>
         </div>
 
-        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-slate-200 dark:border-amber-800/60 p-3 shadow-sm dark:shadow-[2px_2px_0px_#d97706]">
-          <span className="text-[9px] uppercase text-slate-500 dark:text-zinc-400 block tracking-wider font-bold">
-            {isId ? 'AMBANG LAKTAT (LTHR)' : 'THRESHOLD (LTHR)'}
-          </span>
-          <div className="flex items-baseline gap-1 mt-1">
-            <span className="text-2xl font-black text-amber-600 dark:text-amber-300">{profile.estimatedLthr}</span>
-            <span className="text-[10px] text-slate-500 dark:text-zinc-400">BPM</span>
+        <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-slate-200 dark:border-amber-800/60 p-2.5 sm:p-3 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] uppercase text-slate-500 dark:text-zinc-400 block tracking-wider font-bold">
+              {isId ? 'AMBANG LAKTAT (LTHR)' : 'THRESHOLD (LTHR)'}
+            </span>
+            <ShieldAlert className="w-3 h-3 text-amber-500 shrink-0" />
           </div>
-          <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-            {isId ? 'AMBANG AMBANG ANAEROBIK' : 'ANAEROBIC THRESHOLD'}
+          <div className="flex items-baseline gap-1 mt-0.5">
+            <span className="text-lg sm:text-xl font-black text-amber-600 dark:text-amber-300">{profile.estimatedLthr}</span>
+            <span className="text-[9px] text-slate-500 dark:text-zinc-400">BPM</span>
+          </div>
+          <span className="text-[8px] sm:text-[9px] text-amber-600 dark:text-amber-400 block font-bold truncate mt-0.5">
+            {isId ? 'AMBANG ZONA 4' : 'ZONE 4 THRESHOLD'}
           </span>
         </div>
       </div>
 
       {/* Biometrics Status Banner */}
-      <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-violet-900/60 p-3.5 font-mono flex items-center justify-between gap-4 text-xs">
-        <div className="flex items-center gap-3">
+      <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-violet-900/60 p-3 sm:p-3.5 font-mono flex items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></div>
           <div>
-            <span className="text-slate-900 dark:text-zinc-200 font-bold block">
+            <span className="text-slate-900 dark:text-zinc-200 font-bold block text-[11px] sm:text-xs">
               {isId ? 'MESIN ZONA DETAK JANTUNG DINAMIS DIAKTIFKAN' : 'DYNAMIC HEART RATE ZONE ENGINE ACTIVE'}
             </span>
-            <span className="text-[11px] text-slate-600 dark:text-zinc-400 font-sans block mt-0.5">
+            <span className="text-[10px] sm:text-[11px] text-slate-600 dark:text-zinc-400 font-sans block mt-0.5">
               {isId
                 ? `Menggunakan metode ${profile.method}. Semua 5 zona dihitung dan dikalibrasikan secara instan ke aktivitas latihan lari Anda.`
                 : `Active method: ${profile.method}. All 5 training zones automatically synchronize across telemetry charts.`}
@@ -336,9 +339,44 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
         </div>
       </div>
 
-      {/* Desktop 5-Zone Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left font-mono text-xs table-fixed">
+      {/* Mobile 5-Zone Cards (< md) */}
+      <div className="md:hidden space-y-2.5">
+        {profile.zones.map(z => (
+          <div key={z.zoneIndex} className="p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 space-y-2 font-mono">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className={`w-7 text-center py-0.5 text-[10px] font-black shrink-0 ${z.color}`}>
+                  Z{z.zoneIndex}
+                </span>
+                <span className="font-bold text-slate-900 dark:text-white uppercase text-xs truncate">
+                  {z.name}
+                </span>
+              </div>
+              <span className="font-black text-xs text-cyan-600 dark:text-cyan-400 tabular-nums">
+                {z.minBpm} – {z.maxBpm} BPM
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-200 dark:border-zinc-800/80">
+              <span className="text-slate-600 dark:text-zinc-400 font-bold">
+                {profile.methodType === 'MANUAL_BPM' ? 'Manual BPM' : `${z.minPercent}% – ${z.maxPercent}%`}
+              </span>
+              <span className="text-slate-900 dark:text-white font-black tabular-nums">
+                {PaceCalculator.formatDuration(z.totalTimeSeconds)}
+                <span className="text-[10px] text-slate-400 ml-1 font-normal">({z.totalPercentOfTraining}%)</span>
+              </span>
+            </div>
+
+            <p className="text-[10px] text-slate-500 dark:text-zinc-400 font-sans leading-tight">
+              {z.physiologicalRole}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop 5-Zone Table (>= md) */}
+      <div className="hidden md:block overflow-x-auto w-full max-w-full">
+        <table className="w-full text-left font-mono text-xs table-fixed min-w-[620px]">
           <thead>
             <tr className="border-b-2 border-slate-200 dark:border-zinc-800 text-[10px] text-slate-500 dark:text-zinc-400 uppercase tracking-widest bg-slate-50 dark:bg-[#070a14]">
               <th className="py-2.5 px-3 w-16 text-center">{isId ? 'ZONA' : 'ZONE'}</th>
@@ -352,24 +390,24 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
           <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
             {profile.zones.map(z => (
               <tr key={z.zoneIndex} className="hover:bg-slate-50 dark:hover:bg-violet-950/20 transition-colors">
-                <td className="py-3 px-3">
+                <td className="py-3 px-3 text-center">
                   <span className={`px-2 py-0.5 text-[10px] font-black ${z.color}`}>
                     Z{z.zoneIndex}
                   </span>
                 </td>
-                <td className="py-3 px-3 font-bold text-slate-900 dark:text-white uppercase">{z.name}</td>
-                <td className="py-3 px-3 text-slate-600 dark:text-zinc-400 font-bold">
+                <td className="py-3 px-3 font-bold text-slate-900 dark:text-white uppercase truncate">{z.name}</td>
+                <td className="py-3 px-3 text-slate-600 dark:text-zinc-400 font-bold tabular-nums">
                   {profile.methodType === 'MANUAL_BPM' 
                     ? 'Manual BPM' 
                     : `${z.minPercent}% – ${z.maxPercent}%`}
                 </td>
-                <td className="py-3 px-3 font-black text-cyan-600 dark:text-cyan-300">
+                <td className="py-3 px-3 font-black text-cyan-600 dark:text-cyan-300 tabular-nums">
                   {z.minBpm} – {z.maxBpm} BPM
                 </td>
-                <td className="py-3 px-3 text-[11px] text-slate-600 dark:text-zinc-300 max-w-sm">
+                <td className="py-3 px-3 text-[11px] text-slate-600 dark:text-zinc-300 truncate">
                   {z.physiologicalRole}
                 </td>
-                <td className="py-3 px-3 text-right font-black text-slate-900 dark:text-white">
+                <td className="py-3 px-3 text-right font-black text-slate-900 dark:text-white tabular-nums">
                   {PaceCalculator.formatDuration(z.totalTimeSeconds)}
                   <span className="text-[10px] text-slate-400 dark:text-zinc-400 ml-1.5 font-normal">
                     ({z.totalPercentOfTraining}%)
@@ -512,8 +550,8 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                   : (isId ? `2. SESUAIKAN PERSENTASE ZONA (${draftSettings.method}):` : `2. ADJUST ZONE PERCENTAGES (${draftSettings.method}):`)}
               </label>
 
-              <div className="border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#070a14] overflow-hidden">
-                <table className="w-full text-left font-mono text-xs border-collapse table-fixed">
+              <div className="border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#070a14] overflow-x-auto w-full max-w-full">
+                <table className="w-full text-left font-mono text-xs border-collapse table-fixed min-w-[480px]">
                   <thead>
                     <tr className="border-b border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 text-[10px] text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
                       <th className="py-2.5 px-3.5 w-36 text-left font-bold">{isId ? 'ZONA & NAMA' : 'ZONE & NAME'}</th>

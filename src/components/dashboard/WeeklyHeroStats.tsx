@@ -103,7 +103,9 @@ export default function WeeklyHeroStats({ stats }: Props) {
         return (
           <div
             key={i}
-            className={`relative bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:${c.borderColor} p-4 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] hover:shadow-[4px_4px_0px_#7c3aed] transition-all group overflow-hidden flex flex-col justify-between h-full`}
+            className={`relative bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:${c.borderColor} p-3.5 sm:p-4 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] hover:shadow-[4px_4px_0px_#7c3aed] transition-all group overflow-hidden flex flex-col justify-between h-full ${
+              i === 4 ? 'col-span-2 md:col-span-1' : ''
+            }`}
           >
             {/* Top Micro-Label */}
             <div className="flex items-center justify-between mb-2">

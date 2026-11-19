@@ -142,21 +142,21 @@ export default function AthleteBiodataCard({ initialProfile }: Props) {
   };
 
   return (
-    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-5 sm:p-6 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] space-y-6 transition-colors font-mono">
+    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-4 sm:p-6 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] space-y-5 sm:space-y-6 transition-colors font-mono w-full min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-2 border-slate-200 dark:border-zinc-800 gap-3">
         <div>
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <User className="w-4 h-4 text-violet-600 dark:text-violet-400 shrink-0" />
             <span className="text-[10px] font-mono px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold uppercase tracking-wider">
-              {isId ? 'BIODATA_ATLET // PROFIL_FISIK' : 'ATHLETE_BIODATA // PHYSICAL_PROFILE'}
+              {isId ? 'BIODATA ATLET // PROFIL FISIK' : 'ATHLETE BIODATA // PHYSICAL PROFILE'}
             </span>
             <span className="text-[9px] font-mono px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 dark:border-emerald-600 text-emerald-800 dark:text-emerald-300 font-bold uppercase">
               {role.toUpperCase()}
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1">
-            {isId ? 'BIODATA_&_KOMPOSISI_TUBUH' : 'BIODATA_&_BODY_COMPOSITION'}
+          <h2 className="text-lg sm:text-xl lg:text-2xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1 break-words">
+            {isId ? 'BIODATA // KOMPOSISI TUBUH' : 'BIODATA // BODY COMPOSITION'}
           </h2>
           <p className="text-xs font-sans text-slate-500 dark:text-zinc-400 mt-1">
             {isId
@@ -166,7 +166,7 @@ export default function AthleteBiodataCard({ initialProfile }: Props) {
         </div>
 
         {/* Live Pill Badges */}
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           {age && (
             <div className="px-2.5 py-1 bg-slate-100 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-800 text-slate-800 dark:text-zinc-200 font-bold">
               {age} {isId ? 'TAHUN' : 'YRS'}

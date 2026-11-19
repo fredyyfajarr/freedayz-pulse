@@ -31,7 +31,7 @@ export default function AppLayoutClient({
   }
 
   return (
-    <div className="min-h-full flex flex-col md:flex-row relative">
+    <div className="min-h-full flex flex-col md:flex-row relative w-full max-w-full overflow-x-hidden">
       <DynamicDocumentTitle />
       {/* Sidebar (Desktop Collapsible Rail/Expanded + Mobile Header & Drawer) */}
       <Sidebar />
@@ -39,11 +39,11 @@ export default function AppLayoutClient({
       {/* Main Content Area with Clean Dynamic Padding (Zero Floating Overlays) */}
       <div 
         suppressHydrationWarning
-        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${
+        className={`flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-hidden transition-all duration-300 ease-in-out ${
           isDesktopOpen ? 'md:pl-72' : 'md:pl-16'
         }`}
       >
-        <main className="flex-1 pb-24 md:pb-16 pt-0 md:pt-0">
+        <main className="flex-1 w-full max-w-full min-w-0 overflow-x-hidden pb-24 md:pb-16 pt-0 md:pt-0">
           {children}
         </main>
       </div>

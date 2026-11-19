@@ -35,19 +35,19 @@ export default async function SettingsPage() {
   // If Coach: Render dedicated Club & Coach Profile Settings (Zero Fredy HR zones, Zero athlete Garmin sync)
   if (isCoach) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+      <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-4 sm:space-y-6 min-w-0">
         {/* Header */}
-        <div className="pb-4 border-b-2 border-cyan-900/50">
+        <div className="pb-3 sm:pb-4 border-b-2 border-cyan-900/50">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-cyan-400" />
+            <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
             <span className="text-[10px] font-mono px-2 py-0.5 bg-cyan-950 border border-cyan-700/60 text-cyan-300 font-bold uppercase tracking-wider">
-              COACH_&_CLUB_PREFERENCES
+              COACH // CLUB PREFERENCES
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black italic tracking-wide text-white uppercase mt-1">
+          <h1 className="text-lg sm:text-2xl lg:text-3xl font-black italic tracking-wide text-white uppercase mt-1 break-words">
             PENGATURAN KLUB & LISENSI KEPELATIHAN
           </h1>
-          <p className="text-xs font-mono text-zinc-400">
+          <p className="text-[11px] sm:text-xs font-mono text-zinc-400">
             MANAJEMEN IDENTITAS KLUB, KODE AKSES PENDAFTARAN ATLET & SISTEM
           </p>
         </div>
@@ -93,19 +93,19 @@ export default async function SettingsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+    <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-4 sm:space-y-6 min-w-0">
       {/* Header */}
-      <div className="pb-4 border-b-2 border-violet-900/50">
+      <div className="pb-3 sm:pb-4 border-b-2 border-violet-900/50">
         <div className="flex items-center gap-2">
-          <Settings className="w-4 h-4 text-violet-400" />
+          <Settings className="w-4 h-4 text-violet-400 shrink-0" />
           <span className="text-[10px] font-mono px-2 py-0.5 bg-violet-950 border border-violet-700/60 text-violet-300 font-bold uppercase tracking-wider">
-            SYSTEM_&_ATHLETE_PROFILE
+            SYSTEM // ATHLETE PROFILE
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black italic tracking-wide text-white uppercase mt-1">
-          PERSONAL_INFO_&_ZONE_CALIBRATION
+        <h1 className="text-lg sm:text-2xl lg:text-3xl font-black italic tracking-wide text-white uppercase mt-1 break-words">
+          PERSONAL INFO // ZONE CALIBRATION
         </h1>
-        <p className="text-xs font-mono text-zinc-400">
+        <p className="text-[11px] sm:text-xs font-mono text-zinc-400">
           HEART RATE FORMULA, ZONE PERCENTAGES, BPM RANGES & TRAINING INSIGHTS
         </p>
       </div>

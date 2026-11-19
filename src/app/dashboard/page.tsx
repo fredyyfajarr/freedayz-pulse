@@ -46,7 +46,7 @@ export default async function DashboardPage() {
   // 1. DEDICATED COACH PORTAL (Zero Fredy data, Zero athlete telemetry widgets)
   if (userRole === 'coach') {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 space-y-6">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
         <CoachDashboard
           coachName={fullName}
           coachEmail={userEmail}
@@ -62,7 +62,7 @@ export default async function DashboardPage() {
   // If user is a new athlete without Garmin connected, isolate their account and guide them to setup
   if (!isGarminConnected) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 space-y-6">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
         <NewAthleteSetupCard
           athleteName={fullName}
           athleteEmail={userEmail}
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
   const acwr = ACWRCalculator.calculate(summary.allActivities);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 space-y-6">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
       {/* Top Welcome & Telemetry Bar */}
       <DashboardWelcomeBar lastSync={summary.lastSync} />
 

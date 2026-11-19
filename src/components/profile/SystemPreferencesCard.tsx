@@ -13,26 +13,26 @@ export default function SystemPreferencesCard() {
   const isId = language === 'ID';
 
   return (
-    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-5 sm:p-6 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] font-mono space-y-5 transition-colors">
+    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-4 sm:p-6 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] font-mono space-y-4 sm:space-y-5 transition-colors w-full min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 dark:border-zinc-800 gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-600 flex items-center justify-center text-violet-700 dark:text-violet-300">
+          <div className="w-8 h-8 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-600 flex items-center justify-center text-violet-700 dark:text-violet-300 shrink-0">
             <Sparkles className="w-4 h-4" />
           </div>
-          <div>
-            <h3 className="font-black italic tracking-widest uppercase text-sm sm:text-base text-slate-900 dark:text-white">
+          <div className="min-w-0">
+            <h3 className="font-black italic tracking-widest uppercase text-sm sm:text-base text-slate-900 dark:text-white truncate">
               {t('settings.preferences')}
             </h3>
-            <p className="text-[10px] text-slate-500 dark:text-zinc-400 font-mono">
+            <p className="text-[10px] text-slate-500 dark:text-zinc-400 font-mono truncate">
               {isId ? 'BAHASA SISTEM & KALIBRASI TEMA TAMPILAN' : 'SYSTEM LANGUAGE & DISPLAY THEME CALIBRATION'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-600/50 px-2.5 py-0.5 self-start sm:self-center font-bold">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>{isId ? 'TERSINKRON KE PENYIMPANAN LOKAL' : 'AUTOSAVED TO LOCAL STORAGE'}</span>
+        <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-600/50 px-2 py-0.5 self-start sm:self-center font-bold shrink-0">
+          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+          <span>{isId ? 'TERSINKRON OTOMATIS' : 'AUTOSAVED'}</span>
         </div>
       </div>
 
