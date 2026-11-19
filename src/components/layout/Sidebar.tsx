@@ -19,6 +19,7 @@ import {
   Users,
   BookOpen,
   MessageSquare,
+  DollarSign,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -173,6 +174,13 @@ export default function Sidebar() {
       icon: Activity, 
       key: 'acwr',
       isActive: pathname === '/dashboard' && currentTab === 'acwr',
+    },
+    { 
+      href: '/dashboard?tab=rab', 
+      label: isId ? 'RAB & KOMERSIAL' : 'RAB & BUDGET', 
+      icon: DollarSign, 
+      key: 'rab',
+      isActive: pathname === '/dashboard' && currentTab === 'rab',
     },
     { 
       href: '/dashboard?tab=directives', 

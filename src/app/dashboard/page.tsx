@@ -14,6 +14,7 @@ import HRRProfileWidget from '@/components/dashboard/HRRProfileWidget';
 import RacePredictorWidget from '@/components/dashboard/RacePredictorWidget';
 import CoachDashboard from '@/components/coach/CoachDashboard';
 import NewAthleteSetupCard from '@/components/dashboard/NewAthleteSetupCard';
+import AthleteCoachTasksWidget from '@/components/dashboard/AthleteCoachTasksWidget';
 import { ACWRCalculator } from '@/domain/services/ACWRCalculator';
 import { createClient } from '@/utils/supabase/server';
 
@@ -66,6 +67,7 @@ export default async function DashboardPage() {
           athleteName={fullName}
           athleteEmail={userEmail}
         />
+        <AthleteCoachTasksWidget athleteName={fullName} />
       </div>
     );
   }
@@ -92,6 +94,9 @@ export default async function DashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 space-y-6">
       {/* Top Welcome & Telemetry Bar */}
       <DashboardWelcomeBar lastSync={summary.lastSync} />
+
+      {/* Coach Tasks & Commercial Coaching Prescriptions */}
+      <AthleteCoachTasksWidget athleteName={fullName} />
 
       {/* 1. Weekly Hero Stats */}
       <WeeklyHeroStats stats={summary.hero} />

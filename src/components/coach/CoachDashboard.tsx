@@ -24,9 +24,28 @@ import {
   Timer,
   ChevronRight,
   Flame,
-  ArrowRight
+  ArrowRight,
+  DollarSign,
+  Calculator,
+  FileText,
+  PieChart,
+  Receipt,
+  Wallet,
+  CheckCircle2,
+  Clock,
+  ClipboardList,
+  Filter
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { 
+  CoachTask, 
+  RABItem, 
+  CoachingPackage, 
+  CommercialFinancialSummary,
+  RABCategory,
+  TaskType 
+} from '@/domain/entities/CoachingRelationship';
+import { CoachingStorage } from '@/utils/coachingStorage';
 
 interface Props {
   coachName: string;
@@ -57,6 +76,7 @@ interface DemoAthlete {
   targetWeeklyKm: number;
   lastSession: string;
   tsb: number;
+  packageTier: string;
 }
 
 const DEFAULT_TRAINING_PLANS: TrainingPlan[] = [
@@ -105,7 +125,7 @@ const DEFAULT_TRAINING_PLANS: TrainingPlan[] = [
 const DEMO_ATHLETES: DemoAthlete[] = [
   {
     id: 'demo-1',
-    name: 'Budi Santoso (Simulasi)',
+    name: 'Budi Santoso',
     email: 'budi.runner@example.com',
     targetRace: 'Maybank Bali Marathon Sub-4',
     acwr: 1.05,
@@ -114,10 +134,11 @@ const DEMO_ATHLETES: DemoAthlete[] = [
     targetWeeklyKm: 38.0,
     lastSession: 'Tempo Run 8km @ 5:15 /km',
     tsb: 6,
+    packageTier: 'Half Marathon Performance',
   },
   {
     id: 'demo-2',
-    name: 'Siti Rahma (Simulasi)',
+    name: 'Siti Rahma',
     email: 'siti.speed@example.com',
     targetRace: 'Jakarta 10K Debut Sub-50',
     acwr: 1.42,
@@ -126,6 +147,7 @@ const DEMO_ATHLETES: DemoAthlete[] = [
     targetWeeklyKm: 25.0,
     lastSession: 'Track 5x1000m @ 4:52 /km',
     tsb: -14,
+    packageTier: 'Community Squad (Base)',
   },
 ];
 
@@ -135,22 +157,80 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const tabFromQuery = searchParams.get('tab') as 'roster' | 'plans' | 'acwr' | 'directives' | null;
+  const tabFromQuery = searchParams.get('tab') as 'roster' | 'plans' | 'acwr' | 'directives' | 'rab' | null;
 
-  const [activeTab, setActiveTab] = useState<'roster' | 'plans' | 'acwr' | 'directives'>('roster');
+  const [activeTab, setActiveTab] = useState<'roster' | 'plans' | 'acwr' | 'directives' | 'rab'>('roster');
 
   useEffect(() => {
-    if (tabFromQuery && ['roster', 'plans', 'acwr', 'directives'].includes(tabFromQuery)) {
+    if (tabFromQuery && ['roster', 'plans', 'acwr', 'directives', 'rab'].includes(tabFromQuery)) {
       setActiveTab(tabFromQuery);
     }
   }, [tabFromQuery]);
 
-  const switchTab = (tab: 'roster' | 'plans' | 'acwr' | 'directives') => {
+  const switchTab = (tab: 'roster' | 'plans' | 'acwr' | 'directives' | 'rab') => {
     setActiveTab(tab);
     router.replace(`/dashboard?tab=${tab}`, { scroll: false });
   };
+
   const [showDemoSquad, setShowDemoSquad] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+
+  // --- COACH TASKS STATE ---
+  const [tasks, setTasks] = useState<CoachTask[]>([]);
+  const [rosterViewMode, setRosterViewMode] = useState<'tasks' | 'athletes'>('tasks');
+  const [taskStatusFilter, setTaskStatusFilter] = useState<'ALL' | 'PENDING' | 'COMPLETED'>('ALL');
+
+  // Modal: Assign Task
+  const [showAssignTaskModal, setShowAssignTaskModal] = useState(false);
+  const [assignAthleteName, setAssignAthleteName] = useState('Fredy Fajar');
+  const [assignTitle, setAssignTitle] = useState('');
+  const [assignType, setAssignType] = useState<TaskType>('LONG_RUN');
+  const [assignDueDate, setAssignDueDate] = useState('2026-11-23');
+  const [assignDistanceKm, setAssignDistanceKm] = useState(16);
+  const [assignTargetPace, setAssignTargetPace] = useState('5:30 - 5:45 /km');
+  const [assignTargetHrZone, setAssignTargetHrZone] = useState('Zona 2 (142 - 158 BPM)');
+  const [assignInstructions, setAssignInstructions] = useState('');
+
+  // Modal: Review Completed Task
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [taskToReview, setTaskToReview] = useState<CoachTask | null>(null);
+  const [reviewNoteInput, setReviewNoteInput] = useState('');
+
+  // --- COMMERCIAL RAB STATE ---
+  const [rabItems, setRabItems] = useState<RABItem[]>([]);
+  const [packages, setPackages] = useState<CoachingPackage[]>([]);
+  const [rabCategoryFilter, setRabCategoryFilter] = useState<'ALL' | RABCategory>('ALL');
+  const [showAddRABModal, setShowAddRABModal] = useState(false);
+  const [newRabCategory, setNewRabCategory] = useState<RABCategory>('VENUE_TRACK');
+  const [newRabName, setNewRabName] = useState('');
+  const [newRabVolume, setNewRabVolume] = useState(1);
+  const [newRabUnit, setNewRabUnit] = useState('Sesi');
+  const [newRabUnitPrice, setNewRabUnitPrice] = useState(500000);
+  const [newRabStatus, setNewRabStatus] = useState<'PLANNED' | 'COMMITTED' | 'PAID'>('COMMITTED');
+  const [newRabNotes, setNewRabNotes] = useState('');
+
+  // Sync data on load and on custom events
+  useEffect(() => {
+    const loadData = () => {
+      setTasks(CoachingStorage.getTasks());
+      setRabItems(CoachingStorage.getRABItems());
+      setPackages(CoachingStorage.getCoachingPackages());
+    };
+    loadData();
+
+    const handleTaskUpdate = () => setTasks(CoachingStorage.getTasks());
+    const handleRabUpdate = () => setRabItems(CoachingStorage.getRABItems());
+
+    window.addEventListener('coaching_task_updated', handleTaskUpdate);
+    window.addEventListener('coaching_rab_updated', handleRabUpdate);
+
+    return () => {
+      window.removeEventListener('coaching_task_updated', handleTaskUpdate);
+      window.removeEventListener('coaching_rab_updated', handleRabUpdate);
+    };
+  }, []);
+
+  const financialSummary: CommercialFinancialSummary = CoachingStorage.calculateFinancialSummary(rabItems, packages);
 
   // Invite Modal State
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -242,6 +322,86 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
     setNewDirectiveMsg('');
   };
 
+  // Handler for Assigning a Task to an Athlete
+  const handleAssignTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!assignTitle) return;
+
+    const athleteId = assignAthleteName.toLowerCase().includes('fredy') 
+      ? 'ath-fredy' 
+      : assignAthleteName.toLowerCase().includes('budi') 
+      ? 'demo-1' 
+      : 'demo-2';
+
+    CoachingStorage.addTask({
+      athleteId,
+      athleteName: assignAthleteName,
+      coachName: coachName ? `${coachName} (Head Coach)` : 'Coach Faisal (Head Coach)',
+      title: assignTitle,
+      type: assignType,
+      dueDate: assignDueDate,
+      targetDistanceKm: Number(assignDistanceKm),
+      targetPace: assignTargetPace,
+      targetHrZone: assignTargetHrZone,
+      instructions: assignInstructions || 'Lakukan pemanasan 10 menit dan pendinginan dinamis.',
+      status: 'PENDING',
+      adherenceScore: 95,
+    });
+
+    setShowAssignTaskModal(false);
+    setAssignTitle('');
+    setAssignInstructions('');
+    setTasks(CoachingStorage.getTasks());
+  };
+
+  // Handler for Coach Reviewing Completed Task
+  const handleReviewTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!taskToReview || !reviewNoteInput) return;
+
+    CoachingStorage.reviewTask(taskToReview.id, reviewNoteInput);
+    setShowReviewModal(false);
+    setTaskToReview(null);
+    setReviewNoteInput('');
+    setTasks(CoachingStorage.getTasks());
+  };
+
+  // Handler for Adding RAB item
+  const handleAddRABItem = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRabName) return;
+
+    CoachingStorage.addRABItem({
+      category: newRabCategory,
+      name: newRabName,
+      volume: Number(newRabVolume),
+      unit: newRabUnit,
+      unitPriceIdr: Number(newRabUnitPrice),
+      realizationStatus: newRabStatus,
+      notes: newRabNotes || 'Pos operasional resmi tim lari',
+    });
+
+    setShowAddRABModal(false);
+    setNewRabName('');
+    setNewRabNotes('');
+    setRabItems(CoachingStorage.getRABItems());
+  };
+
+  // Filtered Tasks
+  const filteredTasks = tasks.filter(t => {
+    if (taskStatusFilter === 'PENDING') return t.status === 'PENDING';
+    if (taskStatusFilter === 'COMPLETED') return t.status === 'COMPLETED';
+    return true;
+  });
+
+  // Filtered RAB items
+  const filteredRABItems = rabItems.filter(item => {
+    if (rabCategoryFilter === 'ALL') return true;
+    return item.category === rabCategoryFilter;
+  });
+
+  const totalRegisteredAthletes = packages.reduce((acc, p) => acc + p.activeAthletesCount, 0);
+
   return (
     <div className="space-y-6 font-mono text-slate-900 dark:text-white">
       {/* 1. Coach Master Command Header */}
@@ -263,8 +423,8 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
             </h1>
             <p className="text-xs text-slate-600 dark:text-zinc-300 font-sans mt-0.5 max-w-2xl leading-relaxed">
               {isId 
-                ? 'Pusat manajemen skuad lari, pembuatan program latihan berkala, evaluasi beban atlet, dan mitigasi risiko cedera berbasis ACWR.'
-                : 'Central running squad management hub, structured training plan builder, athlete workload evaluation, and injury prevention.'}
+                ? 'Pusat manajemen skuad lari, penugasan sesi latihan atlet, evaluasi kepatuhan RPE, pemantauan ACWR, dan RAB operasional komersial.'
+                : 'Central running squad management hub, athlete workout assignment, RPE feedback tracking, and commercial squad budgeting.'}
             </p>
           </div>
 
@@ -272,20 +432,20 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               type="button"
+              onClick={() => setShowAssignTaskModal(true)}
+              className="px-3.5 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 border border-cyan-400 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#0891b2] cursor-pointer"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>{isId ? '+ TUGASKAN SESI' : '+ ASSIGN TASK'}</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => setShowInviteModal(true)}
               className="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 border border-cyan-400 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#0891b2] cursor-pointer"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>{isId ? 'UNDANG ATLET' : 'INVITE ATHLETE'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowCreatePlanModal(true)}
-              className="px-3.5 py-2 bg-violet-600 hover:bg-violet-500 border border-violet-400 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#7c3aed] cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>{isId ? 'BUAT PROGRAM' : 'NEW PLAN'}</span>
             </button>
 
             <button
@@ -308,45 +468,51 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
             </span>
             <div className="flex items-baseline gap-1.5 mt-1">
               <span className="text-2xl font-black text-cyan-600 dark:text-cyan-400">
-                {showDemoSquad ? DEMO_ATHLETES.length : 0}
+                {totalRegisteredAthletes}
               </span>
               <span className="text-[10px] text-slate-500 dark:text-zinc-500 font-bold uppercase">
-                {showDemoSquad ? (isId ? 'Pelari (Demo)' : 'Runners (Demo)') : (isId ? 'Pelari Aktif' : 'Active')}
+                {isId ? 'Pelari Aktif' : 'Runners'}
               </span>
             </div>
             <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-              {showDemoSquad ? (isId ? 'Mode simulasi aktif' : 'Demo mode active') : (isId ? 'Belum ada atlet tertaut' : 'No athletes linked')}
+              {isId ? 'Tersebar di 3 Paket Komersial' : 'Across 3 Commercial Tiers'}
             </span>
           </div>
 
           <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-cyan-900/60 p-3.5 shadow-xs">
             <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
-              {isId ? 'PROGRAM LATIHAN TERSEDIA' : 'TRAINING PLANS AVAILABLE'}
+              {isId ? 'TUGAS LATIHAN AKTIF' : 'ACTIVE WORKOUT TASKS'}
             </span>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl font-black text-slate-900 dark:text-white">{plans.length}</span>
-              <span className="text-[10px] text-violet-600 dark:text-violet-400 font-bold uppercase">{isId ? 'Modul' : 'Plans'}</span>
+              <span className="text-2xl font-black text-slate-900 dark:text-white">
+                {tasks.filter(t => t.status === 'PENDING').length}
+              </span>
+              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase">
+                {isId ? 'Menunggu' : 'Pending'}
+              </span>
             </div>
             <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-              {isId ? 'Siap ditugaskan ke pelari' : 'Ready to assign'}
+              {tasks.filter(t => t.status === 'COMPLETED').length} {isId ? 'Sesi Telah Tuntas & Dilaporkan' : 'Completed Sessions'}
             </span>
           </div>
 
           <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-cyan-900/60 p-3.5 shadow-xs">
             <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
-              {isId ? 'KESIAPAN SKUAD (ACWR)' : 'SQUAD READINESS'}
+              {isId ? 'TOTAL ANGGARAN RAB (16 MGG)' : 'RAB OPERATIONAL BUDGET'}
             </span>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">OPTIMAL</span>
+              <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                Rp {(financialSummary.totalRabBudget / 1000000).toFixed(1)}M
+              </span>
             </div>
             <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-              {isId ? '0 Atlet dalam Risiko Spike' : '0 Athletes in Danger Zone'}
+              {financialSummary.netMarginPercentage}% {isId ? 'Net Surplus Margin' : 'Net Margin'}
             </span>
           </div>
 
           <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-cyan-900/60 p-3.5 shadow-xs">
             <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
-              {isId ? 'IDENTITAS PELATIH' : 'COACH IDENTITY'}
+              {isId ? 'IDENTITAS KEPELATIHAN' : 'COACH IDENTITY'}
             </span>
             <div className="flex items-center gap-1.5 mt-1">
               <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -355,7 +521,7 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
               </span>
             </div>
             <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5 truncate font-sans">
-              {coachEmail}
+              Head Coach • Freedayzz Athletic Club
             </span>
           </div>
         </div>
@@ -372,11 +538,27 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
               : 'border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
           }`}
         >
-          <Users className="w-4 h-4" />
-          <span>{isId ? 'ROSTER ATLET BINAAN' : 'SQUAD ROSTER'}</span>
-          {showDemoSquad && (
-            <span className="px-1.5 py-0.2 bg-amber-500 text-slate-900 text-[9px] font-black">DEMO</span>
-          )}
+          <ClipboardList className="w-4 h-4" />
+          <span>{isId ? 'PENUGASAN & ROSTER ATLET' : 'TASKS & SQUAD ROSTER'}</span>
+          <span className="px-1.5 py-0.2 bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-300 border border-cyan-400 text-[9px] font-black">
+            {tasks.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => switchTab('rab')}
+          className={`px-4 py-2.5 font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+            activeTab === 'rab'
+              ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20'
+              : 'border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
+          }`}
+        >
+          <DollarSign className="w-4 h-4" />
+          <span>{isId ? 'RAB & KOMERSIAL SQUAD' : 'RAB & SQUAD BUDGET'}</span>
+          <span className="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-400 text-[9px] font-black">
+            RAB
+          </span>
         </button>
 
         <button
@@ -427,192 +609,710 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
       {/* 4. Tab Contents */}
 
-      {/* TAB 1: SQUAD ROSTER */}
+      {/* TAB 1: SQUAD TASKS & ROSTER MANAGEMENT */}
       {activeTab === 'roster' && (
         <div className="space-y-4">
+          {/* Sub Navigation Bar for Tab 1 */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-4 shadow-sm">
-            <div>
-              <h2 className="text-sm sm:text-base font-black italic tracking-wide text-slate-900 dark:text-white uppercase flex items-center gap-2">
-                <Users className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                <span>{isId ? 'DAFTAR ATLET BINAAN // SQUAD MONITORING' : 'ATHLETE SQUAD ROSTER'}</span>
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-0.5">
-                {isId 
-                  ? 'Pantau beban lari mingguan, kepatuhan jadwal, dan kesiapan atlet binaan Anda.' 
-                  : 'Monitor weekly running volume, schedule adherence, and readiness of your athletes.'}
-              </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setRosterViewMode('tasks')}
+                className={`px-3 py-1.5 text-xs font-black uppercase transition-all cursor-pointer ${
+                  rosterViewMode === 'tasks'
+                    ? 'bg-cyan-600 text-white shadow-[2px_2px_0px_#0891b2]'
+                    : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {isId ? `TUGAS & PRESKRIPSI LATIHAN (${tasks.length})` : `WORKOUT TASKS (${tasks.length})`}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRosterViewMode('athletes')}
+                className={`px-3 py-1.5 text-xs font-black uppercase transition-all cursor-pointer ${
+                  rosterViewMode === 'athletes'
+                    ? 'bg-cyan-600 text-white shadow-[2px_2px_0px_#0891b2]'
+                    : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {isId ? 'PROFIL & BEBAN ACWR ATLET' : 'ATHLETES ACWR LOAD'}
+              </button>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setShowDemoSquad(!showDemoSquad)}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer ${
-                  showDemoSquad 
-                    ? 'bg-amber-500/20 border-amber-500 text-amber-600 dark:text-amber-400' 
-                    : 'bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                onClick={() => setShowAssignTaskModal(true)}
+                className="px-3.5 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#0891b2] cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>{showDemoSquad ? (isId ? 'TUTUP MODE SIMULASI' : 'EXIT DEMO') : (isId ? 'PRATINJAU SKUAD DEMO' : 'PREVIEW DEMO SQUAD')}</span>
+                <Plus className="w-3.5 h-3.5" />
+                <span>{isId ? '+ TUGASKAN SESI' : '+ ASSIGN WORKOUT'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShowInviteModal(true)}
-                className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 border border-cyan-400 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black uppercase transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>{isId ? '+ UNDANG' : '+ INVITE'}</span>
+                <span>{isId ? 'UNDANG ATLET' : 'INVITE'}</span>
               </button>
             </div>
           </div>
 
-          {/* If No Real Athletes and Demo Off -> Professional Empty State */}
-          {!showDemoSquad ? (
-            <div className="bg-white dark:bg-[#070a14] border-2 border-dashed border-slate-300 dark:border-zinc-800 p-8 sm:p-12 text-center space-y-5">
-              <div className="w-16 h-16 rounded-2xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-300 dark:border-cyan-700 mx-auto flex items-center justify-center text-cyan-600 dark:text-cyan-400 shadow-sm">
-                <Users className="w-8 h-8" />
+          {/* SUB-VIEW 1: TASKS & PRESCRIPTIONS LIST */}
+          {rosterViewMode === 'tasks' && (
+            <div className="space-y-4">
+              {/* Task Filters */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+                <span className="text-slate-500 dark:text-zinc-400 font-bold uppercase text-[10px] flex items-center gap-1 mr-1">
+                  <Filter className="w-3 h-3" />
+                  <span>Filter:</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setTaskStatusFilter('ALL')}
+                  className={`px-3 py-1 font-bold uppercase transition-colors cursor-pointer ${
+                    taskStatusFilter === 'ALL'
+                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  Semua ({tasks.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTaskStatusFilter('PENDING')}
+                  className={`px-3 py-1 font-bold uppercase transition-colors cursor-pointer ${
+                    taskStatusFilter === 'PENDING'
+                      ? 'bg-amber-500 text-slate-900'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  Menunggu ({tasks.filter(t => t.status === 'PENDING').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTaskStatusFilter('COMPLETED')}
+                  className={`px-3 py-1 font-bold uppercase transition-colors cursor-pointer ${
+                    taskStatusFilter === 'COMPLETED'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  Selesai Dilaporkan ({tasks.filter(t => t.status === 'COMPLETED').length})
+                </button>
               </div>
 
-              <div className="max-w-md mx-auto space-y-2">
-                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">
-                  {isId ? 'Belum Ada Atlet Terdaftar di Klub Anda' : 'No Athletes Registered in Your Squad Yet'}
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans leading-relaxed">
-                  {isId
-                    ? 'Sebagai pelatih, akun Anda terisolasi secara mandiri. Bagikan Kode Akses Klub Anda kepada atlet binaan Anda agar aktivitas lari dan telemetri Garmin mereka terhubung langsung ke dashboard ini.'
-                    : 'As a coach, your account is cleanly isolated. Share your Club Invite Code with your athletes so their Garmin running telemetry connects directly here.'}
-                </p>
-              </div>
+              {/* Tasks Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredTasks.map((task) => {
+                  const isCompleted = task.status === 'COMPLETED';
 
-              {/* Club Code Copy Box */}
-              <div className="inline-flex flex-col sm:flex-row items-center gap-2 p-3 bg-slate-50 dark:bg-[#0d1224] border border-cyan-500/40 max-w-lg mx-auto">
-                <div className="text-left px-2">
-                  <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-bold block uppercase">
-                    {isId ? 'KODE REGISTRASI ATLET KLUB:' : 'ATHLETE CLUB REGISTRATION CODE:'}
-                  </span>
-                  <span className="text-base font-black text-cyan-600 dark:text-cyan-400 tracking-wider">
-                    {clubInviteCode}
-                  </span>
+                  return (
+                    <div
+                      key={task.id}
+                      className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-3 relative hover:border-cyan-500 transition-colors"
+                    >
+                      {/* Athlete Target & Session Badge */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-black px-2 py-0.5 bg-cyan-100 dark:bg-cyan-950 border border-cyan-400 text-cyan-800 dark:text-cyan-300 uppercase">
+                              {task.athleteName}
+                            </span>
+                            <span className={`text-[9px] font-bold px-1.5 py-0.2 uppercase ${
+                              task.type === 'INTERVAL'
+                                ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-400'
+                                : task.type === 'LONG_RUN'
+                                ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-400'
+                                : 'bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 border border-violet-400'
+                            }`}>
+                              {task.type.replace('_', ' ')}
+                            </span>
+                          </div>
+
+                          <h3 className="font-black text-sm text-slate-900 dark:text-white mt-1.5">
+                            {task.title}
+                          </h3>
+                        </div>
+
+                        <span className={`text-[10px] font-black px-2 py-0.5 uppercase shrink-0 flex items-center gap-1 ${
+                          isCompleted
+                            ? 'bg-emerald-100 dark:bg-emerald-950 border border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-amber-100 dark:bg-amber-950 border border-amber-500 text-amber-700 dark:text-amber-300 animate-pulse'
+                        }`}>
+                          {isCompleted ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                          <span>{isCompleted ? 'SELESAI' : 'MENUNGGU EKSEKUSI'}</span>
+                        </span>
+                      </div>
+
+                      {/* Prescribed Parameters */}
+                      <div className="grid grid-cols-3 gap-2 p-2.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-[11px]">
+                        <div>
+                          <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                            TARGET JARAK
+                          </span>
+                          <span className="font-black text-slate-900 dark:text-white">
+                            {task.targetDistanceKm} km
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                            TARGET PACE
+                          </span>
+                          <span className="font-black text-cyan-600 dark:text-cyan-400">
+                            {task.targetPace}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                            ZONA HR
+                          </span>
+                          <span className="font-black text-violet-600 dark:text-violet-400 truncate block">
+                            {task.targetHrZone}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Tactical Instructions */}
+                      <div className="p-2.5 bg-cyan-50/50 dark:bg-cyan-950/20 border border-cyan-200 dark:border-cyan-900/60 text-xs">
+                        <span className="text-[10px] text-cyan-800 dark:text-cyan-300 font-bold block uppercase mb-0.5">
+                          INSTRUKSI TAKTIS COACH:
+                        </span>
+                        <p className="text-[11px] font-sans text-slate-700 dark:text-zinc-300">
+                          {task.instructions}
+                        </p>
+                      </div>
+
+                      {/* Athlete Reported Results & Feedback */}
+                      {isCompleted ? (
+                        <div className="space-y-2 pt-1 border-t border-slate-200 dark:border-zinc-800">
+                          <div className="p-2.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/60 text-[11px] font-sans">
+                            <div className="flex items-center justify-between text-[10px] font-bold uppercase text-emerald-800 dark:text-emerald-300 mb-1">
+                              <span>Laporan Atlet ({task.athleteName}):</span>
+                              <span className="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 text-emerald-800 dark:text-emerald-300 font-black">
+                                RPE {task.reportedRpe}/10
+                              </span>
+                            </div>
+                            <p className="text-slate-700 dark:text-zinc-300 italic">
+                              &quot;{task.athleteFeedback}&quot;
+                            </p>
+                            <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-1">
+                              Diselesaikan: {task.completedAt}
+                            </span>
+                          </div>
+
+                          {task.coachReviewNote ? (
+                            <div className="p-2.5 bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-900/60 text-[11px] font-sans">
+                              <span className="text-[10px] font-bold uppercase text-violet-800 dark:text-violet-300 block mb-0.5">
+                                Catatan Evaluasi Head Coach:
+                              </span>
+                              <p className="text-slate-800 dark:text-zinc-200">
+                                {task.coachReviewNote}
+                              </p>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTaskToReview(task);
+                                setReviewNoteInput('');
+                                setShowReviewModal(true);
+                              }}
+                              className="w-full py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-black uppercase transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              <span>BERI CATATAN EVALUASI COACH</span>
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between text-xs pt-1 text-slate-400 dark:text-zinc-500">
+                          <span>Deadline: {task.dueDate}</span>
+                          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold">
+                            Menunggu penyelesaian lari atlet
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* SUB-VIEW 2: ATHLETES ROSTER & ACWR LOAD */}
+          {rosterViewMode === 'athletes' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-xs">
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white uppercase">
+                    Roster Atlet & Beban Fisiologis
+                  </h3>
+                  <p className="text-slate-500 dark:text-zinc-400 text-[11px] font-sans">
+                    Pantau volume mingguan, target perlombaan, dan paket pembinaan masing-masing atlet.
+                  </p>
                 </div>
                 <button
                   type="button"
-                  onClick={handleCopyCode}
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 cursor-pointer shadow-sm shrink-0"
+                  onClick={() => setShowDemoSquad(!showDemoSquad)}
+                  className={`px-3 py-1.5 border text-xs font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer ${
+                    showDemoSquad 
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-600 dark:text-amber-400' 
+                      : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-zinc-700 text-slate-600 dark:text-zinc-400'
+                  }`}
                 >
-                  {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedCode ? (isId ? 'TERSALIN' : 'COPIED') : (isId ? 'SALIN KODE' : 'COPY CODE')}</span>
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{showDemoSquad ? 'TUTUP MODE SIMULASI' : 'SIMULASI ROSTER TAMBAHAN'}</span>
                 </button>
               </div>
 
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowInviteModal(true)}
-                  className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black uppercase hover:bg-slate-800 dark:hover:bg-zinc-200 transition-colors flex items-center gap-1.5 cursor-pointer"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>{isId ? 'KIRIM UNDANGAN VIA EMAIL' : 'SEND EMAIL INVITATION'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowDemoSquad(true)}
-                  className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 text-xs font-black uppercase transition-colors flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isId ? 'LIHAT CONTOH SIMULASI SKUAD' : 'VIEW DEMO SQUAD PREVIEW'}</span>
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* Demo / Real Athlete Grid */
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {DEMO_ATHLETES.map((athlete) => {
-                const isWarning = athlete.acwrZone === 'WARNING';
-                return (
-                  <div
-                    key={athlete.id}
-                    className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-4 hover:border-cyan-500 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-violet-600 flex items-center justify-center text-white font-black text-sm shrink-0">
-                          {athlete.name.slice(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-black text-sm text-slate-900 dark:text-white">
-                              {athlete.name}
-                            </h3>
-                            <span className="text-[9px] px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950/60 border border-amber-400 text-amber-700 dark:text-amber-300 font-bold">
-                              SIMULASI
-                            </span>
-                          </div>
-                          <span className="text-[11px] text-slate-500 dark:text-zinc-400 block font-sans">
-                            {athlete.email}
-                          </span>
-                          <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold block mt-0.5">
-                            Target: {athlete.targetRace}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 1. Primary Registered Athlete: Fredy Fajar */}
+                <div className="bg-white dark:bg-[#0d1224] border-2 border-cyan-500 p-5 shadow-[3px_3px_0px_#06b6d4] space-y-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center text-white font-black text-sm shrink-0">
+                        FF
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-black text-sm text-slate-900 dark:text-white">
+                            Fredy Fajar
+                          </h4>
+                          <span className="text-[9px] px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 text-emerald-800 dark:text-emerald-300 font-bold">
+                            ATLET UTAMA
                           </span>
                         </div>
-                      </div>
-
-                      <span className={`text-[10px] font-black px-2 py-0.5 uppercase ${
-                        isWarning 
-                          ? 'bg-amber-100 dark:bg-amber-950 border border-amber-500 text-amber-700 dark:text-amber-300'
-                          : 'bg-emerald-100 dark:bg-emerald-950 border border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                      }`}>
-                        {isWarning ? 'WASPADAI LONJAKAN' : 'OPTIMAL LOAD'}
-                      </span>
-                    </div>
-
-                    {/* Athlete Stats */}
-                    <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-[11px]">
-                      <div>
-                        <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                          {isId ? 'BEBAN MINGGUAN' : 'WEEKLY KM'}
+                        <span className="text-[11px] text-slate-500 dark:text-zinc-400 block font-sans">
+                          fredyafajr46@gmail.com
                         </span>
-                        <span className="font-black text-slate-900 dark:text-white">
-                          {athlete.weeklyMileageKm} / {athlete.targetWeeklyKm} km
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                          ACWR RATIO
-                        </span>
-                        <span className={`font-black ${isWarning ? 'text-amber-500' : 'text-emerald-500'}`}>
-                          {athlete.acwr.toFixed(2)}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
-                          TSB (KESIAPAN)
-                        </span>
-                        <span className="font-black text-cyan-500">
-                          {athlete.tsb > 0 ? `+${athlete.tsb}` : athlete.tsb}
+                        <span className="text-[10px] text-violet-600 dark:text-violet-400 font-bold block mt-0.5">
+                          Paket: Elite Marathon Podium (1-on-1)
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs pt-1">
-                      <span className="text-[10px] text-slate-500 dark:text-zinc-400 truncate">
-                        Sesi Terakhir: {athlete.lastSession}
+                    <span className="text-[10px] font-black px-2 py-0.5 uppercase bg-emerald-100 dark:bg-emerald-950 border border-emerald-500 text-emerald-700 dark:text-emerald-300">
+                      OPTIMAL LOAD
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-[11px]">
+                    <div>
+                      <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                        BEBAN MINGGUAN
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => alert(`Fitur catatan evaluasi untuk ${athlete.name} siap dikirim ke atlet!`)}
-                        className="px-2.5 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase hover:bg-slate-800 cursor-pointer"
-                      >
-                        {isId ? 'Beri Catatan' : 'Add Note'}
-                      </button>
+                      <span className="font-black text-slate-900 dark:text-white">
+                        27.8 / 30.0 km
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                        ACWR RATIO
+                      </span>
+                      <span className="font-black text-emerald-600 dark:text-emerald-400">
+                        1.08
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                        TSB FRESHNESS
+                      </span>
+                      <span className="font-black text-cyan-600 dark:text-cyan-400">
+                        +8
+                      </span>
                     </div>
                   </div>
-                );
-              })}
+
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+                      Garmin Live Telemetry Connected
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAssignAthleteName('Fredy Fajar');
+                        setShowAssignTaskModal(true);
+                      }}
+                      className="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-white text-[10px] font-black uppercase cursor-pointer transition-colors"
+                    >
+                      + Tugaskan Sesi
+                    </button>
+                  </div>
+                </div>
+
+                {/* Additional Squad Runners */}
+                {DEMO_ATHLETES.map((athlete) => {
+                  const isWarning = athlete.acwrZone === 'WARNING';
+                  return (
+                    <div
+                      key={athlete.id}
+                      className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-4 hover:border-cyan-500 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shrink-0">
+                            {athlete.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-black text-sm text-slate-900 dark:text-white">
+                                {athlete.name}
+                              </h4>
+                              <span className="text-[9px] px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950/60 border border-amber-400 text-amber-700 dark:text-amber-300 font-bold">
+                                SQUAD
+                              </span>
+                            </div>
+                            <span className="text-[11px] text-slate-500 dark:text-zinc-400 block font-sans">
+                              {athlete.email}
+                            </span>
+                            <span className="text-[10px] text-violet-600 dark:text-violet-400 font-bold block mt-0.5">
+                              Paket: {athlete.packageTier}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span className={`text-[10px] font-black px-2 py-0.5 uppercase ${
+                          isWarning 
+                            ? 'bg-amber-100 dark:bg-amber-950 border border-amber-500 text-amber-700 dark:text-amber-300'
+                            : 'bg-emerald-100 dark:bg-emerald-950 border border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                        }`}>
+                          {isWarning ? 'WASPADAI LONJAKAN' : 'OPTIMAL LOAD'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-[11px]">
+                        <div>
+                          <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                            BEBAN MINGGUAN
+                          </span>
+                          <span className="font-black text-slate-900 dark:text-white">
+                            {athlete.weeklyMileageKm} / {athlete.targetWeeklyKm} km
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                            ACWR RATIO
+                          </span>
+                          <span className={`font-black ${isWarning ? 'text-amber-500' : 'text-emerald-500'}`}>
+                            {athlete.acwr.toFixed(2)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 dark:text-zinc-500 block text-[9px] font-bold uppercase">
+                            TSB FRESHNESS
+                          </span>
+                          <span className="font-black text-cyan-500">
+                            {athlete.tsb > 0 ? `+${athlete.tsb}` : athlete.tsb}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs pt-1">
+                        <span className="text-[10px] text-slate-500 dark:text-zinc-400 truncate">
+                          Target: {athlete.targetRace}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAssignAthleteName(athlete.name);
+                            setShowAssignTaskModal(true);
+                          }}
+                          className="px-2.5 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase hover:bg-slate-800 cursor-pointer"
+                        >
+                          + Tugaskan Sesi
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* TAB 5: RENCANA ANGGARAN BIAYA (RAB) & STRUKTUR KOMERSIAL SQUAD */}
+      {activeTab === 'rab' && (
+        <div className="space-y-6">
+          {/* Header Card */}
+          <div className="bg-white dark:bg-[#0d1224] border-2 border-emerald-500/80 p-5 shadow-[4px_4px_0px_#10b981] space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-emerald-900/60">
+              <div>
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-[10px] font-black px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 text-emerald-800 dark:text-emerald-300 uppercase tracking-widest">
+                    FINANSIAL_KLUB // COMMERCIAL_BUDGET
+                  </span>
+                </div>
+                <h2 className="text-lg sm:text-xl font-black italic tracking-wide uppercase mt-1.5 text-slate-900 dark:text-white">
+                  {isId ? 'RENCANA ANGGARAN BIAYA (RAB) OPERASIONAL SQUAD & PAKET KOMERSIAL' : 'SQUAD COMMERCIAL BUDGET (RAB) & PRICING MATRIX'}
+                </h2>
+                <p className="text-xs text-slate-600 dark:text-zinc-300 font-sans mt-0.5">
+                  {isId 
+                    ? 'Manajemen pos pengeluaran latihan (lintasan track, uji lab laktat, fisioterapi, logistik lomba) dan proyeksi penerimaan paket iuran pembinaan atlet.'
+                    : 'Manage operational expenditure (track venue, lactate tests, physiotherapy, race logistics) and projected athlete fee revenues.'}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowAddRABModal(true)}
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#059669] cursor-pointer shrink-0"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>{isId ? '+ TAMBAH POS BIAYA' : '+ ADD BUDGET ITEM'}</span>
+              </button>
+            </div>
+
+            {/* 4 Financial Summary KPI Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div className="p-3.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 shadow-xs">
+                <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
+                  TOTAL ANGGARAN RAB (PENGELUARAN)
+                </span>
+                <span className="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-400 block mt-1">
+                  Rp {financialSummary.totalRabBudget.toLocaleString('id-ID')}
+                </span>
+                <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
+                  Operasional 16 Minggu (4 Bulan)
+                </span>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 shadow-xs">
+                <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
+                  PROYEKSI PENDAPATAN IURAN ATLET
+                </span>
+                <span className="text-lg sm:text-xl font-black text-cyan-600 dark:text-cyan-400 block mt-1">
+                  Rp {financialSummary.totalProjectedRevenue.toLocaleString('id-ID')}
+                </span>
+                <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
+                  Dari {totalRegisteredAthletes} Atlet Binaan Terdaftar
+                </span>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 shadow-xs">
+                <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
+                  NET SURPLUS / MARGIN OPERASIONAL
+                </span>
+                <span className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400 block mt-1">
+                  +Rp {financialSummary.netMarginIdr.toLocaleString('id-ID')}
+                </span>
+                <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5">
+                  Margin Sehat: +{financialSummary.netMarginPercentage}%
+                </span>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 shadow-xs">
+                <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
+                  REALISASI ANGGARAN (TERBAYAR)
+                </span>
+                <span className="text-lg sm:text-xl font-black text-violet-600 dark:text-violet-400 block mt-1">
+                  Rp {financialSummary.realizedExpenseIdr.toLocaleString('id-ID')}
+                </span>
+                <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
+                  Telah Terealisasi: {financialSummary.budgetUtilizationPercentage}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Coaching Packages Commercial Matrix */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-black uppercase text-slate-700 dark:text-zinc-400 tracking-wider flex items-center gap-2">
+              <Award className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+              <span>STRUKTUR PAKET PEMBINAAN ATLET (COMMERCIAL PACKAGES)</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {packages.map((pkg) => (
+                <div
+                  key={pkg.id}
+                  className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-3 relative hover:border-violet-500 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[9px] font-black px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 text-violet-800 dark:text-violet-300 uppercase">
+                        {pkg.targetCategory} TARGET
+                      </span>
+                      <h4 className="font-black text-sm text-slate-900 dark:text-white mt-1.5">
+                        {pkg.name}
+                      </h4>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300">
+                      {pkg.activeAthletesCount} Atlet
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800">
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-500 block uppercase font-bold">
+                      BIAYA IURAN PEMBINAAN
+                    </span>
+                    <span className="text-lg font-black text-cyan-600 dark:text-cyan-400">
+                      Rp {pkg.monthlyFeeIdr.toLocaleString('id-ID')}
+                    </span>
+                    <span className="text-[10px] text-slate-400 dark:text-zinc-500 font-sans"> / bulan</span>
+                  </div>
+
+                  <div className="space-y-1.5 pt-1">
+                    <span className="text-[10px] font-bold text-slate-600 dark:text-zinc-400 uppercase block">
+                      Benefit & Fasilitas RAB Tim:
+                    </span>
+                    <ul className="text-[11px] font-sans text-slate-600 dark:text-zinc-300 space-y-1">
+                      {pkg.benefits.map((b, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                          <span>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Interactive RAB Items Table */}
+          <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white tracking-wide flex items-center gap-2">
+                  <Receipt className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>RINCIAN ANGGARAN BIAYA OPERASIONAL (RAB SQUAD)</span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-0.5">
+                  Daftar komitmen pembiayaan logistik, sewa lintasan lari, tes laktat, dan tenaga medis.
+                </p>
+              </div>
+
+              {/* Category Filter Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
+                <button
+                  type="button"
+                  onClick={() => setRabCategoryFilter('ALL')}
+                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
+                    rabCategoryFilter === 'ALL'
+                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  Semua ({rabItems.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRabCategoryFilter('VENUE_TRACK')}
+                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
+                    rabCategoryFilter === 'VENUE_TRACK'
+                      ? 'bg-cyan-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  Track Venue
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRabCategoryFilter('PHYSIOLOGY_LAB')}
+                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
+                    rabCategoryFilter === 'PHYSIOLOGY_LAB'
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  Lab Laktat
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRabCategoryFilter('MEDICAL_RECOVERY')}
+                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
+                    rabCategoryFilter === 'MEDICAL_RECOVERY'
+                      ? 'bg-rose-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  Fisioterapi
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRabCategoryFilter('LOGISTICS_NUTRITION')}
+                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
+                    rabCategoryFilter === 'LOGISTICS_NUTRITION'
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  Logistik
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRabCategoryFilter('COACHING_SERVICES')}
+                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
+                    rabCategoryFilter === 'COACHING_SERVICES'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  Honor Pelatih
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border border-slate-200 dark:border-zinc-800">
+                <thead className="bg-slate-100 dark:bg-[#070a14] border-b border-slate-200 dark:border-zinc-800 text-[10px] uppercase font-black text-slate-600 dark:text-zinc-400">
+                  <tr>
+                    <th className="p-3">Pos Pengeluaran</th>
+                    <th className="p-3">Kategori</th>
+                    <th className="p-3">Volume</th>
+                    <th className="p-3">Harga Satuan</th>
+                    <th className="p-3">Total Biaya</th>
+                    <th className="p-3">Status Realisasi</th>
+                    <th className="p-3">Catatan / SOP</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-zinc-800">
+                  {filteredRABItems.map((item) => (
+                    <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-cyan-950/20 transition-colors">
+                      <td className="p-3 font-bold text-slate-900 dark:text-white">
+                        {item.name}
+                      </td>
+                      <td className="p-3">
+                        <span className="text-[9px] px-1.5 py-0.2 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-bold uppercase">
+                          {item.category.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="p-3 font-mono text-slate-700 dark:text-zinc-300">
+                        {item.volume} {item.unit}
+                      </td>
+                      <td className="p-3 font-mono text-slate-600 dark:text-zinc-400">
+                        Rp {item.unitPriceIdr.toLocaleString('id-ID')}
+                      </td>
+                      <td className="p-3 font-mono font-black text-slate-900 dark:text-white">
+                        Rp {item.totalPriceIdr.toLocaleString('id-ID')}
+                      </td>
+                      <td className="p-3">
+                        <span className={`text-[9px] font-black px-2 py-0.5 uppercase ${
+                          item.realizationStatus === 'PAID'
+                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-400'
+                            : item.realizationStatus === 'COMMITTED'
+                            ? 'bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 border border-cyan-400'
+                            : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-400'
+                        }`}>
+                          {item.realizationStatus}
+                        </span>
+                      </td>
+                      <td className="p-3 text-[11px] font-sans text-slate-500 dark:text-zinc-400 max-w-xs">
+                        {item.notes}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 
@@ -713,10 +1413,16 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                   </span>
                   <button
                     type="button"
-                    onClick={() => alert(`Modul "${plan.title}" siap ditugaskan ke atlet bimbingan saat mereka terhubung!`)}
+                    onClick={() => {
+                      setAssignTitle(plan.title);
+                      setAssignTargetPace(plan.targetPace);
+                      setAssignTargetHrZone(plan.hrZone);
+                      setAssignInstructions(plan.weeklyStructure);
+                      setShowAssignTaskModal(true);
+                    }}
                     className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-black uppercase transition-colors flex items-center gap-1 cursor-pointer"
                   >
-                    <span>{isId ? 'Tugaskan ke Skuad' : 'Assign to Squad'}</span>
+                    <span>{isId ? 'Tugaskan ke Atlet' : 'Assign to Athlete'}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -783,35 +1489,6 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                   ? 'Risiko cedera muskuloskeletal meningkat 2x hingga 4x lipat. SOP Pelatih: Segera kurangi volume lari akhir pekan sebesar 30% dan alihkan ke cross-training.'
                   : 'Musculoskeletal injury risk increases 2x-4x. Coach SOP: Reduce upcoming long run volume by 30% and switch to low-impact cross-training.'}
               </p>
-            </div>
-          </div>
-
-          {/* Coach Checklist SOP Box */}
-          <div className="bg-slate-50 dark:bg-[#070a14] border-2 border-slate-200 dark:border-zinc-800 p-5 space-y-3">
-            <h3 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-wider flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span>{isId ? 'STANDAR OPERASIONAL PELATIH UNTUK MITIGASI CEDERA' : 'COACH PROTOCOL FOR INJURY MITIGATION'}</span>
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-sans text-slate-600 dark:text-zinc-300">
-              <div className="p-3 bg-white dark:bg-[#0d1224] border border-slate-200 dark:border-zinc-800">
-                <strong className="text-slate-900 dark:text-white block font-mono font-bold mb-1">
-                  1. Evaluasi TSB (Freshness)
-                </strong>
-                Jika TSB atlet berada di bawah -25, hindari sesi speedwork atau interval tajam. Berikan sesi Easy Run di Zona 1/2.
-              </div>
-              <div className="p-3 bg-white dark:bg-[#0d1224] border border-slate-200 dark:border-zinc-800">
-                <strong className="text-slate-900 dark:text-white block font-mono font-bold mb-1">
-                  2. Aturan Kenaikan 10%
-                </strong>
-                Jangan menaikkan total kilometer mingguan atlet lebih dari 10% dari minggu sebelumnya untuk menjaga ACWR di sweet spot.
-              </div>
-              <div className="p-3 bg-white dark:bg-[#0d1224] border border-slate-200 dark:border-zinc-800">
-                <strong className="text-slate-900 dark:text-white block font-mono font-bold mb-1">
-                  3. Deload Week Berkala
-                </strong>
-                Terapkan minggu pemulihan (deload) setiap 3 atau 4 minggu dengan menurunkan volume lari 25-30% guna memulihkan sistem saraf pusat.
-              </div>
             </div>
           </div>
         </div>
@@ -923,6 +1600,379 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ASSIGN TASK TO ATHLETE */}
+      {showAssignTaskModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0d1224] border-2 border-cyan-500 p-6 max-w-lg w-full shadow-[6px_6px_0px_#06b6d4] text-slate-900 dark:text-white space-y-4 font-mono max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-cyan-900">
+              <div className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                <h3 className="font-black uppercase text-sm tracking-wide">
+                  TUGASKAN SESI LATIHAN KE ATLET
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAssignTaskModal(false)}
+                className="text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-white text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAssignTask} className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    Pilih Atlet Binaan
+                  </label>
+                  <select
+                    value={assignAthleteName}
+                    onChange={(e) => setAssignAthleteName(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
+                  >
+                    <option value="Fredy Fajar">Fredy Fajar (Elite FM)</option>
+                    <option value="Budi Santoso">Budi Santoso (HM Perf)</option>
+                    <option value="Siti Rahma">Siti Rahma (10K Base)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    Tipe Latihan
+                  </label>
+                  <select
+                    value={assignType}
+                    onChange={(e) => setAssignType(e.target.value as any)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
+                  >
+                    <option value="LONG_RUN">Long Run</option>
+                    <option value="INTERVAL">Interval Trek</option>
+                    <option value="TEMPO">Tempo Run</option>
+                    <option value="RECOVERY">Easy Recovery</option>
+                    <option value="RACE_SIMULATION">Simulasi Race Pace</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  Judul Sesi Penugasan
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={assignTitle}
+                  onChange={(e) => setAssignTitle(e.target.value)}
+                  placeholder="misal: Long Run 22K + Pacing Gel Strategy"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    Target Jarak (KM)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="1"
+                    max="60"
+                    required
+                    value={assignDistanceKm}
+                    onChange={(e) => setAssignDistanceKm(Number(e.target.value))}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    Target Pace
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={assignTargetPace}
+                    onChange={(e) => setAssignTargetPace(e.target.value)}
+                    placeholder="misal: 5:30 - 5:45 /km"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    Tanggal Eksekusi
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={assignDueDate}
+                    onChange={(e) => setAssignDueDate(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  Target Zona Detak Jantung
+                </label>
+                <input
+                  type="text"
+                  value={assignTargetHrZone}
+                  onChange={(e) => setAssignTargetHrZone(e.target.value)}
+                  placeholder="misal: Zona 2 (142 - 158 BPM)"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  Instruksi Taktis & Catatan Pelatih
+                </label>
+                <textarea
+                  rows={3}
+                  value={assignInstructions}
+                  onChange={(e) => setAssignInstructions(e.target.value)}
+                  placeholder="Fokus pernapasan, jadwal minum gel per KM, jangan naik ke zona 3 sebelum KM 16..."
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-cyan-500 text-slate-900 dark:text-white resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setShowAssignTaskModal(false)}
+                  className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 text-xs uppercase font-bold cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black uppercase transition-colors cursor-pointer shadow-sm"
+                >
+                  Kirim Tugas ke Atlet
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: REVIEW COMPLETED TASK */}
+      {showReviewModal && taskToReview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0d1224] border-2 border-violet-500 p-6 max-w-lg w-full shadow-[6px_6px_0px_#7c3aed] text-slate-900 dark:text-white space-y-4 font-mono">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-violet-900">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                <h3 className="font-black uppercase text-sm tracking-wide">
+                  EVALUASI EKSEKUSI: {taskToReview.athleteName}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowReviewModal(false)}
+                className="text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-white text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleReviewTask} className="space-y-3">
+              <div className="p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-xs space-y-1.5">
+                <span className="font-bold text-slate-900 dark:text-white block">
+                  {taskToReview.title}
+                </span>
+                <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-zinc-400">
+                  <span>Target: {taskToReview.targetDistanceKm} km ({taskToReview.targetPace})</span>
+                  <span className="font-bold text-rose-600">RPE Atlet: {taskToReview.reportedRpe}/10</span>
+                </div>
+                <div className="pt-1 text-[11px] italic text-slate-700 dark:text-zinc-300 bg-white dark:bg-[#0d1224] p-2 border border-slate-200 dark:border-zinc-800">
+                  Feedback Atlet: &quot;{taskToReview.athleteFeedback}&quot;
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  Catatan Evaluasi / Koreksi Taktis Coach
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={reviewNoteInput}
+                  onChange={(e) => setReviewNoteInput(e.target.value)}
+                  placeholder="Beri umpan balik mengenai pace, anjuran fisioterapi/foam roll, hidrasi, atau penyesuaian sesi esok hari..."
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-violet-500 text-slate-900 dark:text-white resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setShowReviewModal(false)}
+                  className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 text-xs uppercase font-bold cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-black uppercase transition-colors cursor-pointer shadow-sm"
+                >
+                  Kirim Evaluasi ke Atlet
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ADD RAB BUDGET ITEM */}
+      {showAddRABModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0d1224] border-2 border-emerald-500 p-6 max-w-lg w-full shadow-[6px_6px_0px_#10b981] text-slate-900 dark:text-white space-y-4 font-mono">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-emerald-900">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="font-black uppercase text-sm tracking-wide">
+                  TAMBAH POS ANGGARAN BIAYA (RAB)
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddRABModal(false)}
+                className="text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-white text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddRABItem} className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  Kategori Pengeluaran
+                </label>
+                <select
+                  value={newRabCategory}
+                  onChange={(e) => setNewRabCategory(e.target.value as any)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                >
+                  <option value="VENUE_TRACK">Fasilitas & Lintasan Track</option>
+                  <option value="PHYSIOLOGY_LAB">Fisiologis & Uji Lab Laktat</option>
+                  <option value="MEDICAL_RECOVERY">Medis & Fisioterapi</option>
+                  <option value="LOGISTICS_NUTRITION">Logistik & Suplemen</option>
+                  <option value="COACHING_SERVICES">Jasa Kepelatihan & Pacer</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  Nama Pos Pengeluaran
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newRabName}
+                  onChange={(e) => setNewRabName(e.target.value)}
+                  placeholder="misal: Tes Spirometri VO2Max Lab Kuartal II"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    Volume
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    required
+                    value={newRabVolume}
+                    onChange={(e) => setNewRabVolume(Number(e.target.value))}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    Satuan
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newRabUnit}
+                    onChange={(e) => setNewRabUnit(e.target.value)}
+                    placeholder="Sesi / Bulan / Atlet"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                    Status Realisasi
+                  </label>
+                  <select
+                    value={newRabStatus}
+                    onChange={(e) => setNewRabStatus(e.target.value as any)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                  >
+                    <option value="COMMITTED">COMMITTED</option>
+                    <option value="PAID">PAID</option>
+                    <option value="PLANNED">PLANNED</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  Biaya Satuan (Rp)
+                </label>
+                <input
+                  type="number"
+                  step="10000"
+                  min="0"
+                  required
+                  value={newRabUnitPrice}
+                  onChange={(e) => setNewRabUnitPrice(Number(e.target.value))}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
+                  Catatan SOP & Keterangan Pengeluaran
+                </label>
+                <textarea
+                  rows={2}
+                  value={newRabNotes}
+                  onChange={(e) => setNewRabNotes(e.target.value)}
+                  placeholder="Keterangan alokasi, vendor penyedia, atau kriteria pemanfaatan..."
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setShowAddRABModal(false)}
+                  className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 text-xs uppercase font-bold cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase transition-colors cursor-pointer shadow-sm"
+                >
+                  Simpan ke RAB Tim
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
