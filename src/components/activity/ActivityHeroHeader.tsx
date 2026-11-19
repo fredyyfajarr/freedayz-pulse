@@ -42,7 +42,7 @@ export default function ActivityHeroHeader({ activity, polyline = [], deviceName
     : (durationSec ? Math.round(172 * (durationSec / 60)) : undefined));
 
   return (
-    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-6 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] mb-6 transition-colors">
+    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-4 sm:p-6 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] mb-6 transition-colors w-full min-w-0">
       {/* Top Bar: Back, Compare & Badges */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b-2 border-slate-200 dark:border-zinc-800">
         <div className="flex items-center gap-3">
@@ -115,7 +115,7 @@ export default function ActivityHeroHeader({ activity, polyline = [], deviceName
 
       {/* Main Title & Date */}
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase break-words">
           {activity.name}
         </h1>
         <div className="flex flex-wrap items-center gap-4 mt-1.5 text-xs font-mono text-slate-500 dark:text-zinc-400">

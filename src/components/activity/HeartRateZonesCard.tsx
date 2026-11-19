@@ -2,8 +2,10 @@
 
 import React from 'react';
 import { HRZoneBreakdown } from '@/domain/entities/Activity';
+import { MetricStreamPoint } from '@/domain/entities/ActivityDetail';
+import { HRProfileCalculator, CustomHRSettings } from '@/domain/services/HRProfileCalculator';
 import { PaceCalculator } from '@/domain/services/PaceCalculator';
-import { Heart, Zap } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface Props {
@@ -26,6 +28,7 @@ interface Props {
   restingHr?: number;
   maxHr?: number;
   deviceName?: string;
+  stream?: MetricStreamPoint[];
 }
 
 export default function HeartRateZonesCard({
@@ -37,85 +40,193 @@ export default function HeartRateZonesCard({
   restingHr,
   maxHr,
   deviceName,
+  stream = [],
 }: Props) {
   const { language } = useLanguage();
   const isId = language === 'ID';
-  const totalSeconds = zones.totalZoneSeconds || 1;
 
-  // Dynamic user-calibrated BPM brackets (Garmin Forerunner 165 calibration)
-  const z1Min = customZones?.zone1Min ?? 126;
-  const z1Max = customZones?.zone1Max ?? 144;
-  const z2Min = customZones?.zone2Min ?? 145;
-  const z2Max = customZones?.zone2Max ?? 162; // Dynamic 162 BPM max for Zone 2
-  const z3Min = customZones?.zone3Min ?? 163;
-  const z3Max = customZones?.zone3Max ?? 176;
-  const z4Min = customZones?.zone4Min ?? 177;
-  const z4Max = customZones?.zone4Max ?? 188;
-  const z5Min = customZones?.zone5Min ?? 189;
-  const z5Max = customZones?.zone5Max ?? (maxHr || 200);
+  const [hrSettings, setHrSettings] = React.useState<CustomHRSettings | null>(null);
 
-  const zoneConfigs = [
-    {
-      num: 1,
-      name: isId ? 'ZONA 1 // PEMANASAN' : 'ZONE 1 // WARM UP',
-      desc: isId 
-        ? `50% – 62% HRR (${z1Min} – ${z1Max} BPM) // Pemanasan & Pemulihan Aktif`
-        : `50% – 62% HRR (${z1Min} – ${z1Max} BPM) // Warm-up & Recovery`,
-      seconds: zones.zone1Seconds,
-      percent: Math.round((zones.zone1Seconds / totalSeconds) * 100),
-      color: 'bg-slate-400',
-      textColor: 'text-slate-600 dark:text-slate-300',
-      border: 'border-slate-500/50',
-    },
-    {
-      num: 2,
-      name: isId ? 'ZONA 2 // LARI SANTAI' : 'ZONE 2 // EASY',
-      desc: isId 
-        ? `63% – 75% HRR (${z2Min} – ${z2Max} BPM) // Membangun Fondasi Aerobik`
-        : `63% – 75% HRR (${z2Min} – ${z2Max} BPM) // Aerobic Base Building`,
-      seconds: zones.zone2Seconds,
-      percent: Math.round((zones.zone2Seconds / totalSeconds) * 100),
-      color: 'bg-emerald-500',
-      textColor: 'text-emerald-700 dark:text-emerald-400',
-      border: 'border-emerald-500/50',
-    },
-    {
-      num: 3,
-      name: isId ? 'ZONA 3 // AEROBIK' : 'ZONE 3 // AEROBIC',
-      desc: isId 
-        ? `75% – 84% HRR (${z3Min} – ${z3Max} BPM) // Tempo Aliran Kardiovaskular`
-        : `75% – 84% HRR (${z3Min} – ${z3Max} BPM) // Cardiovascular Tempo Flow`,
-      seconds: zones.zone3Seconds,
-      percent: Math.round((zones.zone3Seconds / totalSeconds) * 100),
-      color: 'bg-cyan-500',
-      textColor: 'text-cyan-700 dark:text-cyan-400',
-      border: 'border-cyan-500/50',
-    },
-    {
-      num: 4,
-      name: isId ? 'ZONA 4 // AMBANG LAKTAT' : 'ZONE 4 // THRESHOLD',
-      desc: isId 
-        ? `84% – 92% HRR (${z4Min} – ${z4Max} BPM) // Ketahanan Ambang Laktat`
-        : `84% – 92% HRR (${z4Min} – ${z4Max} BPM) // Lactate Threshold Stamina`,
-      seconds: zones.zone4Seconds,
-      percent: Math.round((zones.zone4Seconds / totalSeconds) * 100),
-      color: 'bg-amber-500',
-      textColor: 'text-amber-700 dark:text-amber-400',
-      border: 'border-amber-500/50',
-    },
-    {
-      num: 5,
-      name: isId ? 'ZONA 5 // MAKSIMUM' : 'ZONE 5 // MAXIMUM',
-      desc: isId 
-        ? `92% – 100% HRR (${z5Min} – ${z5Max} BPM) // Kapasitas Puncak Anaerobik`
-        : `92% – 100% HRR (${z5Min} – ${z5Max} BPM) // Anaerobic Peak Capacity`,
-      seconds: zones.zone5Seconds,
-      percent: Math.round((zones.zone5Seconds / totalSeconds) * 100),
-      color: 'bg-rose-500',
-      textColor: 'text-rose-700 dark:text-rose-400',
-      border: 'border-rose-500/50',
-    },
-  ];
+  React.useEffect(() => {
+    const loadSettings = () => {
+      const s = HRProfileCalculator.getStoredSettings();
+      setHrSettings(s);
+    };
+    loadSettings();
+
+    window.addEventListener('athlete_hr_settings_updated', loadSettings);
+    return () => {
+      window.removeEventListener('athlete_hr_settings_updated', loadSettings);
+    };
+  }, []);
+
+  const profile = React.useMemo(() => {
+    return HRProfileCalculator.calculateProfile(
+      [],
+      restingHr,
+      maxHr,
+      undefined,
+      customZones,
+      hrSettings || undefined
+    );
+  }, [restingHr, maxHr, customZones, hrSettings]);
+
+  // Dynamic seconds calculation from telemetry stream or fallback
+  const calculatedZoneSeconds = React.useMemo(() => {
+    if (stream && stream.length > 0) {
+      const validPts = stream.filter(p => p.heartRate && p.heartRate > 30);
+      if (validPts.length > 0) {
+        const z1Max = profile.zones[0]?.maxBpm ?? customZones?.zone1Max ?? 144;
+        const z2Max = profile.zones[1]?.maxBpm ?? customZones?.zone2Max ?? 162;
+        const z3Max = profile.zones[2]?.maxBpm ?? customZones?.zone3Max ?? 176;
+        const z4Max = profile.zones[3]?.maxBpm ?? customZones?.zone4Max ?? 188;
+
+        let s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0;
+
+        for (let i = 0; i < stream.length; i++) {
+          const pt = stream[i];
+          if (!pt.heartRate || pt.heartRate <= 30) continue;
+
+          let dt = 1;
+          if (stream.length > 1) {
+            if (i === 0) {
+              dt = Math.max(1, stream[1].elapsedSeconds - pt.elapsedSeconds);
+            } else {
+              dt = Math.max(1, pt.elapsedSeconds - stream[i - 1].elapsedSeconds);
+            }
+          }
+
+          const hr = pt.heartRate;
+          if (hr <= z1Max) {
+            s1 += dt;
+          } else if (hr <= z2Max) {
+            s2 += dt;
+          } else if (hr <= z3Max) {
+            s3 += dt;
+          } else if (hr <= z4Max) {
+            s4 += dt;
+          } else {
+            s5 += dt;
+          }
+        }
+
+        const streamTotal = s1 + s2 + s3 + s4 + s5;
+        const targetTotal = zones.totalZoneSeconds || streamTotal || 1;
+
+        if (streamTotal > 0 && targetTotal > 0) {
+          const factor = targetTotal / streamTotal;
+          return {
+            z1: Math.round(s1 * factor),
+            z2: Math.round(s2 * factor),
+            z3: Math.round(s3 * factor),
+            z4: Math.round(s4 * factor),
+            z5: Math.round(s5 * factor),
+            total: targetTotal,
+          };
+        }
+
+        return {
+          z1: s1,
+          z2: s2,
+          z3: s3,
+          z4: s4,
+          z5: s5,
+          total: streamTotal || 1,
+        };
+      }
+    }
+
+    const total = zones.totalZoneSeconds || 1;
+    return {
+      z1: zones.zone1Seconds,
+      z2: zones.zone2Seconds,
+      z3: zones.zone3Seconds,
+      z4: zones.zone4Seconds,
+      z5: zones.zone5Seconds,
+      total,
+    };
+  }, [stream, profile, customZones, zones]);
+
+  const totalCalculated = calculatedZoneSeconds.total || 1;
+
+  const zoneConfigs = profile.zones.map(pz => {
+    const zoneNum = pz.zoneIndex;
+    let seconds = 0;
+    if (zoneNum === 1) seconds = calculatedZoneSeconds.z1;
+    else if (zoneNum === 2) seconds = calculatedZoneSeconds.z2;
+    else if (zoneNum === 3) seconds = calculatedZoneSeconds.z3;
+    else if (zoneNum === 4) seconds = calculatedZoneSeconds.z4;
+    else if (zoneNum === 5) seconds = calculatedZoneSeconds.z5;
+
+    const percent = Math.round((seconds / totalCalculated) * 100);
+
+    let localizedName = '';
+    let roleDesc = '';
+    switch (zoneNum) {
+      case 1:
+        localizedName = isId ? 'ZONA 1 // PEMANASAN' : 'ZONE 1 // WARM UP';
+        roleDesc = isId ? 'Pemanasan & Pemulihan Aktif' : 'Warm-up & Recovery';
+        break;
+      case 2:
+        localizedName = isId ? 'ZONA 2 // LARI SANTAI' : 'ZONE 2 // EASY';
+        roleDesc = isId ? 'Membangun Fondasi Aerobik' : 'Aerobic Base Building';
+        break;
+      case 3:
+        localizedName = isId ? 'ZONA 3 // AEROBIK' : 'ZONE 3 // AEROBIC';
+        roleDesc = isId ? 'Tempo Aliran Kardiovaskular' : 'Cardiovascular Tempo Flow';
+        break;
+      case 4:
+        localizedName = isId ? 'ZONA 4 // AMBANG LAKTAT' : 'ZONE 4 // THRESHOLD';
+        roleDesc = isId ? 'Ketahanan Ambang Laktat' : 'Lactate Threshold Stamina';
+        break;
+      case 5:
+      default:
+        localizedName = isId ? 'ZONA 5 // MAKSIMUM' : 'ZONE 5 // MAXIMUM';
+        roleDesc = isId ? 'Kapasitas Puncak Anaerobik' : 'Anaerobic Peak Capacity';
+        break;
+    }
+
+    let desc = '';
+    if (profile.methodType === 'MANUAL_BPM') {
+      desc = `${pz.minBpm} – ${pz.maxBpm} BPM // ${roleDesc}`;
+    } else {
+      const methodAbbr = profile.methodType === 'MAX_HR' ? 'MAX HR' : profile.methodType;
+      desc = `${pz.minPercent}% – ${pz.maxPercent}% ${methodAbbr} (${pz.minBpm} – ${pz.maxBpm} BPM) // ${roleDesc}`;
+    }
+
+    let color = 'bg-slate-400';
+    let textColor = 'text-slate-600 dark:text-slate-300';
+    let border = 'border-slate-500/50';
+
+    if (zoneNum === 2) {
+      color = 'bg-emerald-500';
+      textColor = 'text-emerald-700 dark:text-emerald-400';
+      border = 'border-emerald-500/50';
+    } else if (zoneNum === 3) {
+      color = 'bg-cyan-500';
+      textColor = 'text-cyan-700 dark:text-cyan-400';
+      border = 'border-cyan-500/50';
+    } else if (zoneNum === 4) {
+      color = 'bg-amber-500';
+      textColor = 'text-amber-700 dark:text-amber-400';
+      border = 'border-amber-500/50';
+    } else if (zoneNum === 5) {
+      color = 'bg-rose-500';
+      textColor = 'text-rose-700 dark:text-rose-400';
+      border = 'border-rose-500/50';
+    }
+
+    return {
+      num: zoneNum,
+      name: localizedName,
+      desc,
+      seconds,
+      percent,
+      color,
+      textColor,
+      border,
+    };
+  });
 
   const formatTrainingEffect = (label?: string) => {
     if (!label) return isId ? 'STIMULUS AEROBIK' : 'AEROBIC STIMULUS';
@@ -131,18 +242,25 @@ export default function HeartRateZonesCard({
     return clean;
   };
 
+  const getMethodBadgeText = () => {
+    if (profile.methodType === 'MANUAL_BPM') {
+      return isId ? 'KALIBRASI_MANUAL_BPM' : 'MANUAL_BPM_CALIBRATION';
+    }
+    return isId ? `%KALIBRASI_${profile.methodType}` : `%${profile.methodType}_CALIBRATION`;
+  };
+
   return (
-    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-5 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] transition-colors">
+    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-4 sm:p-5 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] transition-colors w-full min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b-2 border-slate-200 dark:border-zinc-800 gap-2">
-        <div className="flex items-center gap-2">
-          <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
-          <h3 className="font-black italic tracking-widest uppercase text-sm text-slate-900 dark:text-white">
+        <div className="flex items-center gap-2 min-w-0">
+          <Heart className="w-4 h-4 text-rose-500 fill-rose-500 shrink-0" />
+          <h3 className="font-black italic tracking-widest uppercase text-xs sm:text-sm text-slate-900 dark:text-white truncate">
             {isId ? 'ZONA_DETAK_JANTUNG // DISTRIBUSI_INTENSITAS' : 'HEART_RATE_ZONES // INTENSITY_DISTRIBUTION'}
           </h3>
         </div>
-        <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-400">
-          {(deviceName || 'FORERUNNER 165').toUpperCase()} // {isId ? '%KALIBRASI_HRR' : '%HRR_CALIBRATION'}
+        <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-400 shrink-0">
+          {(deviceName || 'FORERUNNER 165').toUpperCase()} // {getMethodBadgeText()}
         </span>
       </div>
 
@@ -151,7 +269,7 @@ export default function HeartRateZonesCard({
         <div className="grid grid-cols-2 gap-3 mb-5 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-violet-800/40 font-mono">
           <div className="border-r border-slate-200 dark:border-zinc-800 pr-3">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-black uppercase text-cyan-700 dark:text-cyan-400 tracking-wider">
+              <span className="text-[9px] font-black uppercase text-cyan-700 dark:text-cyan-400 tracking-wider truncate">
                 {isId ? 'EFEK AEROBIK' : 'AEROBIC EFFECT'}
               </span>
               <span className="text-sm font-black text-slate-900 dark:text-white">
@@ -164,14 +282,14 @@ export default function HeartRateZonesCard({
                 className="bg-cyan-500 h-full"
               ></div>
             </div>
-            <span className="text-[9px] text-slate-500 dark:text-zinc-400 mt-1 block">
+            <span className="text-[9px] text-slate-500 dark:text-zinc-400 mt-1 block truncate">
               {formatTrainingEffect(trainingEffectLabel)}
             </span>
           </div>
 
           <div className="pl-1">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-black uppercase text-rose-700 dark:text-rose-400 tracking-wider">
+              <span className="text-[9px] font-black uppercase text-rose-700 dark:text-rose-400 tracking-wider truncate">
                 {isId ? 'EFEK ANAEROBIK' : 'ANAEROBIC EFFECT'}
               </span>
               <span className="text-sm font-black text-slate-900 dark:text-white">
@@ -184,7 +302,7 @@ export default function HeartRateZonesCard({
                 className="bg-rose-500 h-full"
               ></div>
             </div>
-            <span className="text-[9px] text-slate-500 dark:text-zinc-400 mt-1 block">
+            <span className="text-[9px] text-slate-500 dark:text-zinc-400 mt-1 block truncate">
               {isId ? 'MANFAAT KECEPATAN ANAEROBIK' : 'ANAEROBIC SPEED BENEFIT'}
             </span>
           </div>
@@ -197,10 +315,10 @@ export default function HeartRateZonesCard({
           <div key={z.num} className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 p-2.5">
             <div className="flex items-start justify-between gap-2 text-xs mb-1.5">
               <div className="min-w-0">
-                <span className={`font-black tracking-wider ${z.textColor}`}>
+                <span className={`font-black tracking-wider ${z.textColor} block text-xs`}>
                   {z.name}
                 </span>
-                <span className="text-[10px] text-slate-600 dark:text-zinc-400 block font-sans leading-tight mt-0.5">
+                <span className="text-[10px] text-slate-600 dark:text-zinc-400 block font-sans leading-tight mt-0.5 break-words">
                   {z.desc}
                 </span>
               </div>

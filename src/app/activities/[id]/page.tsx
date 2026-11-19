@@ -56,7 +56,7 @@ export default async function ActivityDetailPage({
   const athleteSettings = AthleteSettingsManager.getSettings();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-6 min-w-0">
       {/* 1. Hero Header */}
       <ActivityHeroHeader
         activity={activity}
@@ -98,6 +98,7 @@ export default async function ActivityDetailPage({
             restingHr={athleteSettings.restingHr}
             maxHr={athleteSettings.maxHr}
             deviceName={athleteSettings.deviceName}
+            stream={detail?.metricStream || []}
           />
         </div>
         <div>

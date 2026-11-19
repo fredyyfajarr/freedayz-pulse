@@ -161,7 +161,7 @@ export default function FreedayzzPerformanceLab({
   }, [activity.relativeEffortScore, isId]);
 
   return (
-    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-5 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] space-y-4 font-mono transition-colors">
+    <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-4 sm:p-5 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] space-y-4 font-mono transition-colors w-full min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 dark:border-zinc-800 gap-2">
         <div className="flex items-center gap-2">
@@ -173,7 +173,7 @@ export default function FreedayzzPerformanceLab({
                 {isId ? 'MESIN_TELEMETRI' : 'TELEMETRY_ENGINE'}
               </span>
             </h3>
-            <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5">
+            <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5 break-words">
               {isId ? 'EKSEKUSI PACE, GRADE ADJUSTED PACE & ANALISIS KOPEL JANTUNG' : 'PACING EXECUTION, GRADE ADJUSTED PACE & CARDIAC COUPLING ANALYSIS'}
             </p>
           </div>

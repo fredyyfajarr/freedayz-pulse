@@ -10,7 +10,7 @@ export type { AthleteBiometricSettings, CustomHRZoneThresholds };
 export { DEFAULT_CUSTOM_ZONES };
 
 const DEFAULT_SETTINGS: AthleteBiometricSettings = {
-  maxHr: 200,
+  maxHr: 201,
   restingHr: 51,
   dailySleepScores: {
     '2026-10-26': 67,

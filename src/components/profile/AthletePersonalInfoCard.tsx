@@ -74,24 +74,41 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
   const handleOpenModal = () => {
     const stored = HRProfileCalculator.getStoredSettings();
     const copy = JSON.parse(JSON.stringify(stored));
-    if (copy.manualZoneBpms && copy.maxHr) {
-      copy.manualZoneBpms = copy.manualZoneBpms.map((z: any) => 
-        z.idx === 5 ? { ...z, maxBpm: copy.maxHr } : z
-      );
+    const currentMax = copy.maxHr || 201;
+    const currentLthr = copy.lthr || 177;
+
+    if (!copy.hrrPercentages) {
+      copy.hrrPercentages = HRProfileCalculator.DEFAULT_HRR_ZONES.map((z: any) => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
     }
-    // Auto-fix if LTHR had inherited HRR's 50%
-    if (copy.method === 'LTHR' && (!copy.lthrPercentages || copy.zonePercentages?.[0]?.minP === 50)) {
-      const lthrMaxP = Math.round(((copy.maxHr || 201) / (copy.lthr || 177)) * 100);
-      copy.zonePercentages = HRProfileCalculator.DEFAULT_LTHR_ZONES.map((z: any) => ({
+    if (!copy.maxHrPercentages) {
+      copy.maxHrPercentages = HRProfileCalculator.DEFAULT_MAXHR_ZONES.map((z: any) => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+    }
+    if (!copy.lthrPercentages || copy.lthrPercentages?.[0]?.minP === 50) {
+      const lthrMaxP = Math.round((currentMax / currentLthr) * 100);
+      copy.lthrPercentages = HRProfileCalculator.DEFAULT_LTHR_ZONES.map((z: any) => ({
         idx: z.idx,
         minP: z.minP,
         maxP: z.idx === 5 ? Math.max(106, lthrMaxP) : z.maxP,
       }));
-    } else if (copy.method === 'MAX_HR' && (!copy.maxHrPercentages || copy.zonePercentages?.[0]?.maxP === 62.5)) {
-      copy.zonePercentages = HRProfileCalculator.DEFAULT_MAXHR_ZONES.map((z: any) => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
-    } else if (copy.method === 'HRR' && (!copy.hrrPercentages || !copy.zonePercentages)) {
-      copy.zonePercentages = HRProfileCalculator.DEFAULT_HRR_ZONES.map((z: any) => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
     }
+    if (!copy.manualZoneBpms) {
+      copy.manualZoneBpms = HRProfileCalculator.DEFAULT_MAXHR_ZONES.map((z: any) => ({
+        idx: z.idx,
+        minBpm: Math.round(currentMax * (z.minP / 100)),
+        maxBpm: z.idx === 5 ? currentMax : Math.round(currentMax * (z.maxP / 100)),
+      }));
+    }
+
+    if (copy.method === 'LTHR') {
+      copy.zonePercentages = copy.lthrPercentages;
+    } else if (copy.method === 'MAX_HR') {
+      copy.zonePercentages = copy.maxHrPercentages;
+    } else if (copy.method === 'HRR') {
+      copy.zonePercentages = copy.hrrPercentages;
+    }
+
+    copy.manualZoneBpms = copy.manualZoneBpms.map((z: any) => (z.idx === 5 ? { ...z, maxBpm: currentMax } : z));
+
     setDraftSettings(copy);
     setDraftDeviceName(deviceName);
     setIsEditing(true);
@@ -99,27 +116,37 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
 
   const handleSelectMethod = (m: HRMethod) => {
     setDraftSettings(prev => {
+      const currentMax = prev.maxHr || 201;
+      const currentLthr = prev.lthr || 177;
       const copy: CustomHRSettings = { ...prev, method: m };
+
       if (m === 'MAX_HR') {
-        copy.zonePercentages = prev.maxHrPercentages || HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+        const pcts = prev.maxHrPercentages || HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+        copy.maxHrPercentages = pcts;
+        copy.zonePercentages = pcts;
       } else if (m === 'LTHR') {
-        const lthrMaxP = Math.round(((prev.maxHr || 201) / (prev.lthr || 177)) * 100);
-        copy.zonePercentages = prev.lthrPercentages || HRProfileCalculator.DEFAULT_LTHR_ZONES.map(z => ({ 
-          idx: z.idx, 
-          minP: z.minP, 
-          maxP: z.idx === 5 ? Math.max(106, lthrMaxP) : z.maxP 
-        }));
+        const lthrMaxP = Math.round((currentMax / currentLthr) * 100);
+        const pcts = (prev.lthrPercentages && prev.lthrPercentages[0]?.minP >= 60)
+          ? prev.lthrPercentages
+          : HRProfileCalculator.DEFAULT_LTHR_ZONES.map(z => ({ 
+              idx: z.idx, 
+              minP: z.minP, 
+              maxP: z.idx === 5 ? Math.max(106, lthrMaxP) : z.maxP 
+            }));
+        copy.lthrPercentages = pcts;
+        copy.zonePercentages = pcts;
       } else if (m === 'HRR') {
-        copy.zonePercentages = prev.hrrPercentages || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+        const pcts = prev.hrrPercentages || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+        copy.hrrPercentages = pcts;
+        copy.zonePercentages = pcts;
       } else if (m === 'MANUAL_BPM') {
-        const currentMax = copy.maxHr || 201;
         const defaultFromMaxHr = HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({
           idx: z.idx,
           minBpm: Math.round(currentMax * (z.minP / 100)),
           maxBpm: z.idx === 5 ? currentMax : Math.round(currentMax * (z.maxP / 100)),
         }));
-        const currentManual = copy.manualZoneBpms && copy.manualZoneBpms.length > 0
-          ? copy.manualZoneBpms.map(z => (z.idx === 5 ? { ...z, maxBpm: currentMax } : z))
+        const currentManual = prev.manualZoneBpms && prev.manualZoneBpms.length > 0
+          ? prev.manualZoneBpms.map(z => (z.idx === 5 ? { ...z, maxBpm: currentMax } : z))
           : defaultFromMaxHr;
         copy.manualZoneBpms = currentManual;
       }
@@ -130,13 +157,13 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
   const handleUpdatePercentage = (idx: number, field: 'minP' | 'maxP', val: number) => {
     setDraftSettings(prev => {
       const currentMethod = prev.method;
-      const defaultPcts = currentMethod === 'MAX_HR'
-        ? HRProfileCalculator.DEFAULT_MAXHR_ZONES
-        : currentMethod === 'LTHR'
-        ? HRProfileCalculator.DEFAULT_LTHR_ZONES
-        : HRProfileCalculator.DEFAULT_HRR_ZONES;
+      const activePcts = currentMethod === 'LTHR'
+        ? (prev.lthrPercentages || HRProfileCalculator.DEFAULT_LTHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })))
+        : currentMethod === 'MAX_HR'
+        ? (prev.maxHrPercentages || HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })))
+        : (prev.hrrPercentages || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })));
 
-      const pcts = [...(prev.zonePercentages || defaultPcts.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })))];
+      const pcts = [...activePcts];
       const targetIdx = pcts.findIndex(p => p.idx === idx);
       if (targetIdx !== -1) {
         pcts[targetIdx] = { ...pcts[targetIdx], [field]: val };
@@ -152,11 +179,11 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
 
   const handleUpdateManualBpm = (idx: number, field: 'minBpm' | 'maxBpm', val: number) => {
     setDraftSettings(prev => {
-      const currentMax = (idx === 5 && field === 'maxBpm') ? val : prev.maxHr;
-      const bpms = [...(prev.manualZoneBpms || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ 
+      const currentMax = (idx === 5 && field === 'maxBpm') ? val : (prev.maxHr || 201);
+      const bpms = [...(prev.manualZoneBpms || HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ 
         idx: z.idx, 
-        minBpm: z.minBpm, 
-        maxBpm: z.idx === 5 ? prev.maxHr : z.maxBpm 
+        minBpm: Math.round(currentMax * (z.minP / 100)), 
+        maxBpm: z.idx === 5 ? currentMax : Math.round(currentMax * (z.maxP / 100)) 
       })))];
       const targetIdx = bpms.findIndex(b => b.idx === idx);
       if (targetIdx !== -1) {
@@ -566,7 +593,12 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                   <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
                     {[1, 2, 3, 4, 5].map(idx => {
                       const previewZone = previewProfile.zones.find(z => z.zoneIndex === idx);
-                      const userPct = draftSettings.zonePercentages?.find(p => p.idx === idx);
+                      const activePcts = draftSettings.method === 'LTHR'
+                        ? (draftSettings.lthrPercentages || draftSettings.zonePercentages)
+                        : draftSettings.method === 'MAX_HR'
+                        ? (draftSettings.maxHrPercentages || draftSettings.zonePercentages)
+                        : (draftSettings.hrrPercentages || draftSettings.zonePercentages);
+                      const userPct = activePcts?.find(p => p.idx === idx);
                       const userManual = draftSettings.manualZoneBpms?.find(m => m.idx === idx);
 
                       return (
@@ -601,8 +633,19 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                                     type="number"
                                     min="30"
                                     max="230"
-                                    value={idx === 5 ? draftSettings.maxHr : (userManual?.maxBpm ?? previewZone?.maxBpm)}
-                                    onChange={e => handleUpdateManualBpm(idx, 'maxBpm', Number(e.target.value))}
+                                    value={idx === 5 ? (draftSettings.maxHr || 201) : (userManual?.maxBpm ?? previewZone?.maxBpm)}
+                                    onChange={e => {
+                                      const val = Number(e.target.value);
+                                      if (idx === 5) {
+                                        setDraftSettings(prev => ({
+                                          ...prev,
+                                          maxHr: val,
+                                          manualZoneBpms: (prev.manualZoneBpms || []).map(m => m.idx === 5 ? { ...m, maxBpm: val } : m)
+                                        }));
+                                      } else {
+                                        handleUpdateManualBpm(idx, 'maxBpm', val);
+                                      }
+                                    }}
                                     className="w-16 sm:w-20 h-8 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 font-mono font-black text-center text-xs focus:border-cyan-500 outline-none"
                                   />
                                   <span className="w-9 text-left text-[11px] text-slate-500 dark:text-zinc-400 font-bold">BPM</span>
@@ -637,7 +680,7 @@ export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, in
                           {/* Column 3: Resulting BPM */}
                           <td className="py-2.5 px-3.5 text-right whitespace-nowrap">
                             <span className="font-black text-xs text-cyan-600 dark:text-cyan-400 tabular-nums">
-                              {previewZone?.minBpm} – {previewZone?.maxBpm}
+                              {previewZone?.minBpm} – {idx === 5 ? (draftSettings.maxHr || 201) : previewZone?.maxBpm}
                             </span>
                             <span className="text-[10px] text-slate-400 dark:text-zinc-500 ml-1 font-normal">BPM</span>
                           </td>

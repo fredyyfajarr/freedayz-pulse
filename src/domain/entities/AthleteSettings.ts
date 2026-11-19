@@ -21,7 +21,7 @@ export const DEFAULT_CUSTOM_ZONES: CustomHRZoneThresholds = {
   zone4Min: 177,
   zone4Max: 188,
   zone5Min: 189,
-  zone5Max: 200,
+  zone5Max: 201,
 };
 
 export interface AthleteBiometricSettings {
