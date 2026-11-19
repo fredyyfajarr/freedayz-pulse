@@ -128,14 +128,14 @@ export default function AthleteCoachTasksWidget({ athleteName = 'Fredy Fajar' }:
         </div>
       </div>
 
-      {/* 2. Commercial Benefits Banner (RAB Transparency) */}
+      {/* 2. Program Benefits Banner */}
       <div className="p-3 bg-gradient-to-r from-cyan-50/60 to-violet-50/60 dark:from-cyan-950/20 dark:to-violet-950/20 border border-cyan-300 dark:border-cyan-800 text-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-slate-700 dark:text-zinc-300">
           <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
           <span>
             {isId 
-              ? 'Fasilitas aktif dari RAB Tim: Akses Lintasan Lari Stadion Sintetis • Uji Fisiologis Laktat • Sesi Fisioterapi & Ice Bath Bulanan'
-              : 'Active Squad Facilities: Synthetic Athletic Track Access • Lactate Testing • Monthly Physiotherapy & Ice Bath'}
+              ? 'Program Pembinaan Aktif: Akses Lintasan Lari Stadion • Pemantauan Telemetri Mingguan • Pendampingan Long Run Tim'
+              : 'Active Squad Program: Synthetic Track Access • Weekly Telemetry Monitoring • Group Long Run Support'}
           </span>
         </div>
         <div className="flex items-center gap-2 font-bold text-[11px]">

@@ -25,12 +25,6 @@ import {
   ChevronRight,
   Flame,
   ArrowRight,
-  DollarSign,
-  Calculator,
-  FileText,
-  PieChart,
-  Receipt,
-  Wallet,
   CheckCircle2,
   Clock,
   ClipboardList,
@@ -39,10 +33,7 @@ import {
 import { useLanguage } from '@/context/LanguageContext';
 import { 
   CoachTask, 
-  RABItem, 
   CoachingPackage, 
-  CommercialFinancialSummary,
-  RABCategory,
   TaskType 
 } from '@/domain/entities/CoachingRelationship';
 import { CoachingStorage } from '@/utils/coachingStorage';
@@ -157,17 +148,17 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const tabFromQuery = searchParams.get('tab') as 'roster' | 'plans' | 'acwr' | 'directives' | 'rab' | null;
+  const tabFromQuery = searchParams.get('tab') as 'roster' | 'plans' | 'acwr' | 'directives' | null;
 
-  const [activeTab, setActiveTab] = useState<'roster' | 'plans' | 'acwr' | 'directives' | 'rab'>('roster');
+  const [activeTab, setActiveTab] = useState<'roster' | 'plans' | 'acwr' | 'directives'>('roster');
 
   useEffect(() => {
-    if (tabFromQuery && ['roster', 'plans', 'acwr', 'directives', 'rab'].includes(tabFromQuery)) {
+    if (tabFromQuery && ['roster', 'plans', 'acwr', 'directives'].includes(tabFromQuery)) {
       setActiveTab(tabFromQuery);
     }
   }, [tabFromQuery]);
 
-  const switchTab = (tab: 'roster' | 'plans' | 'acwr' | 'directives' | 'rab') => {
+  const switchTab = (tab: 'roster' | 'plans' | 'acwr' | 'directives') => {
     setActiveTab(tab);
     router.replace(`/dashboard?tab=${tab}`, { scroll: false });
   };
@@ -196,41 +187,24 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
   const [taskToReview, setTaskToReview] = useState<CoachTask | null>(null);
   const [reviewNoteInput, setReviewNoteInput] = useState('');
 
-  // --- COMMERCIAL RAB STATE ---
-  const [rabItems, setRabItems] = useState<RABItem[]>([]);
   const [packages, setPackages] = useState<CoachingPackage[]>([]);
-  const [rabCategoryFilter, setRabCategoryFilter] = useState<'ALL' | RABCategory>('ALL');
-  const [showAddRABModal, setShowAddRABModal] = useState(false);
-  const [newRabCategory, setNewRabCategory] = useState<RABCategory>('VENUE_TRACK');
-  const [newRabName, setNewRabName] = useState('');
-  const [newRabVolume, setNewRabVolume] = useState(1);
-  const [newRabUnit, setNewRabUnit] = useState('Sesi');
-  const [newRabUnitPrice, setNewRabUnitPrice] = useState(500000);
-  const [newRabStatus, setNewRabStatus] = useState<'PLANNED' | 'COMMITTED' | 'PAID'>('COMMITTED');
-  const [newRabNotes, setNewRabNotes] = useState('');
 
   // Sync data on load and on custom events
   useEffect(() => {
     const loadData = () => {
       setTasks(CoachingStorage.getTasks());
-      setRabItems(CoachingStorage.getRABItems());
       setPackages(CoachingStorage.getCoachingPackages());
     };
     loadData();
 
     const handleTaskUpdate = () => setTasks(CoachingStorage.getTasks());
-    const handleRabUpdate = () => setRabItems(CoachingStorage.getRABItems());
 
     window.addEventListener('coaching_task_updated', handleTaskUpdate);
-    window.addEventListener('coaching_rab_updated', handleRabUpdate);
 
     return () => {
       window.removeEventListener('coaching_task_updated', handleTaskUpdate);
-      window.removeEventListener('coaching_rab_updated', handleRabUpdate);
     };
   }, []);
-
-  const financialSummary: CommercialFinancialSummary = CoachingStorage.calculateFinancialSummary(rabItems, packages);
 
   // Invite Modal State
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -366,38 +340,11 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
     setTasks(CoachingStorage.getTasks());
   };
 
-  // Handler for Adding RAB item
-  const handleAddRABItem = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newRabName) return;
-
-    CoachingStorage.addRABItem({
-      category: newRabCategory,
-      name: newRabName,
-      volume: Number(newRabVolume),
-      unit: newRabUnit,
-      unitPriceIdr: Number(newRabUnitPrice),
-      realizationStatus: newRabStatus,
-      notes: newRabNotes || 'Pos operasional resmi tim lari',
-    });
-
-    setShowAddRABModal(false);
-    setNewRabName('');
-    setNewRabNotes('');
-    setRabItems(CoachingStorage.getRABItems());
-  };
-
   // Filtered Tasks
   const filteredTasks = tasks.filter(t => {
     if (taskStatusFilter === 'PENDING') return t.status === 'PENDING';
     if (taskStatusFilter === 'COMPLETED') return t.status === 'COMPLETED';
     return true;
-  });
-
-  // Filtered RAB items
-  const filteredRABItems = rabItems.filter(item => {
-    if (rabCategoryFilter === 'ALL') return true;
-    return item.category === rabCategoryFilter;
   });
 
   const totalRegisteredAthletes = packages.reduce((acc, p) => acc + p.activeAthletesCount, 0);
@@ -423,8 +370,8 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
             </h1>
             <p className="text-xs text-slate-600 dark:text-zinc-300 font-sans mt-0.5 max-w-2xl leading-relaxed">
               {isId 
-                ? 'Pusat manajemen skuad lari, penugasan sesi latihan atlet, evaluasi kepatuhan RPE, pemantauan ACWR, dan RAB operasional komersial.'
-                : 'Central running squad management hub, athlete workout assignment, RPE feedback tracking, and commercial squad budgeting.'}
+                ? 'Pusat manajemen skuad lari, penugasan sesi latihan atlet, evaluasi kepatuhan RPE, dan pemantauan beban latihan ACWR.'
+                : 'Central running squad management hub, athlete workout assignment, RPE feedback tracking, and ACWR training load monitoring.'}
             </p>
           </div>
 
@@ -498,15 +445,15 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
 
           <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-cyan-900/60 p-3.5 shadow-xs">
             <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
-              {isId ? 'TOTAL ANGGARAN RAB (16 MGG)' : 'RAB OPERATIONAL BUDGET'}
+              {isId ? 'STATUS KESIAPAN BEBAN SKUAD' : 'SQUAD LOAD STATUS'}
             </span>
             <div className="flex items-baseline gap-1.5 mt-1">
               <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                Rp {(financialSummary.totalRabBudget / 1000000).toFixed(1)}M
+                OPTIMAL
               </span>
             </div>
             <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-              {financialSummary.netMarginPercentage}% {isId ? 'Net Surplus Margin' : 'Net Margin'}
+              {isId ? 'ACWR Rata-rata 1.05 (Zona Manis)' : 'Avg ACWR 1.05 (Sweet Spot)'}
             </span>
           </div>
 
@@ -542,22 +489,6 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
           <span>{isId ? 'PENUGASAN & ROSTER ATLET' : 'TASKS & SQUAD ROSTER'}</span>
           <span className="px-1.5 py-0.2 bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-300 border border-cyan-400 text-[9px] font-black">
             {tasks.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => switchTab('rab')}
-          className={`px-4 py-2.5 font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'rab'
-              ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20'
-              : 'border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
-          }`}
-        >
-          <DollarSign className="w-4 h-4" />
-          <span>{isId ? 'RAB & KOMERSIAL SQUAD' : 'RAB & SQUAD BUDGET'}</span>
-          <span className="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-400 text-[9px] font-black">
-            RAB
           </span>
         </button>
 
@@ -1032,287 +963,6 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
               </div>
             </div>
           )}
-        </div>
-      )}
-
-      {/* TAB 5: RENCANA ANGGARAN BIAYA (RAB) & STRUKTUR KOMERSIAL SQUAD */}
-      {activeTab === 'rab' && (
-        <div className="space-y-6">
-          {/* Header Card */}
-          <div className="bg-white dark:bg-[#0d1224] border-2 border-emerald-500/80 p-5 shadow-[4px_4px_0px_#10b981] space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-emerald-900/60">
-              <div>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <span className="text-[10px] font-black px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 text-emerald-800 dark:text-emerald-300 uppercase tracking-widest">
-                    FINANSIAL_KLUB // COMMERCIAL_BUDGET
-                  </span>
-                </div>
-                <h2 className="text-lg sm:text-xl font-black italic tracking-wide uppercase mt-1.5 text-slate-900 dark:text-white">
-                  {isId ? 'RENCANA ANGGARAN BIAYA (RAB) OPERASIONAL SQUAD & PAKET KOMERSIAL' : 'SQUAD COMMERCIAL BUDGET (RAB) & PRICING MATRIX'}
-                </h2>
-                <p className="text-xs text-slate-600 dark:text-zinc-300 font-sans mt-0.5">
-                  {isId 
-                    ? 'Manajemen pos pengeluaran latihan (lintasan track, uji lab laktat, fisioterapi, logistik lomba) dan proyeksi penerimaan paket iuran pembinaan atlet.'
-                    : 'Manage operational expenditure (track venue, lactate tests, physiotherapy, race logistics) and projected athlete fee revenues.'}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowAddRABModal(true)}
-                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#059669] cursor-pointer shrink-0"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{isId ? '+ TAMBAH POS BIAYA' : '+ ADD BUDGET ITEM'}</span>
-              </button>
-            </div>
-
-            {/* 4 Financial Summary KPI Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-              <div className="p-3.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 shadow-xs">
-                <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
-                  TOTAL ANGGARAN RAB (PENGELUARAN)
-                </span>
-                <span className="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-400 block mt-1">
-                  Rp {financialSummary.totalRabBudget.toLocaleString('id-ID')}
-                </span>
-                <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-                  Operasional 16 Minggu (4 Bulan)
-                </span>
-              </div>
-
-              <div className="p-3.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 shadow-xs">
-                <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
-                  PROYEKSI PENDAPATAN IURAN ATLET
-                </span>
-                <span className="text-lg sm:text-xl font-black text-cyan-600 dark:text-cyan-400 block mt-1">
-                  Rp {financialSummary.totalProjectedRevenue.toLocaleString('id-ID')}
-                </span>
-                <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-                  Dari {totalRegisteredAthletes} Atlet Binaan Terdaftar
-                </span>
-              </div>
-
-              <div className="p-3.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 shadow-xs">
-                <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
-                  NET SURPLUS / MARGIN OPERASIONAL
-                </span>
-                <span className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400 block mt-1">
-                  +Rp {financialSummary.netMarginIdr.toLocaleString('id-ID')}
-                </span>
-                <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5">
-                  Margin Sehat: +{financialSummary.netMarginPercentage}%
-                </span>
-              </div>
-
-              <div className="p-3.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 shadow-xs">
-                <span className="text-[10px] text-slate-500 dark:text-zinc-400 block uppercase font-bold">
-                  REALISASI ANGGARAN (TERBAYAR)
-                </span>
-                <span className="text-lg sm:text-xl font-black text-violet-600 dark:text-violet-400 block mt-1">
-                  Rp {financialSummary.realizedExpenseIdr.toLocaleString('id-ID')}
-                </span>
-                <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-                  Telah Terealisasi: {financialSummary.budgetUtilizationPercentage}%
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Coaching Packages Commercial Matrix */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-black uppercase text-slate-700 dark:text-zinc-400 tracking-wider flex items-center gap-2">
-              <Award className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-              <span>STRUKTUR PAKET PEMBINAAN ATLET (COMMERCIAL PACKAGES)</span>
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {packages.map((pkg) => (
-                <div
-                  key={pkg.id}
-                  className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-3 relative hover:border-violet-500 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <span className="text-[9px] font-black px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 text-violet-800 dark:text-violet-300 uppercase">
-                        {pkg.targetCategory} TARGET
-                      </span>
-                      <h4 className="font-black text-sm text-slate-900 dark:text-white mt-1.5">
-                        {pkg.name}
-                      </h4>
-                    </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300">
-                      {pkg.activeAthletesCount} Atlet
-                    </span>
-                  </div>
-
-                  <div className="p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800">
-                    <span className="text-[10px] text-slate-500 dark:text-zinc-500 block uppercase font-bold">
-                      BIAYA IURAN PEMBINAAN
-                    </span>
-                    <span className="text-lg font-black text-cyan-600 dark:text-cyan-400">
-                      Rp {pkg.monthlyFeeIdr.toLocaleString('id-ID')}
-                    </span>
-                    <span className="text-[10px] text-slate-400 dark:text-zinc-500 font-sans"> / bulan</span>
-                  </div>
-
-                  <div className="space-y-1.5 pt-1">
-                    <span className="text-[10px] font-bold text-slate-600 dark:text-zinc-400 uppercase block">
-                      Benefit & Fasilitas RAB Tim:
-                    </span>
-                    <ul className="text-[11px] font-sans text-slate-600 dark:text-zinc-300 space-y-1">
-                      {pkg.benefits.map((b, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5">
-                          <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                          <span>{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Interactive RAB Items Table */}
-          <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-zinc-800 p-5 shadow-sm space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white tracking-wide flex items-center gap-2">
-                  <Receipt className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <span>RINCIAN ANGGARAN BIAYA OPERASIONAL (RAB SQUAD)</span>
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-0.5">
-                  Daftar komitmen pembiayaan logistik, sewa lintasan lari, tes laktat, dan tenaga medis.
-                </p>
-              </div>
-
-              {/* Category Filter Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
-                <button
-                  type="button"
-                  onClick={() => setRabCategoryFilter('ALL')}
-                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
-                    rabCategoryFilter === 'ALL'
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
-                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
-                  }`}
-                >
-                  Semua ({rabItems.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRabCategoryFilter('VENUE_TRACK')}
-                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
-                    rabCategoryFilter === 'VENUE_TRACK'
-                      ? 'bg-cyan-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
-                  }`}
-                >
-                  Track Venue
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRabCategoryFilter('PHYSIOLOGY_LAB')}
-                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
-                    rabCategoryFilter === 'PHYSIOLOGY_LAB'
-                      ? 'bg-violet-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
-                  }`}
-                >
-                  Lab Laktat
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRabCategoryFilter('MEDICAL_RECOVERY')}
-                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
-                    rabCategoryFilter === 'MEDICAL_RECOVERY'
-                      ? 'bg-rose-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
-                  }`}
-                >
-                  Fisioterapi
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRabCategoryFilter('LOGISTICS_NUTRITION')}
-                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
-                    rabCategoryFilter === 'LOGISTICS_NUTRITION'
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
-                  }`}
-                >
-                  Logistik
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRabCategoryFilter('COACHING_SERVICES')}
-                  className={`px-2.5 py-1 font-bold uppercase transition-colors cursor-pointer ${
-                    rabCategoryFilter === 'COACHING_SERVICES'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-zinc-400'
-                  }`}
-                >
-                  Honor Pelatih
-                </button>
-              </div>
-            </div>
-
-            {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border border-slate-200 dark:border-zinc-800">
-                <thead className="bg-slate-100 dark:bg-[#070a14] border-b border-slate-200 dark:border-zinc-800 text-[10px] uppercase font-black text-slate-600 dark:text-zinc-400">
-                  <tr>
-                    <th className="p-3">Pos Pengeluaran</th>
-                    <th className="p-3">Kategori</th>
-                    <th className="p-3">Volume</th>
-                    <th className="p-3">Harga Satuan</th>
-                    <th className="p-3">Total Biaya</th>
-                    <th className="p-3">Status Realisasi</th>
-                    <th className="p-3">Catatan / SOP</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-zinc-800">
-                  {filteredRABItems.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-cyan-950/20 transition-colors">
-                      <td className="p-3 font-bold text-slate-900 dark:text-white">
-                        {item.name}
-                      </td>
-                      <td className="p-3">
-                        <span className="text-[9px] px-1.5 py-0.2 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-bold uppercase">
-                          {item.category.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td className="p-3 font-mono text-slate-700 dark:text-zinc-300">
-                        {item.volume} {item.unit}
-                      </td>
-                      <td className="p-3 font-mono text-slate-600 dark:text-zinc-400">
-                        Rp {item.unitPriceIdr.toLocaleString('id-ID')}
-                      </td>
-                      <td className="p-3 font-mono font-black text-slate-900 dark:text-white">
-                        Rp {item.totalPriceIdr.toLocaleString('id-ID')}
-                      </td>
-                      <td className="p-3">
-                        <span className={`text-[9px] font-black px-2 py-0.5 uppercase ${
-                          item.realizationStatus === 'PAID'
-                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-400'
-                            : item.realizationStatus === 'COMMITTED'
-                            ? 'bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 border border-cyan-400'
-                            : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-400'
-                        }`}>
-                          {item.realizationStatus}
-                        </span>
-                      </td>
-                      <td className="p-3 text-[11px] font-sans text-slate-500 dark:text-zinc-400 max-w-xs">
-                        {item.notes}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
       )}
 
@@ -1825,151 +1475,6 @@ export default function CoachDashboard({ coachName, coachEmail, userId }: Props)
                   className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-black uppercase transition-colors cursor-pointer shadow-sm"
                 >
                   Kirim Evaluasi ke Atlet
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: ADD RAB BUDGET ITEM */}
-      {showAddRABModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0d1224] border-2 border-emerald-500 p-6 max-w-lg w-full shadow-[6px_6px_0px_#10b981] text-slate-900 dark:text-white space-y-4 font-mono">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-emerald-900">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                <h3 className="font-black uppercase text-sm tracking-wide">
-                  TAMBAH POS ANGGARAN BIAYA (RAB)
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowAddRABModal(false)}
-                className="text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-white text-sm cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleAddRABItem} className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
-                  Kategori Pengeluaran
-                </label>
-                <select
-                  value={newRabCategory}
-                  onChange={(e) => setNewRabCategory(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
-                >
-                  <option value="VENUE_TRACK">Fasilitas & Lintasan Track</option>
-                  <option value="PHYSIOLOGY_LAB">Fisiologis & Uji Lab Laktat</option>
-                  <option value="MEDICAL_RECOVERY">Medis & Fisioterapi</option>
-                  <option value="LOGISTICS_NUTRITION">Logistik & Suplemen</option>
-                  <option value="COACHING_SERVICES">Jasa Kepelatihan & Pacer</option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
-                  Nama Pos Pengeluaran
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newRabName}
-                  onChange={(e) => setNewRabName(e.target.value)}
-                  placeholder="misal: Tes Spirometri VO2Max Lab Kuartal II"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
-                    Volume
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    required
-                    value={newRabVolume}
-                    onChange={(e) => setNewRabVolume(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
-                    Satuan
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={newRabUnit}
-                    onChange={(e) => setNewRabUnit(e.target.value)}
-                    placeholder="Sesi / Bulan / Atlet"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
-                    Status Realisasi
-                  </label>
-                  <select
-                    value={newRabStatus}
-                    onChange={(e) => setNewRabStatus(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
-                  >
-                    <option value="COMMITTED">COMMITTED</option>
-                    <option value="PAID">PAID</option>
-                    <option value="PLANNED">PLANNED</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
-                  Biaya Satuan (Rp)
-                </label>
-                <input
-                  type="number"
-                  step="10000"
-                  min="0"
-                  required
-                  value={newRabUnitPrice}
-                  onChange={(e) => setNewRabUnitPrice(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase">
-                  Catatan SOP & Keterangan Pengeluaran
-                </label>
-                <textarea
-                  rows={2}
-                  value={newRabNotes}
-                  onChange={(e) => setNewRabNotes(e.target.value)}
-                  placeholder="Keterangan alokasi, vendor penyedia, atau kriteria pemanfaatan..."
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-700 text-xs font-mono focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white resize-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-zinc-800">
-                <button
-                  type="button"
-                  onClick={() => setShowAddRABModal(false)}
-                  className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 text-xs uppercase font-bold cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase transition-colors cursor-pointer shadow-sm"
-                >
-                  Simpan ke RAB Tim
                 </button>
               </div>
             </form>
