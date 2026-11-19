@@ -152,51 +152,122 @@ export default function RunningDynamicsCard({ dynamics, avgCadence, maxCadence, 
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs pt-2">
-              <div className="space-y-1">
-                <div className="flex justify-between text-[10px] text-slate-500 dark:text-zinc-400">
-                  <span>{isId ? 'RASIO VERTIKAL (PANTULAN-KE-DORONGAN):' : 'VERTICAL RATIO (BOUNCE-TO-PROPULSION):'}</span>
-                  <strong className="text-slate-900 dark:text-white">{dynamics.avgVerticalRatioPercent}%</strong>
-                </div>
-                <div className="h-1.5 w-full bg-slate-200 dark:bg-zinc-800 overflow-hidden flex">
-                  <div className="h-full bg-indigo-500" style={{ width: '25%' }} title="Purple (Elite < 6.1%)" />
-                  <div className="h-full bg-blue-500" style={{ width: '25%' }} title="Blue (Excellent 6.1-7.4%)" />
-                  <div className="h-full bg-emerald-500" style={{ width: '25%' }} title="Green (Good 7.5-8.6%)" />
-                  <div className="h-full bg-amber-500" style={{ width: '25%' }} title="Orange/Red (> 8.6%)" />
-                </div>
-                <p className="text-[10px] text-slate-600 dark:text-zinc-500 font-sans">
-                  {dynamics.avgVerticalRatioPercent <= 8.6
-                    ? (isId 
-                        ? 'Efisiensi dorongan sangat baik: energi diarahkan maju ke depan alih-alih terbuang percuma dalam pantulan vertikal.' 
-                        : 'Excellent propulsion efficiency: energy is directed forward rather than lost in wasted vertical bounce.')
-                    : (isId 
-                        ? 'Pantulan ke atas cukup tinggi. Menaikkan kadensi sedikit (175–180 SPM) akan memperhalus osilasi vertikal.' 
-                        : 'Noticeable upward bounce detected. Increasing cadence slightly (175–180 SPM) will smooth out vertical oscillation.')}
-                </p>
-              </div>
+            {/* Benchmark Bars with Intuitive Layman-Friendly Legends */}
+            {(() => {
+              const vr = dynamics.avgVerticalRatioPercent || 0;
+              const vrTier = vr < 6.1 ? 1 : vr <= 7.4 ? 2 : vr <= 8.6 ? 3 : 4;
 
-              <div className="space-y-1">
-                <div className="flex justify-between text-[10px] text-slate-500 dark:text-zinc-400">
-                  <span>{isId ? 'WAKTU KONTAK TANAH (FASE PIJAKAN):' : 'GROUND CONTACT TIME (STANCE PHASE):'}</span>
-                  <strong className="text-slate-900 dark:text-white">{dynamics.avgGroundContactTimeMs} ms</strong>
+              const gct = dynamics.avgGroundContactTimeMs || 0;
+              const gctTier = gct < 208 ? 1 : gct <= 240 ? 2 : gct <= 272 ? 3 : 4;
+
+              return (
+                <div className="space-y-3 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    {/* Vertical Ratio */}
+                    <div className="space-y-1.5 p-3 bg-white dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800">
+                      <div className="flex justify-between text-[11px] text-slate-700 dark:text-zinc-300">
+                        <span className="font-bold">{isId ? 'RASIO VERTIKAL (PANTULAN):' : 'VERTICAL RATIO (BOUNCE):'}</span>
+                        <strong className="text-cyan-600 dark:text-cyan-400 font-mono text-xs">{vr}%</strong>
+                      </div>
+
+                      {/* Bar */}
+                      <div className="h-2 w-full bg-slate-200 dark:bg-zinc-800 overflow-hidden flex rounded-xs">
+                        <div className="h-full bg-indigo-500" style={{ width: '25%' }} />
+                        <div className="h-full bg-blue-500" style={{ width: '25%' }} />
+                        <div className="h-full bg-emerald-500" style={{ width: '25%' }} />
+                        <div className="h-full bg-amber-500" style={{ width: '25%' }} />
+                      </div>
+
+                      {/* Intuitive 4-Tier Legend */}
+                      <div className="grid grid-cols-4 gap-1 text-[9px] text-center font-bold font-mono">
+                        <div className={`p-1 border transition-all ${vrTier === 1 ? 'bg-indigo-100 dark:bg-indigo-950/70 border-indigo-500 text-indigo-800 dark:text-indigo-300 shadow-xs' : 'bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-400'}`}>
+                          <span>&lt;6.1%</span>
+                          <span className="block text-[8px] font-normal">{isId ? 'Elit' : 'Elite'}</span>
+                        </div>
+                        <div className={`p-1 border transition-all ${vrTier === 2 ? 'bg-blue-100 dark:bg-blue-950/70 border-blue-500 text-blue-800 dark:text-blue-300 shadow-xs' : 'bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-400'}`}>
+                          <span>6.1-7.4%</span>
+                          <span className="block text-[8px] font-normal">{isId ? 'Sgt Baik' : 'Great'}</span>
+                        </div>
+                        <div className={`p-1 border transition-all ${vrTier === 3 ? 'bg-emerald-100 dark:bg-emerald-950/70 border-emerald-500 text-emerald-800 dark:text-emerald-300 shadow-xs' : 'bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-400'}`}>
+                          <span>7.5-8.6%</span>
+                          <span className="block text-[8px] font-normal">{isId ? 'Baik' : 'Good'}</span>
+                        </div>
+                        <div className={`p-1 border transition-all ${vrTier === 4 ? 'bg-amber-100 dark:bg-amber-950/70 border-amber-500 text-amber-800 dark:text-amber-300 shadow-xs' : 'bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-400'}`}>
+                          <span>&gt;8.6%</span>
+                          <span className="block text-[8px] font-normal">{isId ? 'Tinggi' : 'High'}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-[11px] text-slate-600 dark:text-zinc-400 font-sans pt-1 leading-snug">
+                        {vr <= 8.6
+                          ? (isId 
+                              ? '✓ Efisiensi dorongan sangat baik: energi diarahkan maju ke depan alih-alih terbuang percuma dalam pantulan ke atas.' 
+                              : '✓ Excellent propulsion: energy is directed forward rather than lost in wasted vertical bounce.')
+                          : (isId 
+                              ? '⚠ Pantulan ke atas cukup tinggi. Menaikkan kadensi sedikit (175–180 SPM) akan memperhalus osilasi vertikal.' 
+                              : '⚠ Upward bounce is elevated. Increasing cadence slightly (175–180 SPM) will smooth out vertical bounce.')}
+                      </p>
+                    </div>
+
+                    {/* Ground Contact Time */}
+                    <div className="space-y-1.5 p-3 bg-white dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800">
+                      <div className="flex justify-between text-[11px] text-slate-700 dark:text-zinc-300">
+                        <span className="font-bold">{isId ? 'KONTAK TANAH (FASE PIJAKAN):' : 'GROUND CONTACT TIME:'}</span>
+                        <strong className="text-cyan-600 dark:text-cyan-400 font-mono text-xs">{gct} ms</strong>
+                      </div>
+
+                      {/* Bar */}
+                      <div className="h-2 w-full bg-slate-200 dark:bg-zinc-800 overflow-hidden flex rounded-xs">
+                        <div className="h-full bg-indigo-500" style={{ width: '25%' }} />
+                        <div className="h-full bg-blue-500" style={{ width: '25%' }} />
+                        <div className="h-full bg-emerald-500" style={{ width: '25%' }} />
+                        <div className="h-full bg-amber-500" style={{ width: '25%' }} />
+                      </div>
+
+                      {/* Intuitive 4-Tier Legend */}
+                      <div className="grid grid-cols-4 gap-1 text-[9px] text-center font-bold font-mono">
+                        <div className={`p-1 border transition-all ${gctTier === 1 ? 'bg-indigo-100 dark:bg-indigo-950/70 border-indigo-500 text-indigo-800 dark:text-indigo-300 shadow-xs' : 'bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-400'}`}>
+                          <span>&lt;208ms</span>
+                          <span className="block text-[8px] font-normal">{isId ? 'Elit' : 'Elite'}</span>
+                        </div>
+                        <div className={`p-1 border transition-all ${gctTier === 2 ? 'bg-blue-100 dark:bg-blue-950/70 border-blue-500 text-blue-800 dark:text-blue-300 shadow-xs' : 'bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-400'}`}>
+                          <span>208-240</span>
+                          <span className="block text-[8px] font-normal">{isId ? 'Sgt Cepat' : 'Great'}</span>
+                        </div>
+                        <div className={`p-1 border transition-all ${gctTier === 3 ? 'bg-emerald-100 dark:bg-emerald-950/70 border-emerald-500 text-emerald-800 dark:text-emerald-300 shadow-xs' : 'bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-400'}`}>
+                          <span>241-272</span>
+                          <span className="block text-[8px] font-normal">{isId ? 'Baik' : 'Good'}</span>
+                        </div>
+                        <div className={`p-1 border transition-all ${gctTier === 4 ? 'bg-amber-100 dark:bg-amber-950/70 border-amber-500 text-amber-800 dark:text-amber-300 shadow-xs' : 'bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-400'}`}>
+                          <span>&gt;272ms</span>
+                          <span className="block text-[8px] font-normal">{isId ? 'Sedang' : 'Fair'}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-[11px] text-slate-600 dark:text-zinc-400 font-sans pt-1 leading-snug">
+                        {gct <= 250
+                          ? (isId 
+                              ? '✓ Pijakan kaki cepat seperti pegas mengurangi gaya rem perlambatan.' 
+                              : '✓ Quick spring-like foot strike reduces deceleration braking forces.')
+                          : (isId 
+                              ? '⚠ Durasi kontak tanah sedang. Putaran langkah lebih cepat membantu mengurangi beban sentakan pada sendi lutut.' 
+                              : '⚠ Moderate stance duration. Quicker turnover reduces braking shock on knee joints.')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Layman Guide Banner */}
+                  <div className="p-2 bg-slate-100 dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 text-[10px] text-slate-500 dark:text-zinc-400 flex items-center justify-between">
+                    <span>
+                      {isId
+                        ? 'Keterangan Warna: Ungu = Standar Elit • Biru = Sangat Baik • Hijau = Baik/Umum • Oranye = Perlu Peningkatan'
+                        : 'Color Guide: Purple = Elite • Blue = Excellent • Green = Good • Orange = Improvement Needed'}
+                    </span>
+                    <span className="font-bold text-cyan-600 dark:text-cyan-400">Garmin Running Standard</span>
+                  </div>
                 </div>
-                <div className="h-1.5 w-full bg-slate-200 dark:bg-zinc-800 overflow-hidden flex">
-                  <div className="h-full bg-indigo-500" style={{ width: '25%' }} title="< 208ms Elite" />
-                  <div className="h-full bg-blue-500" style={{ width: '25%' }} title="208-240ms Excellent" />
-                  <div className="h-full bg-emerald-500" style={{ width: '25%' }} title="241-272ms Good" />
-                  <div className="h-full bg-amber-500" style={{ width: '25%' }} title="> 272ms Fair" />
-                </div>
-                <p className="text-[10px] text-slate-600 dark:text-zinc-500 font-sans">
-                  {dynamics.avgGroundContactTimeMs <= 250
-                    ? (isId 
-                        ? 'Pijakan kaki cepat seperti pegas mengurangi gaya rem perlambatan.' 
-                        : 'Quick spring-like foot strike reduces deceleration braking forces.')
-                    : (isId 
-                        ? 'Durasi kontak tanah sedang. Putaran langkah lebih cepat membantu mengurangi guncangan rem pada sendi lutut.' 
-                        : 'Moderate foot strike duration. A quicker turnover helps reduce braking shock on knee joints.')}
-                </p>
-              </div>
-            </div>
+              );
+            })()}
           </div>
 
           {/* Ground Contact Time Balance (L/R Symmetry & Injury Risk Alert) */}

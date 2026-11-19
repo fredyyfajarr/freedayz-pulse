@@ -86,7 +86,9 @@ export async function updateSession(request: NextRequest) {
   if (user) {
     const role = user.user_metadata?.role;
     if (role === 'coach') {
-      const athleteExclusiveRoutes = ['/onboarding', '/activities', '/fitness', '/recovery', '/records'];
+      // Only onboarding (Garmin BYOK key setup) is athlete-exclusive;
+      // Coaches have full access to /dashboard, /activities, /fitness, /recovery, /records, and /settings
+      const athleteExclusiveRoutes = ['/onboarding'];
       const isAthleteRoute = athleteExclusiveRoutes.some(
         (r) => pathname === r || pathname.startsWith(`${r}/`)
       );

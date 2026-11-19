@@ -1,5 +1,5 @@
 {
-  "maxHr": 200,
+  "maxHr": 201,
   "restingHr": 51,
   "dailySleepScores": {
     "2026-10-26": 67
@@ -17,5 +17,5 @@
     "zone5Max": 200
   },
   "deviceName": "FORERUNNER 165",
-  "lastUpdated": "2026-11-09T20:00:00.000Z"
+  "lastUpdated": "2026-11-19T03:42:40.083Z"
 }

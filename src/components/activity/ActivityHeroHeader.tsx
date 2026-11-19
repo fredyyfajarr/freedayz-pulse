@@ -209,18 +209,18 @@ export default function ActivityHeroHeader({ activity, polyline = [], deviceName
         </div>
 
         {/* Garmin Running Steps */}
-        <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 p-3.5 border-l-2 border-l-emerald-500 col-span-2 sm:col-span-1">
+        <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 p-3 sm:p-3.5 border-l-2 border-l-emerald-500 col-span-2 sm:col-span-1 overflow-hidden">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-zinc-400 truncate">
               {t('detail.steps')}
             </span>
-            <Footprints className="w-3.5 h-3.5 text-emerald-500" />
+            <Footprints className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+          <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0 min-w-0">
+            <span className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
               {calculatedSteps ? calculatedSteps.toLocaleString() : '--'}
             </span>
-            <span className="text-xs font-bold text-slate-500 dark:text-zinc-400">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-zinc-400 shrink-0 uppercase">
               {language === 'ID' ? 'LANGKAH' : 'STEPS'}
             </span>
           </div>

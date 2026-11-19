@@ -1,92 +1,143 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Activity } from '@/domain/entities/Activity';
-import { HRProfileCalculator, AthleteHRProfile } from '@/domain/services/HRProfileCalculator';
+import { 
+  HRProfileCalculator, 
+  AthleteHRProfile, 
+  CustomHRSettings, 
+  HRMethod 
+} from '@/domain/services/HRProfileCalculator';
 import { PaceCalculator } from '@/domain/services/PaceCalculator';
-import { AthleteBiometricSettings, CustomHRZoneThresholds, DEFAULT_CUSTOM_ZONES } from '@/domain/entities/AthleteSettings';
-import { Heart, ShieldCheck, Zap, Watch, Edit3, X, Check, RefreshCw, Sliders } from 'lucide-react';
+import { Heart, Zap, ShieldAlert, Check, RefreshCw, Edit3, X, HelpCircle, Watch, Sliders, Settings2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface Props {
   activities: Activity[];
-  initialSettings?: AthleteBiometricSettings;
   garmin7dAvgRhr?: number;
+  initialSettings?: {
+    maxHr?: number;
+    restingHr?: number;
+    deviceName?: string;
+  };
 }
 
-export default function AthletePersonalInfoCard({ activities, initialSettings, garmin7dAvgRhr }: Props) {
+export default function AthletePersonalInfoCard({ activities, garmin7dAvgRhr, initialSettings }: Props) {
   const { language } = useLanguage();
   const isId = language === 'ID';
-  const [restingHr, setRestingHr] = useState<number>(garmin7dAvgRhr || initialSettings?.restingHr || 51);
-  const [maxHr, setMaxHr] = useState<number>(initialSettings?.maxHr || 200);
-  const [customZones, setCustomZones] = useState<CustomHRZoneThresholds>(
-    initialSettings?.customZones || DEFAULT_CUSTOM_ZONES
-  );
+
+  const [hrSettings, setHrSettings] = useState<CustomHRSettings>(() => {
+    const stored = HRProfileCalculator.getStoredSettings();
+    if (garmin7dAvgRhr && !stored.restingHr) {
+      stored.restingHr = garmin7dAvgRhr;
+    }
+    return stored;
+  });
+
   const [deviceName, setDeviceName] = useState<string>(initialSettings?.deviceName || 'FORERUNNER 165');
 
-  // Edit Modal State
+  // Modal & Draft States
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [draftRestingHr, setDraftRestingHr] = useState<number>(garmin7dAvgRhr || restingHr);
-  const [draftMaxHr, setDraftMaxHr] = useState<number>(maxHr);
-  const [draftCustomZones, setDraftCustomZones] = useState<CustomHRZoneThresholds>(
-    initialSettings?.customZones || DEFAULT_CUSTOM_ZONES
-  );
-  const [draftDeviceName, setDraftDeviceName] = useState<string>(initialSettings?.deviceName || 'FORERUNNER 165');
+  const [draftSettings, setDraftSettings] = useState<CustomHRSettings>(hrSettings);
+  const [draftDeviceName, setDraftDeviceName] = useState<string>(deviceName);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
-  // Exact %HRR brackets configured in user's Garmin Connect Running profile (Zone 2 max = 162 BPM)
-  const brackets = [
-    { idx: 1, minP: 50, maxP: 62.5 },
-    { idx: 2, minP: 62.5, maxP: 74.5 },
-    { idx: 3, minP: 74.5, maxP: 84 },
-    { idx: 4, minP: 84, maxP: 92 },
-    { idx: 5, minP: 92, maxP: 100 },
-  ];
+  // Sync listener
+  useEffect(() => {
+    const handleUpdate = () => {
+      setHrSettings(HRProfileCalculator.getStoredSettings());
+    };
+    window.addEventListener('athlete_hr_settings_updated', handleUpdate);
+    return () => window.removeEventListener('athlete_hr_settings_updated', handleUpdate);
+  }, []);
 
   const profile: AthleteHRProfile = HRProfileCalculator.calculateProfile(
     activities,
-    restingHr,
-    maxHr,
-    brackets,
-    customZones
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    hrSettings
   );
 
-  // Preview draft zones in edit modal
-  const draftHrr = Math.max(1, draftMaxHr - draftRestingHr);
-  const previewZ1Min = draftCustomZones.zone1Min || Math.round(draftRestingHr + draftHrr * 0.50);
-  const previewZ1Max = draftCustomZones.zone1Max || Math.round(draftRestingHr + draftHrr * 0.625);
-  const previewZ2Min = draftCustomZones.zone2Min || (previewZ1Max + 1);
-  const previewZ2Max = draftCustomZones.zone2Max || 162;
-  const previewZ3Min = draftCustomZones.zone3Min || (previewZ2Max + 1);
-  const previewZ3Max = draftCustomZones.zone3Max || Math.round(draftRestingHr + draftHrr * 0.84);
-  const previewZ4Min = draftCustomZones.zone4Min || (previewZ3Max + 1);
-  const previewZ4Max = draftCustomZones.zone4Max || Math.round(draftRestingHr + draftHrr * 0.92);
+  // Preview profile for the modal
+  const previewProfile: AthleteHRProfile = HRProfileCalculator.calculateProfile(
+    activities,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    draftSettings
+  );
+
+  const handleOpenModal = () => {
+    setDraftSettings(JSON.parse(JSON.stringify(hrSettings)));
+    setDraftDeviceName(deviceName);
+    setIsEditing(true);
+  };
+
+  const handleSelectMethod = (m: HRMethod) => {
+    setDraftSettings(prev => {
+      const copy: CustomHRSettings = { ...prev, method: m };
+      if (m === 'MAX_HR' && (!copy.zonePercentages || copy.zonePercentages.length === 0)) {
+        copy.zonePercentages = HRProfileCalculator.DEFAULT_MAXHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+      } else if (m === 'LTHR' && (!copy.zonePercentages || copy.zonePercentages.length === 0)) {
+        copy.zonePercentages = HRProfileCalculator.DEFAULT_LTHR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+      } else if (m === 'HRR' && (!copy.zonePercentages || copy.zonePercentages.length === 0)) {
+        copy.zonePercentages = HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP }));
+      } else if (m === 'MANUAL_BPM' && (!copy.manualZoneBpms || copy.manualZoneBpms.length === 0)) {
+        copy.manualZoneBpms = HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minBpm: z.minBpm, maxBpm: z.maxBpm }));
+      }
+      return copy;
+    });
+  };
+
+  const handleUpdatePercentage = (idx: number, field: 'minP' | 'maxP', val: number) => {
+    setDraftSettings(prev => {
+      const pcts = [...(prev.zonePercentages || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minP: z.minP, maxP: z.maxP })))];
+      const targetIdx = pcts.findIndex(p => p.idx === idx);
+      if (targetIdx !== -1) {
+        pcts[targetIdx] = { ...pcts[targetIdx], [field]: val };
+      }
+      return { ...prev, zonePercentages: pcts };
+    });
+  };
+
+  const handleUpdateManualBpm = (idx: number, field: 'minBpm' | 'maxBpm', val: number) => {
+    setDraftSettings(prev => {
+      const bpms = [...(prev.manualZoneBpms || HRProfileCalculator.DEFAULT_HRR_ZONES.map(z => ({ idx: z.idx, minBpm: z.minBpm, maxBpm: z.maxBpm })))];
+      const targetIdx = bpms.findIndex(b => b.idx === idx);
+      if (targetIdx !== -1) {
+        bpms[targetIdx] = { ...bpms[targetIdx], [field]: val };
+      }
+      return { ...prev, manualZoneBpms: bpms };
+    });
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const res = await fetch('/api/settings/biometrics', {
+      HRProfileCalculator.saveStoredSettings(draftSettings);
+      setHrSettings(draftSettings);
+      setDeviceName(draftDeviceName.trim() || 'FORERUNNER 165');
+
+      // Also sync to biometrics endpoint
+      await fetch('/api/settings/biometrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          maxHr: draftMaxHr,
-          restingHr: draftRestingHr,
-          customZones: draftCustomZones,
+          maxHr: draftSettings.maxHr,
+          restingHr: draftSettings.restingHr,
           deviceName: draftDeviceName.trim() || 'FORERUNNER 165',
         }),
       });
-      if (res.ok) {
-        setRestingHr(draftMaxHr > draftRestingHr ? draftRestingHr : restingHr);
-        setMaxHr(draftMaxHr > draftRestingHr ? draftMaxHr : maxHr);
-        setCustomZones(draftCustomZones);
-        setDeviceName(draftDeviceName.trim() || 'FORERUNNER 165');
-        setSaveSuccess(true);
-        setTimeout(() => {
-          setSaveSuccess(false);
-          setIsEditing(false);
-        }, 800);
-      }
+
+      setSaveSuccess(true);
+      setTimeout(() => {
+        setSaveSuccess(false);
+        setIsEditing(false);
+      }, 700);
     } catch (e) {
       console.error('Error updating biometrics:', e);
     } finally {
@@ -105,8 +156,8 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
               {deviceName.toUpperCase()}
             </span>
             <span className="text-[10px] font-mono px-2 py-0.5 bg-violet-100 dark:bg-violet-950 border border-violet-400 dark:border-violet-700 text-violet-800 dark:text-violet-300 font-bold uppercase tracking-wider flex items-center gap-1">
-              <Zap className="w-3 h-3 text-cyan-500" />
-              {isId ? 'SINKRON_DINAMIS' : 'DYNAMIC_SYNC'}
+              <Sliders className="w-3 h-3 text-cyan-500" />
+              {isId ? 'METODE_DINAMIS' : 'DYNAMIC_METHOD'}: {profile.methodType}
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black italic tracking-wide text-slate-900 dark:text-white uppercase mt-1">
@@ -114,25 +165,19 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
           </h2>
           <p className="text-xs font-mono text-slate-500 dark:text-zinc-400">
             {isId 
-              ? 'RENTANG %HRR TERSINKRONISASI DENGAN GARMIN & AMBANG METABOLIK BPM TEPAT'
-              : 'HARDWARE-SYNCHRONIZED %HRR BRACKETS & EXACT METABOLIC BPM THRESHOLDS'}
+              ? 'KONFIGURASI FLEKSIBEL: %HRR KARVONEN, %MAX HR, %LTHR, ATAU MANUAL BPM SESUAI INTENSITAS'
+              : 'FLEXIBLE CONFIGURATION: %HRR KARVONEN, %MAX HR, %LTHR, OR MANUAL BPM ZONES'}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => {
-              setDraftRestingHr(restingHr);
-              setDraftMaxHr(maxHr);
-              setDraftDeviceName(deviceName);
-              setDraftCustomZones(customZones);
-              setIsEditing(true);
-            }}
+            onClick={handleOpenModal}
             className="px-3.5 py-2 bg-violet-600 hover:bg-violet-700 dark:bg-violet-900 dark:hover:bg-violet-700 border-2 border-violet-400 dark:border-violet-500 text-white text-xs font-mono font-black uppercase transition-all flex items-center gap-2 shadow-[2px_2px_0px_#7c3aed] cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5 text-cyan-300" />
-            <span>{isId ? 'EDIT BIOMETRIK' : 'EDIT BIOMETRICS'}</span>
+            <span>{isId ? 'ATUR ZONA MANUAL / PERSEN' : 'CONFIG ZONES & METHOD'}</span>
           </button>
         </div>
       </div>
@@ -143,11 +188,11 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
           <span className="text-[9px] uppercase text-slate-500 dark:text-zinc-400 block tracking-wider font-bold">
             {isId ? 'METODE HITUNG HR' : 'HR CALCULATION METHOD'}
           </span>
-          <span className="text-sm font-black text-violet-700 dark:text-violet-300 mt-1 block">
-            %HRR (KARVONEN)
+          <span className="text-sm font-black text-violet-700 dark:text-violet-300 mt-1 block truncate">
+            {profile.method}
           </span>
-          <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-            {isId ? 'KONFIGURASI KUSTOM' : 'DYNAMIC CUSTOM CONFIG'}
+          <span className="text-[9px] text-emerald-600 dark:text-emerald-400 block mt-0.5 font-bold">
+            {isId ? 'KUSTOM DIAKTIFKAN' : 'CUSTOM ACTIVE'}
           </span>
         </div>
 
@@ -162,8 +207,8 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
             <span className="text-2xl font-black text-slate-900 dark:text-white">{profile.restingHr}</span>
             <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold">BPM</span>
           </div>
-          <span className="text-[9px] text-emerald-600 dark:text-emerald-400 block mt-0.5 font-bold">
-            {garmin7dAvgRhr ? `${isId ? 'SINKRON GARMIN 7H' : 'SYNCED GARMIN 7D AVG'} (${garmin7dAvgRhr} BPM)` : (isId ? 'DIKALIBRASI ATLET' : 'USER CALIBRATED')}
+          <span className="text-[9px] text-slate-500 dark:text-zinc-400 block mt-0.5">
+            {garmin7dAvgRhr ? `${isId ? 'SINKRON GARMIN 7H' : 'GARMIN 7D'} (${garmin7dAvgRhr} BPM)` : (isId ? 'DIKALIBRASI ATLET' : 'CALIBRATED')}
           </span>
         </div>
 
@@ -192,7 +237,7 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
             <span className="text-[10px] text-slate-500 dark:text-zinc-400">BPM</span>
           </div>
           <span className="text-[9px] text-slate-400 dark:text-zinc-500 block mt-0.5">
-            {isId ? 'INISIASI ZONA 4 (84% HRR)' : 'ZONE 4 INITIATION (84% HRR)'}
+            {isId ? 'AMBANG AMBANG ANAEROBIK' : 'ANAEROBIC THRESHOLD'}
           </span>
         </div>
       </div>
@@ -200,59 +245,31 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
       {/* Biometrics Status Banner */}
       <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-violet-900/60 p-3.5 font-mono flex items-center justify-between gap-4 text-xs">
         <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></div>
           <div>
             <span className="text-slate-900 dark:text-zinc-200 font-bold block">
-              {isId ? 'MESIN BIOMETRIK OTOMATIS & DAPAT DIKALIBRASI AKTIF' : 'AUTOMATED & EDITABLE BIOMETRIC ENGINE ACTIVE'}
+              {isId ? 'MESIN ZONA DETAK JANTUNG DINAMIS DIAKTIFKAN' : 'DYNAMIC HEART RATE ZONE ENGINE ACTIVE'}
             </span>
             <span className="text-[11px] text-slate-600 dark:text-zinc-400 font-sans block mt-0.5">
               {isId
-                ? `Max HR diatur pada ${profile.maxHr} BPM dan RHR pada ${profile.restingHr} BPM (Cadangan Detak Jantung = ${profile.heartRateReserve} BPM). Bila metrik Garmin Anda berubah, klik EDIT BIOMETRIK di atas untuk memperbarui dan mengkalibrasi ulang seluruh 5 zona latihan secara otomatis.`
-                : `Max HR is set at ${profile.maxHr} BPM and Resting HR at ${profile.restingHr} BPM (Heart Rate Reserve = ${profile.heartRateReserve} BPM). When your Garmin stats shift, click EDIT BIOMETRICS above to update and recalibrate all 5 training zones automatically.`}
+                ? `Menggunakan metode ${profile.method}. Semua 5 zona dihitung dan dikalibrasikan secara instan ke aktivitas latihan lari Anda.`
+                : `Active method: ${profile.method}. All 5 training zones automatically synchronize across telemetry charts.`}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Mobile-Optimized Compact Zone Cards (screens < sm) */}
-      <div className="block sm:hidden space-y-2.5 font-mono">
-        {profile.zones.map(z => (
-          <div key={z.zoneIndex} className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 p-3 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className={`px-2 py-0.5 text-[10px] font-black ${z.color}`}>
-                  Z{z.zoneIndex}
-                </span>
-                <span className="font-bold text-xs text-slate-900 dark:text-white uppercase">{z.name}</span>
-              </div>
-              <span className="font-black text-cyan-600 dark:text-cyan-300 text-xs">
-                {z.minBpm} – {z.maxBpm} BPM
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-600 dark:text-zinc-300 font-sans leading-snug">
-              {z.physiologicalRole}
-            </p>
-            <div className="flex items-center justify-between text-[10px] pt-1.5 border-t border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400">
-              <span>{isId ? 'Rentang' : 'Range'}: {z.minPercent}% – {z.maxPercent}% HRR</span>
-              <span className="font-bold text-slate-900 dark:text-white">
-                {PaceCalculator.formatDuration(z.totalTimeSeconds)} ({z.totalPercentOfTraining}%)
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Desktop 5-Zone Table (screens >= sm) */}
-      <div className="hidden sm:block overflow-x-auto">
+      {/* Desktop 5-Zone Table */}
+      <div className="overflow-x-auto">
         <table className="w-full text-left font-mono text-xs">
           <thead>
-            <tr className="border-b-2 border-slate-200 dark:border-zinc-800 text-[10px] text-slate-500 dark:text-zinc-400 uppercase tracking-widest">
+            <tr className="border-b-2 border-slate-200 dark:border-zinc-800 text-[10px] text-slate-500 dark:text-zinc-400 uppercase tracking-widest bg-slate-50 dark:bg-[#070a14]">
               <th className="py-2.5 px-3">{isId ? 'ZONA' : 'ZONE'}</th>
               <th className="py-2.5 px-3">{isId ? 'NAMA' : 'NAME'}</th>
-              <th className="py-2.5 px-3">{isId ? 'RENTANG % HRR' : '% HRR RANGE'}</th>
-              <th className="py-2.5 px-3">{isId ? 'AMBANG BPM' : 'BPM THRESHOLD'}</th>
+              <th className="py-2.5 px-3">{profile.methodType === 'MANUAL_BPM' ? (isId ? 'METODE' : 'METHOD') : (isId ? 'RENTANG INTENSITAS' : 'INTENSITY RANGE')}</th>
+              <th className="py-2.5 px-3">{isId ? 'AMBANG BPM TEPAT' : 'EXACT BPM RANGE'}</th>
               <th className="py-2.5 px-3">{isId ? 'PERAN FISIOLOGIS & MANFAAT METABOLIK' : 'PHYSIOLOGICAL ROLE & METABOLIC BENEFIT'}</th>
-              <th className="py-2.5 px-3 text-right">{isId ? 'TOTAL WAKTU TERCATAT' : 'TOTAL RECORDED TIME'}</th>
+              <th className="py-2.5 px-3 text-right">{isId ? 'TOTAL WAKTU TERCATAT' : 'TOTAL TIME'}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
@@ -264,8 +281,10 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
                   </span>
                 </td>
                 <td className="py-3 px-3 font-bold text-slate-900 dark:text-white uppercase">{z.name}</td>
-                <td className="py-3 px-3 text-slate-600 dark:text-zinc-400">
-                  {z.minPercent}% – {z.maxPercent}%
+                <td className="py-3 px-3 text-slate-600 dark:text-zinc-400 font-bold">
+                  {profile.methodType === 'MANUAL_BPM' 
+                    ? 'Manual BPM' 
+                    : `${z.minPercent}% – ${z.maxPercent}%`}
                 </td>
                 <td className="py-3 px-3 font-black text-cyan-600 dark:text-cyan-300">
                   {z.minBpm} – {z.maxBpm} BPM
@@ -285,25 +304,25 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
         </table>
       </div>
 
-      {/* EDIT BIOMETRICS MODAL */}
+      {/* EDIT BIOMETRICS & MANUAL ZONES MODAL */}
       {isEditing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
           <div 
-            className="bg-white dark:bg-[#0b0f1d] border-2 border-violet-500 shadow-[6px_6px_0px_#7c3aed] max-w-md w-full p-5 sm:p-6 space-y-5 font-mono text-slate-900 dark:text-white relative"
+            className="bg-white dark:bg-[#0b0f1d] border-2 border-violet-500 shadow-[6px_6px_0px_#7c3aed] max-w-2xl w-full p-5 sm:p-6 space-y-5 font-mono text-slate-900 dark:text-white relative max-h-[92vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200 dark:border-zinc-800">
               <div className="flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-cyan-500 dark:text-cyan-400" />
+                <Settings2 className="w-5 h-5 text-cyan-500 dark:text-cyan-400" />
                 <div>
                   <h3 className="text-sm font-black tracking-wider text-slate-900 dark:text-white uppercase">
-                    {isId ? 'KALIBRASI_BIOMETRIK' : 'CALIBRATE_BIOMETRICS'}
+                    {isId ? 'KALIBRASI_ZONA_HR & METODE' : 'HEART_RATE_ZONE_CALIBRATION'}
                   </h3>
                   <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5">
                     {isId 
-                      ? 'PERBARUI MAX HR & RHR UNTUK MENGHITUNG ULANG ZONA KARVONEN'
-                      : 'UPDATE MAX HR & RESTING HR TO RECALCULATE KARVONEN ZONES'}
+                      ? 'PILIH METODE %HRR, %MAX HR, %LTHR, ATAU INPUT ANGKA BPM MANUAL SESUKA ANDA'
+                      : 'CHOOSE %HRR, %MAX HR, %LTHR, OR SET EXACT BPM VALUES MANUALLY'}
                   </p>
                 </div>
               </div>
@@ -316,150 +335,159 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
               </button>
             </div>
 
-            {/* Inputs */}
-            <div className="space-y-4">
-              {/* GPS Device Model */}
-              <div>
-                <label className="text-xs text-slate-700 dark:text-zinc-300 uppercase font-bold block mb-1.5 flex justify-between">
-                  <span>{isId ? 'MODEL JAM GPS / PERANGKAT' : 'GPS WATCH MODEL / DEVICE'}</span>
-                  <span className="text-violet-600 dark:text-violet-400 font-black">{draftDeviceName.toUpperCase()}</span>
-                </label>
-                <input
-                  type="text"
-                  value={draftDeviceName}
-                  onChange={e => setDraftDeviceName(e.target.value)}
-                  placeholder="e.g. FORERUNNER 165, COROS PACE 3, APPLE WATCH ULTRA"
-                  className="w-full bg-slate-50 dark:bg-[#070a14] border-2 border-violet-400 dark:border-violet-800/80 p-2.5 text-slate-900 dark:text-white font-mono font-bold text-sm uppercase focus:outline-none focus:border-violet-500"
-                />
-                <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
-                  {isId 
-                    ? 'Nama jam GPS / perangkat yang otomatis tampil pada kartu HR Zones & stiker Share Story.'
-                    : 'GPS watch name automatically displayed on HR Zones cards & Share Story stickers.'}
-                </span>
+            {/* 1. Method Selection Tabs */}
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase text-slate-700 dark:text-zinc-300 block">
+                {isId ? '1. PILIH METODE PERHITUNGAN ZONA:' : '1. SELECT CALCULATION METHOD:'}
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { id: 'HRR', label: '% HRR (Karvonen)' },
+                  { id: 'MAX_HR', label: '% Max HR' },
+                  { id: 'LTHR', label: '% LTHR (Friel)' },
+                  { id: 'MANUAL_BPM', label: 'Manual BPM' },
+                ].map(opt => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => handleSelectMethod(opt.id as HRMethod)}
+                    className={`py-2 px-2 text-xs font-black uppercase border-2 transition-all cursor-pointer text-center ${
+                      draftSettings.method === opt.id
+                        ? 'bg-violet-600 text-white border-violet-400 shadow-[2px_2px_0px_#7c3aed]'
+                        : 'bg-slate-50 dark:bg-[#070a14] border-slate-300 dark:border-zinc-800 text-slate-700 dark:text-zinc-400 hover:border-violet-400'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Max HR */}
+            {/* 2. Anchor Biometrics (Resting, Max, LTHR) */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 text-xs">
               <div>
-                <label className="text-xs text-slate-700 dark:text-zinc-300 uppercase font-bold block mb-1.5 flex justify-between">
-                  <span>{isId ? 'DETAK JANTUNG MAKSIMAL (PUNCAK)' : 'MAX HEART RATE (PEAK BREAKTHROUGH)'}</span>
-                  <span className="text-rose-600 dark:text-rose-400 font-black">{draftMaxHr} BPM</span>
+                <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 mb-1">
+                  {isId ? 'MAX HR (BPM)' : 'MAX HR (BPM)'}
                 </label>
                 <input
                   type="number"
                   min="130"
                   max="230"
-                  value={draftMaxHr}
-                  onChange={e => setDraftMaxHr(Number(e.target.value))}
-                  className="w-full bg-slate-50 dark:bg-[#070a14] border-2 border-rose-400 dark:border-rose-800/80 p-2.5 text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:border-rose-500"
+                  value={draftSettings.maxHr}
+                  onChange={e => setDraftSettings(prev => ({ ...prev, maxHr: Number(e.target.value) }))}
+                  className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm"
                 />
-                <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
-                  {isId 
-                    ? 'Masukkan detak jantung tertinggi yang terdeteksi Garmin saat sesi interval keras atau balapan Anda.'
-                    : 'Input peak heart rate detected by Garmin during your hardest interval or race effort.'}
-                </span>
               </div>
 
-              {/* Resting HR */}
               <div>
-                <label className="text-xs text-slate-700 dark:text-zinc-300 uppercase font-bold block mb-1.5 flex justify-between">
-                  <span>{isId ? 'DETAK JANTUNG ISTIRAHAT RATA-RATA (RHR)' : 'AVERAGE RESTING HR (RHR)'}</span>
-                  <span className="text-cyan-600 dark:text-cyan-400 font-black">{draftRestingHr} BPM</span>
+                <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 mb-1">
+                  {isId ? 'RESTING HR (BPM)' : 'RESTING HR (BPM)'}
                 </label>
                 <input
                   type="number"
                   min="35"
                   max="100"
-                  value={draftRestingHr}
-                  onChange={e => setDraftRestingHr(Number(e.target.value))}
-                  className="w-full bg-slate-50 dark:bg-[#070a14] border-2 border-cyan-400 dark:border-cyan-800/80 p-2.5 text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:border-cyan-500"
+                  value={draftSettings.restingHr}
+                  onChange={e => setDraftSettings(prev => ({ ...prev, restingHr: Number(e.target.value) }))}
+                  className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm"
                 />
-                <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
-                  {isId
-                    ? 'Ditemukan di Garmin Connect > Statistik Kesehatan > Detak Jantung (Rata-rata Istirahat).'
-                    : 'Found in Garmin Connect > Health Stats > Heart Rate (Resting Avg).'}
-                </span>
-                {garmin7dAvgRhr && (
-                  <button
-                    type="button"
-                    onClick={() => setDraftRestingHr(garmin7dAvgRhr)}
-                    className="text-[10px] text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 font-bold underline cursor-pointer mt-1 block"
-                  >
-                    {isId ? 'SINKRONKAN DENGAN RATA-RATA 7H GARMIN' : 'SYNC WITH GARMIN 7D AVG'} ({garmin7dAvgRhr} BPM)
-                  </button>
-                )}
               </div>
 
-              {/* Zone 2 Upper Limit (Max Easy BPM) */}
               <div>
-                <label className="text-xs text-slate-700 dark:text-zinc-300 uppercase font-bold block mb-1.5 flex justify-between">
-                  <span>{isId ? 'BATAS ATAS ZONA 2 (MAKSIMUM EASY BPM)' : 'ZONE 2 CEILING (MAX EASY BPM)'}</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-black">{previewZ2Max} BPM</span>
+                <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 mb-1">
+                  {isId ? 'LTHR AMBANG (BPM)' : 'LTHR THRESHOLD (BPM)'}
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    min="135"
-                    max="180"
-                    value={draftCustomZones.zone2Max || 162}
-                    onChange={e => {
-                      const val = Number(e.target.value);
-                      setDraftCustomZones(prev => ({
-                        ...prev,
-                        zone2Max: val,
-                        zone3Min: val + 1,
-                      }));
-                    }}
-                    className="flex-1 bg-slate-50 dark:bg-[#070a14] border-2 border-emerald-500/80 p-2 text-slate-900 dark:text-white font-mono font-bold text-base focus:outline-none focus:border-emerald-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDraftCustomZones(prev => ({
-                        ...prev,
-                        zone2Max: 162,
-                        zone3Min: 163,
-                      }));
-                    }}
-                    className="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 hover:bg-emerald-200 border border-emerald-400 dark:border-emerald-600 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold uppercase transition-colors"
-                  >
-                    162 BPM ({isId ? 'JAM GARMIN' : 'GARMIN WATCH'})
-                  </button>
-                </div>
-                <span className="text-[10px] text-slate-500 dark:text-zinc-500 block mt-1">
-                  {isId
-                    ? 'Batas denyut jantung maksimum lari santai (Zona 2) sesuai angka di jam tangan Anda (misal 162 BPM).'
-                    : 'Maximum heart rate boundary for easy runs (Zone 2) matching your watch setting (e.g. 162 BPM).'}
-                </span>
+                <input
+                  type="number"
+                  min="120"
+                  max="210"
+                  value={draftSettings.lthr}
+                  onChange={e => setDraftSettings(prev => ({ ...prev, lthr: Number(e.target.value) }))}
+                  className="w-full bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-2 font-mono font-black text-sm"
+                />
               </div>
+            </div>
 
-              {/* Live Preview Box */}
-              <div className="bg-slate-50 dark:bg-[#070a14] border border-violet-300 dark:border-violet-800/80 p-3 space-y-2 text-xs">
-                <div className="flex justify-between items-center text-slate-600 dark:text-zinc-400 text-[10px] uppercase font-bold border-b border-slate-200 dark:border-zinc-800 pb-1">
-                  <span>{isId ? 'CADANGAN HRR BARU:' : 'NEW HRR (RESERVE):'}</span>
-                  <strong className="text-violet-700 dark:text-white text-xs">{draftHrr} BPM</strong>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-[10px] pt-1">
-                  <div>
-                    <span className="text-slate-500 dark:text-zinc-500">{isId ? 'Z1 (Pemanasan):' : 'Z1 (Warm Up):'}</span>{' '}
-                    <strong className="text-slate-800 dark:text-slate-300">{previewZ1Min}–{previewZ1Max}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 dark:text-zinc-500">{isId ? 'Z2 (Lari Santai):' : 'Z2 (Easy):'}</span>{' '}
-                    <strong className="text-emerald-600 dark:text-emerald-400">{previewZ2Min}–{previewZ2Max}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 dark:text-zinc-500">{isId ? 'Z3 (Aerobik):' : 'Z3 (Aerobic):'}</span>{' '}
-                    <strong className="text-cyan-600 dark:text-cyan-300">{previewZ3Min}–{previewZ3Max}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 dark:text-zinc-500">{isId ? 'Z4 (Ambang Laktat):' : 'Z4 (Threshold):'}</span>{' '}
-                    <strong className="text-amber-600 dark:text-amber-300">{previewZ4Min}–{previewZ4Max}</strong>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-slate-500 dark:text-zinc-500">{isId ? 'Z5 (Maksimal):' : 'Z5 (Max):'}</span>{' '}
-                    <strong className="text-rose-600 dark:text-rose-400">{previewZ4Max + 1}–{draftMaxHr} BPM</strong>
-                  </div>
-                </div>
+            {/* 3. Zone Configuration (Percentages or Manual BPMs) */}
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase text-slate-700 dark:text-zinc-300 block">
+                {draftSettings.method === 'MANUAL_BPM'
+                  ? (isId ? '2. INPUT RANGE BPM MANUAL PER ZONA (Z1 - Z5):' : '2. INPUT MANUAL BPM RANGE PER ZONE (Z1 - Z5):')
+                  : (isId ? `2. SESUAIKAN PERSENTASE ZONA (${draftSettings.method}):` : `2. ADJUST ZONE PERCENTAGES (${draftSettings.method}):`)}
+              </label>
+
+              <div className="space-y-2">
+                {[1, 2, 3, 4, 5].map(idx => {
+                  const previewZone = previewProfile.zones.find(z => z.zoneIndex === idx);
+                  const userPct = draftSettings.zonePercentages?.find(p => p.idx === idx);
+                  const userManual = draftSettings.manualZoneBpms?.find(m => m.idx === idx);
+
+                  return (
+                    <div 
+                      key={idx}
+                      className="p-2.5 bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                    >
+                      <div className="flex items-center gap-2 w-32 shrink-0">
+                        <span className={`px-2 py-0.5 text-[10px] font-black ${previewZone?.color}`}>
+                          Z{idx}
+                        </span>
+                        <span className="font-bold text-slate-900 dark:text-white uppercase">{previewZone?.name}</span>
+                      </div>
+
+                      {draftSettings.method === 'MANUAL_BPM' ? (
+                        /* Manual BPM inputs */
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="60"
+                            max="230"
+                            value={userManual?.minBpm ?? previewZone?.minBpm}
+                            onChange={e => handleUpdateManualBpm(idx, 'minBpm', Number(e.target.value))}
+                            className="w-20 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
+                          />
+                          <span className="text-slate-400">–</span>
+                          <input
+                            type="number"
+                            min="60"
+                            max="230"
+                            value={userManual?.maxBpm ?? previewZone?.maxBpm}
+                            onChange={e => handleUpdateManualBpm(idx, 'maxBpm', Number(e.target.value))}
+                            className="w-20 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
+                          />
+                          <span className="text-[10px] text-slate-500 font-bold">BPM</span>
+                        </div>
+                      ) : (
+                        /* Percentage inputs */
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            step="0.5"
+                            value={userPct?.minP ?? previewZone?.minPercent}
+                            onChange={e => handleUpdatePercentage(idx, 'minP', Number(e.target.value))}
+                            className="w-16 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
+                          />
+                          <span className="text-slate-400">% –</span>
+                          <input
+                            type="number"
+                            step="0.5"
+                            value={userPct?.maxP ?? previewZone?.maxPercent}
+                            onChange={e => handleUpdatePercentage(idx, 'maxP', Number(e.target.value))}
+                            className="w-16 bg-white dark:bg-black border border-slate-300 dark:border-zinc-700 p-1.5 font-black text-center text-xs"
+                          />
+                          <span className="text-slate-400">%</span>
+                        </div>
+                      )}
+
+                      {/* Resulting BPM readout */}
+                      <div className="text-right">
+                        <span className="text-[10px] text-slate-400 block font-bold">HASIL BPM</span>
+                        <span className="font-black text-cyan-600 dark:text-cyan-400">
+                          {previewZone?.minBpm} – {previewZone?.maxBpm} BPM
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -468,7 +496,7 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-bold uppercase transition-colors cursor-pointer"
+                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-bold uppercase transition-colors cursor-pointer"
               >
                 {isId ? 'BATAL' : 'CANCEL'}
               </button>
@@ -476,7 +504,7 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={isSaving || draftMaxHr <= draftRestingHr}
+                disabled={isSaving}
                 className="px-4 py-2 bg-violet-600 hover:bg-violet-700 dark:bg-violet-700 dark:hover:bg-violet-600 disabled:opacity-50 border border-violet-400 text-white font-bold uppercase transition-all flex items-center gap-2 shadow-[2px_2px_0px_#7c3aed] cursor-pointer"
               >
                 {isSaving ? (
@@ -492,7 +520,7 @@ export default function AthletePersonalInfoCard({ activities, initialSettings, g
                 ) : (
                   <>
                     <Check className="w-3.5 h-3.5" />
-                    <span>{isId ? 'SIMPAN BIOMETRIK' : 'SAVE BIOMETRICS'}</span>
+                    <span>{isId ? 'SIMPAN KALIBRASI ZONA' : 'SAVE ZONE CALIBRATION'}</span>
                   </>
                 )}
               </button>

@@ -69,6 +69,11 @@ export default function RecoverySevenDayCharts({
     const asleepH = Math.floor(asleepSec / 3600);
     const asleepM = Math.floor((asleepSec % 3600) / 60);
     const awakeM = Math.round(awakeSec / 60);
+    const awakeH = Math.floor(awakeM / 60);
+    const awakeRemM = awakeM % 60;
+    const awakeFormatted = isId
+      ? (awakeH > 0 ? `${awakeH}j ${awakeRemM}m` : `${awakeM} mnt`)
+      : (awakeH > 0 ? `${awakeH}h ${awakeRemM}m` : `${awakeM}m`);
 
     const sleepScore = d.sleep?.sleepScore || Math.min(100, Math.max(45, Math.round((asleepHours / 7.5) * 85)));
     const rawQuality = d.sleep?.sleepQuality || (sleepScore >= 80 ? 'EXCELLENT' : sleepScore >= 70 ? 'GOOD' : sleepScore >= 60 ? 'FAIR' : 'POOR');
@@ -95,7 +100,7 @@ export default function RecoverySevenDayCharts({
       asleepHours,
       sleepFormatted: d.sleep?.formattedHours || `${sleepHours}h`,
       asleepFormatted: `${asleepH}h ${asleepM}m`,
-      awakeFormatted: `${awakeM}m`,
+      awakeFormatted,
       sleepScore,
       sleepQuality,
       restStressFormatted: `${restStressH}h ${restStressM}m`,
@@ -580,8 +585,8 @@ export default function RecoverySevenDayCharts({
               <span className="text-sm font-black text-violet-700 dark:text-violet-300 mt-1 block">{activeSleepDay.asleepFormatted}</span>
             </div>
             <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 p-2.5">
-              <span className="text-[9px] text-slate-500 dark:text-zinc-500 uppercase block font-bold">
-                {isId ? 'WAKTU TERBANGUN' : 'RESTLESS AWAKE'}
+              <span className="text-[9px] text-slate-500 dark:text-zinc-500 uppercase block font-bold" title={isId ? 'Durasi terjaga/gelisah di sela tidur malam' : 'Nocturnal wakefulness / restless time'}>
+                {isId ? 'DURASI TERJAGA SAAT TIDUR' : 'RESTLESS / AWAKE DURATION'}
               </span>
               <span className="text-sm font-black text-rose-600 dark:text-rose-400 mt-1 block">{activeSleepDay.awakeFormatted}</span>
             </div>
@@ -601,7 +606,7 @@ export default function RecoverySevenDayCharts({
                   <th className="py-2.5 px-3">{isId ? 'TANGGAL / HARI' : 'DATE / DAY'}</th>
                   <th className="py-2.5 px-3">{isId ? 'TOTAL TIDUR' : 'TOTAL SLEEP'}</th>
                   <th className="py-2.5 px-3">{isId ? 'AKTUAL TERTIDUR' : 'ACTUAL ASLEEP'}</th>
-                  <th className="py-2.5 px-3">{isId ? 'WAKTU BANGUN' : 'AWAKE TIME'}</th>
+                  <th className="py-2.5 px-3" title={isId ? 'Durasi terjaga di sela tidur malam (WASO)' : 'Wake after sleep onset duration'}>{isId ? 'DURASI TERJAGA' : 'AWAKE (WASO)'}</th>
                   <th className="py-2.5 px-3">{isId ? 'SKOR TIDUR' : 'SLEEP SCORE'}</th>
                   <th className="py-2.5 px-3">{isId ? 'PENGISIAN ENERGI' : 'SLEEP RECHARGE'}</th>
                   <th className="py-2.5 px-3">{isId ? 'AKSI' : 'ACTION'}</th>
