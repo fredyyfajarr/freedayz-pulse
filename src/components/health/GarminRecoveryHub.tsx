@@ -9,7 +9,6 @@ import {
   BatteryCharging, 
   Moon, 
   ShieldCheck, 
-  TrendingUp, 
   Award 
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -169,46 +168,6 @@ export default function GarminRecoveryHub({ snapshot }: Props) {
               {dailySummary?.sleep.formattedHours ?? '5h 13m'}
             </span>
           </div>
-        </div>
-      </div>
-
-      {/* Race Predictions Row based on VO2Max / VDOT */}
-      <div className="bg-slate-50 dark:bg-[#070a14] border border-slate-200 dark:border-zinc-800 p-4 font-mono">
-        <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-200 dark:border-zinc-800">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-            <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-              {language === 'ID' ? 'PREDIKTOR_BALAPAN_VDOT // TARGET_PACE' : 'VDOT_CALIBRATED_RACE_PREDICTOR // TARGET_PACES'}
-            </h4>
-          </div>
-          <span className="text-[9px] text-slate-500 dark:text-zinc-500">
-            {language === 'ID' ? 'FORMULA FISIOLOGIS JACK DANIELS' : 'JACK DANIELS PHYSIOLOGICAL FORMULA'}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {vo2MaxEstimate.racePredictions.map((pred, i) => {
-            let localizedDist = pred.distanceLabel;
-            if (language === 'ID') {
-              if (pred.distanceLabel.includes('5K')) localizedDist = 'LOMBA 5K';
-              else if (pred.distanceLabel.includes('10K')) localizedDist = 'LOMBA 10K';
-              else if (pred.distanceLabel.includes('HALF')) localizedDist = 'HALF MARATHON (21.1K)';
-              else if (pred.distanceLabel.includes('MARATHON')) localizedDist = 'MARATHON PENUH (42.2K)';
-            }
-            return (
-              <div key={i} className="bg-white dark:bg-[#0a0e1c] border border-slate-200 dark:border-zinc-800/80 p-3 shadow-sm dark:shadow-none">
-                <span className="text-[9px] text-slate-600 dark:text-zinc-400 uppercase block font-bold">
-                  {localizedDist}
-                </span>
-                <span className="text-lg font-black text-amber-600 dark:text-amber-300 mt-1 block">
-                  {PaceCalculator.formatDuration(pred.predictedTimeSeconds)}
-                </span>
-                <span className="text-xs text-cyan-600 dark:text-cyan-400 block mt-0.5 font-bold">
-                  {PaceCalculator.formatPace(pred.predictedPaceSecPerKm)}
-                </span>
-              </div>
-            );
-          })}
         </div>
       </div>
     </div>
