@@ -1,5 +1,6 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
@@ -278,6 +279,15 @@ export async function updateAthleteBiodata(formData: FormData) {
 export async function signout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  const cookieStore = await cookies();
+  cookieStore.delete('pulse_demo_mode');
+  revalidatePath('/', 'layout');
+  redirect('/login');
+}
+
+export async function exitDemoMode() {
+  const cookieStore = await cookies();
+  cookieStore.delete('pulse_demo_mode');
   revalidatePath('/', 'layout');
   redirect('/login');
 }

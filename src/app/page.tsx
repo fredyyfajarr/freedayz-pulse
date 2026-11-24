@@ -108,9 +108,9 @@ export default function LandingPage() {
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-violet-600" />}
             </button>
 
-            {/* Launch App / Dashboard CTA */}
+            {/* Launch App / Dashboard CTA -> Auth Gateway */}
             <Link
-              href="/dashboard"
+              href="/login"
               className="flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-mono font-black text-xs uppercase tracking-wider border-2 border-violet-400 shadow-[3px_3px_0px_#cbd5e1] dark:shadow-[3px_3px_0px_#1e1b4b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer whitespace-nowrap"
             >
               <span>{content.nav.launchLab}</span>
@@ -162,7 +162,7 @@ export default function LandingPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 font-mono">
               <Link
-                href="/dashboard"
+                href="/login"
                 className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-black text-sm uppercase tracking-wider border-2 border-violet-400 shadow-[4px_4px_0px_#4c1d95] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
               >
                 <Zap className="w-4 h-4 text-cyan-300" />
@@ -732,7 +732,7 @@ export default function LandingPage() {
           </p>
           <div className="pt-2 font-mono">
             <Link
-              href="/dashboard"
+              href="/login"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black text-base uppercase tracking-wider border-2 border-violet-400 shadow-[4px_4px_0px_#4c1d95] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
             >
               <span>{content.cta.button}</span>

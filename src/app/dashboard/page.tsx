@@ -38,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardPage() {
   // Auth User, Role & Telemetry Access Inspection
   const access = await getCurrentUserAccess();
-  const { user, isCoach, hasTelemetryAccess, fullName, email: userEmail, weeklyTargetKm } = access;
+  const { user, isCoach, isDemoMode, hasTelemetryAccess, fullName, email: userEmail, weeklyTargetKm } = access;
 
   // 1. DEDICATED COACH PORTAL (Zero athlete telemetry widgets)
   if (isCoach) {
@@ -66,9 +66,9 @@ export default async function DashboardPage() {
     );
   }
 
-  // If repository empty and user is connected Garmin user, run initial sync with Garmin
+  // If repository empty and user is connected Garmin user, run initial sync with Garmin (never in demo mode)
   const existing = await container.repository.getAllActivities();
-  if (existing.length === 0) {
+  if (existing.length === 0 && !isDemoMode) {
     try {
       await container.syncUseCase.execute(false);
     } catch (err) {

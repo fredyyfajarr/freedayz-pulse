@@ -9,9 +9,10 @@ export async function GET() {
   if (auth.response) return auth.response;
 
   try {
-    // If no activities yet, run initial background sync
+    // If no activities yet and not in demo mode, run initial background sync
+    const isDemo = auth.user.user_metadata?.garmin_demo_mode === true;
     const existing = await container.repository.getAllActivities();
-    if (existing.length === 0) {
+    if (existing.length === 0 && !isDemo) {
       try {
         await container.syncUseCase.execute(false);
       } catch (syncErr) {

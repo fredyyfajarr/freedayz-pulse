@@ -9,6 +9,28 @@ export async function POST(request: Request) {
   const auth = await requireAuthenticatedUser();
   if (auth.response) return auth.response;
 
+  // 1. DEMO MODE: Static Simulated Sync (Never contact external Garmin servers or overwrite activities)
+  const isDemo = auth.user.user_metadata?.garmin_demo_mode === true;
+  if (isDemo) {
+    // Realistic UI delay simulation
+    await new Promise((r) => setTimeout(r, 600));
+
+    const now = new Date();
+    await container.repository.setLastSyncTimestamp(now);
+    const existing = await container.repository.getAllActivities();
+
+    return NextResponse.json({
+      success: true,
+      message: 'Sinkronisasi simulasi berhasil (Demo Mode: 35 sesi atlet Bimo Pratama tetap statis & terlindungi).',
+      syncedCount: existing.length,
+      newCount: 0,
+      updatedCount: 0,
+      isDemoSimulation: true,
+      healthUpdated: true,
+      lastSync: now.toISOString(),
+    });
+  }
+
   try {
     const body = await request.json().catch(() => ({}));
     const force = Boolean(body?.force);
@@ -18,6 +40,17 @@ export async function POST(request: Request) {
       auth.user.user_metadata.garmin_api_key.trim().length > 0
         ? auth.user.user_metadata.garmin_api_key.trim()
         : undefined;
+
+    if (!userApiKey && !process.env.GARMIN_PERSONAL_API_KEY) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            'Garmin Personal API Key belum terkonfigurasi pada akun Anda. Silakan hubungkan API Key Garmin di menu Pengaturan (Filosofi BYOK).',
+        },
+        { status: 400 }
+      );
+    }
 
     const garminClient = userApiKey
       ? new GarminApiClient(undefined, userApiKey)

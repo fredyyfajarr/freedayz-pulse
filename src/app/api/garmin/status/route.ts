@@ -9,6 +9,26 @@ export async function GET() {
   const auth = await requireAuthenticatedUser();
   if (auth.response) return auth.response;
 
+  // 1. DEMO MODE: Simulated Static Telemetry Status (Never call external Garmin servers)
+  const isDemo = auth.user.user_metadata?.garmin_demo_mode === true;
+  if (isDemo) {
+    const [lastSync, allActivities] = await Promise.all([
+      container.repository.getLastSyncTimestamp(),
+      container.repository.getAllActivities(),
+    ]);
+
+    return NextResponse.json({
+      configured: true,
+      connected: true,
+      latencyMs: 12,
+      maskedKey: 'DEMO-BYOK-MOCK-SENSOR',
+      lastSyncIso: lastSync ? lastSync.toISOString() : new Date().toISOString(),
+      activityCount: allActivities.length,
+      mode: 'demo_static',
+      message: 'Demo Telemetri: Sensor Garmin tersinkronisasi (Mode Statis Bimo Pratama)',
+    });
+  }
+
   const userKey =
     typeof auth.user.user_metadata?.garmin_api_key === 'string' &&
     auth.user.user_metadata.garmin_api_key.trim().length > 0
