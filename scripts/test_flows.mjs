@@ -11,14 +11,14 @@ async function testFlows() {
     { name: 'Fitness PMC Page (Demo Mode)', url: '/fitness', expectStatus: 200, checkJson: false },
     { name: 'Recovery Hub Page (Demo Mode)', url: '/recovery', expectStatus: 200, checkJson: false },
     { name: 'Activities List Page (Demo Mode)', url: '/activities', expectStatus: 200, checkJson: false },
-    { name: 'Activity Detail Page [25136191911]', url: '/activities/25136191911', expectStatus: 200, checkJson: false },
+    { name: 'Activity Detail Page [9000000001]', url: '/activities/9000000001', expectStatus: 200, checkJson: false },
     { name: 'Compare Activities Page', url: '/activities/compare', expectStatus: 200, checkJson: false },
     { name: 'Records Page', url: '/records', expectStatus: 200, checkJson: false },
     { name: 'Settings & Biometrics Page', url: '/settings', expectStatus: 200, checkJson: false },
     { name: 'API: Dashboard Telemetry', url: '/api/dashboard', expectStatus: 200, checkJson: true },
     { name: 'API: Fitness PMC Timeline', url: '/api/fitness', expectStatus: 200, checkJson: true },
     { name: 'API: Activities Collection', url: '/api/activities', expectStatus: 200, checkJson: true },
-    { name: 'API: Activity Detail [25136191911]', url: '/api/activities/25136191911', expectStatus: 200, checkJson: true },
+    { name: 'API: Activity Detail [9000000001]', url: '/api/activities/9000000001', expectStatus: 200, checkJson: true },
     { name: 'API: Garmin Sync Status', url: '/api/garmin/status', expectStatus: 200, checkJson: true },
   ];
 
@@ -39,7 +39,7 @@ async function testFlows() {
           extra = ` (Fitness: ${data.summary?.currentFitness ?? 'N/A'}, Fatigue: ${data.summary?.currentFatigue ?? 'N/A'}, Form: ${data.summary?.currentForm ?? 'N/A'})`;
         } else if (t.url === '/api/activities') {
           extra = ` (Total Activities: ${Array.isArray(data) ? data.length : data.activities?.length ?? 'OK'})`;
-        } else if (t.url.includes('/api/activities/25136191911')) {
+        } else if (t.url.includes('/api/activities/9000000001')) {
           extra = ` (Activity: ${data.name ?? data.activity?.name ?? 'OK'})`;
         } else if (t.url === '/api/garmin/status') {
           extra = ` (Connected: ${data.connected ?? data.isGarminConnected ?? 'OK'})`;

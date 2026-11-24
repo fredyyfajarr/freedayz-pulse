@@ -1,0 +1,2700 @@
+{
+  "activityId": "9000000019",
+  "polyline": [
+    {
+      "lat": -6.3039,
+      "lon": 106.65855,
+      "time": 1792883700000,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6584485,
+      "time": 1792883710239,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6581495,
+      "time": 1792883720478,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6576692,
+      "time": 1792883730717,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6570334,
+      "time": 1792883740956,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.656275,
+      "time": 1792883751194,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6554324,
+      "time": 1792883761433,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6545464,
+      "time": 1792883771672,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6536579,
+      "time": 1792883781911,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6528058,
+      "time": 1792883792150,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.652025,
+      "time": 1792883802389,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6513457,
+      "time": 1792883812628,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6507926,
+      "time": 1792883822867,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6503843,
+      "time": 1792883833106,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6501342,
+      "time": 1792883843344,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65005,
+      "time": 1792883853583,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6501342,
+      "time": 1792883863822,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6503843,
+      "time": 1792883874061,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6507926,
+      "time": 1792883884300,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6513457,
+      "time": 1792883894539,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.652025,
+      "time": 1792883904778,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6528058,
+      "time": 1792883915017,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6536579,
+      "time": 1792883925256,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6545464,
+      "time": 1792883935494,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6554324,
+      "time": 1792883945733,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.656275,
+      "time": 1792883955972,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6570334,
+      "time": 1792883966211,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6576692,
+      "time": 1792883976450,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6581495,
+      "time": 1792883986689,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6584485,
+      "time": 1792883996928,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65855,
+      "time": 1792884007167,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6584485,
+      "time": 1792884017406,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6581495,
+      "time": 1792884027644,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6576692,
+      "time": 1792884037883,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6570334,
+      "time": 1792884048122,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.656275,
+      "time": 1792884058361,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6554324,
+      "time": 1792884068600,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6545464,
+      "time": 1792884078839,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6536579,
+      "time": 1792884089078,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6528058,
+      "time": 1792884099317,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.652025,
+      "time": 1792884109556,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6513457,
+      "time": 1792884119794,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6507926,
+      "time": 1792884130033,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6503843,
+      "time": 1792884140272,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6501342,
+      "time": 1792884150511,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65005,
+      "time": 1792884160750,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6501342,
+      "time": 1792884170989,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6503843,
+      "time": 1792884181228,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6507926,
+      "time": 1792884191467,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6513457,
+      "time": 1792884201706,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.652025,
+      "time": 1792884211944,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6528058,
+      "time": 1792884222183,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6536579,
+      "time": 1792884232422,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6545464,
+      "time": 1792884242661,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6554324,
+      "time": 1792884252900,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.656275,
+      "time": 1792884263139,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6570334,
+      "time": 1792884273378,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6576692,
+      "time": 1792884283617,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6581495,
+      "time": 1792884293856,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6584485,
+      "time": 1792884304094,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65855,
+      "time": 1792884314333,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6584485,
+      "time": 1792884324572,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6581495,
+      "time": 1792884334811,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6576692,
+      "time": 1792884345050,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6570334,
+      "time": 1792884355289,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.656275,
+      "time": 1792884365528,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6554324,
+      "time": 1792884375767,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6545464,
+      "time": 1792884386006,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6536579,
+      "time": 1792884396244,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6528058,
+      "time": 1792884406483,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.652025,
+      "time": 1792884416722,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6513457,
+      "time": 1792884426961,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6507926,
+      "time": 1792884437200,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6503843,
+      "time": 1792884447439,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6501342,
+      "time": 1792884457678,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65005,
+      "time": 1792884467917,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6501342,
+      "time": 1792884478156,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6503843,
+      "time": 1792884488394,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6507926,
+      "time": 1792884498633,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6513457,
+      "time": 1792884508872,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.652025,
+      "time": 1792884519111,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6528058,
+      "time": 1792884529350,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6536579,
+      "time": 1792884539589,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6545464,
+      "time": 1792884549828,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6554324,
+      "time": 1792884560067,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.656275,
+      "time": 1792884570306,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6570334,
+      "time": 1792884580544,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6576692,
+      "time": 1792884590783,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6581495,
+      "time": 1792884601022,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6584485,
+      "time": 1792884611261,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65855,
+      "time": 1792884621500,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6584485,
+      "time": 1792884631739,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6581495,
+      "time": 1792884641978,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6576692,
+      "time": 1792884652217,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6570334,
+      "time": 1792884662456,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.656275,
+      "time": 1792884672694,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6554324,
+      "time": 1792884682933,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6545464,
+      "time": 1792884693172,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6536579,
+      "time": 1792884703411,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6528058,
+      "time": 1792884713650,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.652025,
+      "time": 1792884723889,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6513457,
+      "time": 1792884734128,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6507926,
+      "time": 1792884744367,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6503843,
+      "time": 1792884754606,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6501342,
+      "time": 1792884764844,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65005,
+      "time": 1792884775083,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6501342,
+      "time": 1792884785322,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6503843,
+      "time": 1792884795561,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6507926,
+      "time": 1792884805800,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6513457,
+      "time": 1792884816039,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.652025,
+      "time": 1792884826278,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6528058,
+      "time": 1792884836517,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6536579,
+      "time": 1792884846756,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6545464,
+      "time": 1792884856994,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6554324,
+      "time": 1792884867233,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.656275,
+      "time": 1792884877472,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6570334,
+      "time": 1792884887711,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6576692,
+      "time": 1792884897950,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6581495,
+      "time": 1792884908189,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6584485,
+      "time": 1792884918428,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65855,
+      "time": 1792884928667,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6584485,
+      "time": 1792884938906,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6581495,
+      "time": 1792884949144,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6576692,
+      "time": 1792884959383,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6570334,
+      "time": 1792884969622,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.656275,
+      "time": 1792884979861,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6554324,
+      "time": 1792884990100,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6545464,
+      "time": 1792885000339,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6536579,
+      "time": 1792885010578,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6528058,
+      "time": 1792885020817,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.652025,
+      "time": 1792885031056,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6513457,
+      "time": 1792885041294,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6507926,
+      "time": 1792885051533,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6503843,
+      "time": 1792885061772,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6501342,
+      "time": 1792885072011,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65005,
+      "time": 1792885082250,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6501342,
+      "time": 1792885092489,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6503843,
+      "time": 1792885102728,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6507926,
+      "time": 1792885112967,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6513457,
+      "time": 1792885123206,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.652025,
+      "time": 1792885133444,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6528058,
+      "time": 1792885143683,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6536579,
+      "time": 1792885153922,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6545464,
+      "time": 1792885164161,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6554324,
+      "time": 1792885174400,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.656275,
+      "time": 1792885184639,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6570334,
+      "time": 1792885194878,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6576692,
+      "time": 1792885205117,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6581495,
+      "time": 1792885215356,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6584485,
+      "time": 1792885225594,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65855,
+      "time": 1792885235833,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6584485,
+      "time": 1792885246072,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6581495,
+      "time": 1792885256311,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6576692,
+      "time": 1792885266550,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6570334,
+      "time": 1792885276789,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.656275,
+      "time": 1792885287028,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6554324,
+      "time": 1792885297267,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6545464,
+      "time": 1792885307506,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2978744,
+      "lon": 106.6536579,
+      "time": 1792885317744,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2980735,
+      "lon": 106.6528058,
+      "time": 1792885327983,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2984873,
+      "lon": 106.652025,
+      "time": 1792885338222,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.2991378,
+      "lon": 106.6513457,
+      "time": 1792885348461,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3000361,
+      "lon": 106.6507926,
+      "time": 1792885358700,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3011677,
+      "lon": 106.6503843,
+      "time": 1792885368939,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.302483,
+      "lon": 106.6501342,
+      "time": 1792885379178,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65005,
+      "time": 1792885389417,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6501342,
+      "time": 1792885399656,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6503843,
+      "time": 1792885409894,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6507926,
+      "time": 1792885420133,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6513457,
+      "time": 1792885430372,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.652025,
+      "time": 1792885440611,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6528058,
+      "time": 1792885450850,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6536579,
+      "time": 1792885461089,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3099256,
+      "lon": 106.6545464,
+      "time": 1792885471328,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3097265,
+      "lon": 106.6554324,
+      "time": 1792885481567,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3093127,
+      "lon": 106.656275,
+      "time": 1792885491806,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3086622,
+      "lon": 106.6570334,
+      "time": 1792885502044,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3077639,
+      "lon": 106.6576692,
+      "time": 1792885512283,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3066323,
+      "lon": 106.6581495,
+      "time": 1792885522522,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.305317,
+      "lon": 106.6584485,
+      "time": 1792885532761,
+      "speed": 3.05
+    },
+    {
+      "lat": -6.3039,
+      "lon": 106.65855,
+      "time": 1792885543000,
+      "speed": 3.05
+    }
+  ],
+  "metricStream": [
+    {
+      "timestamp": 1792883700000,
+      "elapsedSeconds": 0,
+      "distanceMeters": 0,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 125,
+      "cadence": 176,
+      "elevationMeters": 15,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 85,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883718000,
+      "elapsedSeconds": 18,
+      "distanceMeters": 54.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 126,
+      "cadence": 177,
+      "elevationMeters": 15.1,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 85,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883736000,
+      "elapsedSeconds": 36,
+      "distanceMeters": 109.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 127,
+      "cadence": 178,
+      "elevationMeters": 15.2,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 85,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883754000,
+      "elapsedSeconds": 54,
+      "distanceMeters": 164.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 128,
+      "cadence": 178,
+      "elevationMeters": 15.4,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 85,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883772000,
+      "elapsedSeconds": 72,
+      "distanceMeters": 219.6,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 129,
+      "cadence": 178,
+      "elevationMeters": 15.5,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 84,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883790000,
+      "elapsedSeconds": 90,
+      "distanceMeters": 274.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 129,
+      "cadence": 178,
+      "elevationMeters": 15.6,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 84,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883808000,
+      "elapsedSeconds": 108,
+      "distanceMeters": 329.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 129,
+      "cadence": 177,
+      "elevationMeters": 15.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 84,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883826000,
+      "elapsedSeconds": 126,
+      "distanceMeters": 384.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 129,
+      "cadence": 176,
+      "elevationMeters": 15.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 84,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883844000,
+      "elapsedSeconds": 144,
+      "distanceMeters": 439.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 129,
+      "cadence": 175,
+      "elevationMeters": 15.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 84,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883862000,
+      "elapsedSeconds": 162,
+      "distanceMeters": 494,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 128,
+      "cadence": 174,
+      "elevationMeters": 16,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 84,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883880000,
+      "elapsedSeconds": 180,
+      "distanceMeters": 548.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 127,
+      "cadence": 174,
+      "elevationMeters": 16.1,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 84,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883898000,
+      "elapsedSeconds": 198,
+      "distanceMeters": 603.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 127,
+      "cadence": 174,
+      "elevationMeters": 16.2,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 83,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883916000,
+      "elapsedSeconds": 216,
+      "distanceMeters": 658.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 126,
+      "cadence": 174,
+      "elevationMeters": 16.4,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 83,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883934000,
+      "elapsedSeconds": 234,
+      "distanceMeters": 713.6,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 125,
+      "cadence": 175,
+      "elevationMeters": 16.5,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 83,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883952000,
+      "elapsedSeconds": 252,
+      "distanceMeters": 768.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 125,
+      "cadence": 176,
+      "elevationMeters": 16.6,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 83,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883970000,
+      "elapsedSeconds": 270,
+      "distanceMeters": 823.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 125,
+      "cadence": 177,
+      "elevationMeters": 16.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 83,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792883988000,
+      "elapsedSeconds": 288,
+      "distanceMeters": 878.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 125,
+      "cadence": 178,
+      "elevationMeters": 16.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 83,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884006000,
+      "elapsedSeconds": 306,
+      "distanceMeters": 933.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 126,
+      "cadence": 178,
+      "elevationMeters": 16.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 83,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884024000,
+      "elapsedSeconds": 324,
+      "distanceMeters": 988,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 126,
+      "cadence": 178,
+      "elevationMeters": 16.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 82,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884042000,
+      "elapsedSeconds": 342,
+      "distanceMeters": 1042.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 127,
+      "cadence": 178,
+      "elevationMeters": 17,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 82,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884060000,
+      "elapsedSeconds": 360,
+      "distanceMeters": 1097.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 128,
+      "cadence": 177,
+      "elevationMeters": 17.1,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 82,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884078000,
+      "elapsedSeconds": 378,
+      "distanceMeters": 1152.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 129,
+      "cadence": 176,
+      "elevationMeters": 17.2,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 82,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884096000,
+      "elapsedSeconds": 396,
+      "distanceMeters": 1207.6,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 130,
+      "cadence": 175,
+      "elevationMeters": 17.3,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 82,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884114000,
+      "elapsedSeconds": 414,
+      "distanceMeters": 1262.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 131,
+      "cadence": 174,
+      "elevationMeters": 17.3,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 82,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884132000,
+      "elapsedSeconds": 432,
+      "distanceMeters": 1317.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 132,
+      "cadence": 174,
+      "elevationMeters": 17.4,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 81,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884150000,
+      "elapsedSeconds": 450,
+      "distanceMeters": 1372.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 133,
+      "cadence": 174,
+      "elevationMeters": 17.5,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 81,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884168000,
+      "elapsedSeconds": 468,
+      "distanceMeters": 1427.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 133,
+      "cadence": 174,
+      "elevationMeters": 17.5,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 81,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884186000,
+      "elapsedSeconds": 486,
+      "distanceMeters": 1482,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 133,
+      "cadence": 175,
+      "elevationMeters": 17.6,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 81,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884204000,
+      "elapsedSeconds": 504,
+      "distanceMeters": 1536.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 133,
+      "cadence": 176,
+      "elevationMeters": 17.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 81,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884222000,
+      "elapsedSeconds": 522,
+      "distanceMeters": 1591.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 133,
+      "cadence": 177,
+      "elevationMeters": 17.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 81,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884240000,
+      "elapsedSeconds": 540,
+      "distanceMeters": 1646.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 132,
+      "cadence": 178,
+      "elevationMeters": 17.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 81,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884258000,
+      "elapsedSeconds": 558,
+      "distanceMeters": 1701.6,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 131,
+      "cadence": 178,
+      "elevationMeters": 17.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 80,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884276000,
+      "elapsedSeconds": 576,
+      "distanceMeters": 1756.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 131,
+      "cadence": 178,
+      "elevationMeters": 17.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 80,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884294000,
+      "elapsedSeconds": 594,
+      "distanceMeters": 1811.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 130,
+      "cadence": 178,
+      "elevationMeters": 17.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 80,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884312000,
+      "elapsedSeconds": 612,
+      "distanceMeters": 1866.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 130,
+      "cadence": 177,
+      "elevationMeters": 17.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 80,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884330000,
+      "elapsedSeconds": 630,
+      "distanceMeters": 1921.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 129,
+      "cadence": 176,
+      "elevationMeters": 17.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 80,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884348000,
+      "elapsedSeconds": 648,
+      "distanceMeters": 1976,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 129,
+      "cadence": 175,
+      "elevationMeters": 18,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 80,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884366000,
+      "elapsedSeconds": 666,
+      "distanceMeters": 2030.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 129,
+      "cadence": 174,
+      "elevationMeters": 18,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 80,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884384000,
+      "elapsedSeconds": 684,
+      "distanceMeters": 2085.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 130,
+      "cadence": 174,
+      "elevationMeters": 18,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 79,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884402000,
+      "elapsedSeconds": 702,
+      "distanceMeters": 2140.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 130,
+      "cadence": 174,
+      "elevationMeters": 18,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 79,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884420000,
+      "elapsedSeconds": 720,
+      "distanceMeters": 2195.6,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 131,
+      "cadence": 174,
+      "elevationMeters": 18,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 79,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884438000,
+      "elapsedSeconds": 738,
+      "distanceMeters": 2250.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 132,
+      "cadence": 175,
+      "elevationMeters": 18,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 79,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884456000,
+      "elapsedSeconds": 756,
+      "distanceMeters": 2305.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 133,
+      "cadence": 176,
+      "elevationMeters": 18,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 79,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884474000,
+      "elapsedSeconds": 774,
+      "distanceMeters": 2360.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 134,
+      "cadence": 177,
+      "elevationMeters": 18,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 79,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884492000,
+      "elapsedSeconds": 792,
+      "distanceMeters": 2415.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 135,
+      "cadence": 178,
+      "elevationMeters": 18,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 79,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884510000,
+      "elapsedSeconds": 810,
+      "distanceMeters": 2470,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 136,
+      "cadence": 178,
+      "elevationMeters": 17.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 78,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884528000,
+      "elapsedSeconds": 828,
+      "distanceMeters": 2524.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 137,
+      "cadence": 178,
+      "elevationMeters": 17.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 78,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884546000,
+      "elapsedSeconds": 846,
+      "distanceMeters": 2579.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 137,
+      "cadence": 177,
+      "elevationMeters": 17.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 78,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884564000,
+      "elapsedSeconds": 864,
+      "distanceMeters": 2634.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 137,
+      "cadence": 177,
+      "elevationMeters": 17.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 78,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884582000,
+      "elapsedSeconds": 882,
+      "distanceMeters": 2689.5,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 137,
+      "cadence": 176,
+      "elevationMeters": 17.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 78,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884600000,
+      "elapsedSeconds": 900,
+      "distanceMeters": 2744.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 137,
+      "cadence": 175,
+      "elevationMeters": 17.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 78,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884618000,
+      "elapsedSeconds": 918,
+      "distanceMeters": 2799.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 136,
+      "cadence": 174,
+      "elevationMeters": 17.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 78,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884636000,
+      "elapsedSeconds": 936,
+      "distanceMeters": 2854.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 135,
+      "cadence": 174,
+      "elevationMeters": 17.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 77,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884654000,
+      "elapsedSeconds": 954,
+      "distanceMeters": 2909.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 135,
+      "cadence": 174,
+      "elevationMeters": 17.6,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 77,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884672000,
+      "elapsedSeconds": 972,
+      "distanceMeters": 2964,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 134,
+      "cadence": 175,
+      "elevationMeters": 17.6,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 77,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884690000,
+      "elapsedSeconds": 990,
+      "distanceMeters": 3018.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 134,
+      "cadence": 175,
+      "elevationMeters": 17.5,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 77,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884708000,
+      "elapsedSeconds": 1008,
+      "distanceMeters": 3073.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 133,
+      "cadence": 176,
+      "elevationMeters": 17.4,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 77,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884726000,
+      "elapsedSeconds": 1026,
+      "distanceMeters": 3128.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 133,
+      "cadence": 177,
+      "elevationMeters": 17.4,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 77,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884744000,
+      "elapsedSeconds": 1044,
+      "distanceMeters": 3183.5,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 133,
+      "cadence": 178,
+      "elevationMeters": 17.3,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 77,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884762000,
+      "elapsedSeconds": 1062,
+      "distanceMeters": 3238.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 134,
+      "cadence": 178,
+      "elevationMeters": 17.2,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 76,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884780000,
+      "elapsedSeconds": 1080,
+      "distanceMeters": 3293.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 134,
+      "cadence": 178,
+      "elevationMeters": 17.1,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 76,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884798000,
+      "elapsedSeconds": 1098,
+      "distanceMeters": 3348.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 135,
+      "cadence": 177,
+      "elevationMeters": 17.1,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 76,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884816000,
+      "elapsedSeconds": 1116,
+      "distanceMeters": 3403.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 136,
+      "cadence": 177,
+      "elevationMeters": 17,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 76,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884834000,
+      "elapsedSeconds": 1134,
+      "distanceMeters": 3458,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 137,
+      "cadence": 176,
+      "elevationMeters": 16.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 76,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884852000,
+      "elapsedSeconds": 1152,
+      "distanceMeters": 3512.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 139,
+      "cadence": 175,
+      "elevationMeters": 16.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 76,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884870000,
+      "elapsedSeconds": 1170,
+      "distanceMeters": 3567.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 140,
+      "cadence": 174,
+      "elevationMeters": 16.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 75,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884888000,
+      "elapsedSeconds": 1188,
+      "distanceMeters": 3622.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 140,
+      "cadence": 174,
+      "elevationMeters": 16.6,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 75,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884906000,
+      "elapsedSeconds": 1206,
+      "distanceMeters": 3677.5,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 141,
+      "cadence": 174,
+      "elevationMeters": 16.5,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 75,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884924000,
+      "elapsedSeconds": 1224,
+      "distanceMeters": 3732.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 141,
+      "cadence": 175,
+      "elevationMeters": 16.4,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 75,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884942000,
+      "elapsedSeconds": 1242,
+      "distanceMeters": 3787.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 141,
+      "cadence": 175,
+      "elevationMeters": 16.3,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 75,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884960000,
+      "elapsedSeconds": 1260,
+      "distanceMeters": 3842.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 141,
+      "cadence": 176,
+      "elevationMeters": 16.2,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 75,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884978000,
+      "elapsedSeconds": 1278,
+      "distanceMeters": 3897.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 141,
+      "cadence": 177,
+      "elevationMeters": 16.1,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 75,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792884996000,
+      "elapsedSeconds": 1296,
+      "distanceMeters": 3952,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 140,
+      "cadence": 178,
+      "elevationMeters": 16,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 74,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885014000,
+      "elapsedSeconds": 1314,
+      "distanceMeters": 4006.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 140,
+      "cadence": 178,
+      "elevationMeters": 15.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 74,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885032000,
+      "elapsedSeconds": 1332,
+      "distanceMeters": 4061.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 139,
+      "cadence": 178,
+      "elevationMeters": 15.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 74,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885050000,
+      "elapsedSeconds": 1350,
+      "distanceMeters": 4116.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 138,
+      "cadence": 177,
+      "elevationMeters": 15.6,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 74,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885068000,
+      "elapsedSeconds": 1368,
+      "distanceMeters": 4171.5,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 138,
+      "cadence": 177,
+      "elevationMeters": 15.5,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 74,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885086000,
+      "elapsedSeconds": 1386,
+      "distanceMeters": 4226.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 137,
+      "cadence": 176,
+      "elevationMeters": 15.4,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 74,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885104000,
+      "elapsedSeconds": 1404,
+      "distanceMeters": 4281.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 137,
+      "cadence": 175,
+      "elevationMeters": 15.3,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 74,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885122000,
+      "elapsedSeconds": 1422,
+      "distanceMeters": 4336.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 137,
+      "cadence": 174,
+      "elevationMeters": 15.2,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 73,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885140000,
+      "elapsedSeconds": 1440,
+      "distanceMeters": 4391.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 138,
+      "cadence": 174,
+      "elevationMeters": 15,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 73,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885158000,
+      "elapsedSeconds": 1458,
+      "distanceMeters": 4446,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 139,
+      "cadence": 174,
+      "elevationMeters": 14.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 73,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885176000,
+      "elapsedSeconds": 1476,
+      "distanceMeters": 4500.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 139,
+      "cadence": 175,
+      "elevationMeters": 14.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 73,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885194000,
+      "elapsedSeconds": 1494,
+      "distanceMeters": 4555.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 141,
+      "cadence": 175,
+      "elevationMeters": 14.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 73,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885212000,
+      "elapsedSeconds": 1512,
+      "distanceMeters": 4610.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 142,
+      "cadence": 176,
+      "elevationMeters": 14.6,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 73,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885230000,
+      "elapsedSeconds": 1530,
+      "distanceMeters": 4665.5,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 143,
+      "cadence": 177,
+      "elevationMeters": 14.5,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 73,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885248000,
+      "elapsedSeconds": 1548,
+      "distanceMeters": 4720.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 144,
+      "cadence": 178,
+      "elevationMeters": 14.4,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 72,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885266000,
+      "elapsedSeconds": 1566,
+      "distanceMeters": 4775.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 144,
+      "cadence": 178,
+      "elevationMeters": 14.2,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 72,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885284000,
+      "elapsedSeconds": 1584,
+      "distanceMeters": 4830.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 145,
+      "cadence": 178,
+      "elevationMeters": 14.1,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 72,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885302000,
+      "elapsedSeconds": 1602,
+      "distanceMeters": 4885.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 145,
+      "cadence": 177,
+      "elevationMeters": 14,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 72,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885320000,
+      "elapsedSeconds": 1620,
+      "distanceMeters": 4940,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 145,
+      "cadence": 177,
+      "elevationMeters": 13.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 72,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885338000,
+      "elapsedSeconds": 1638,
+      "distanceMeters": 4994.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 145,
+      "cadence": 176,
+      "elevationMeters": 13.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 72,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885356000,
+      "elapsedSeconds": 1656,
+      "distanceMeters": 5049.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 145,
+      "cadence": 175,
+      "elevationMeters": 13.7,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 72,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885374000,
+      "elapsedSeconds": 1674,
+      "distanceMeters": 5104.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 144,
+      "cadence": 174,
+      "elevationMeters": 13.6,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 71,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885392000,
+      "elapsedSeconds": 1692,
+      "distanceMeters": 5159.5,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 144,
+      "cadence": 174,
+      "elevationMeters": 13.5,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 71,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885410000,
+      "elapsedSeconds": 1710,
+      "distanceMeters": 5214.4,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 143,
+      "cadence": 174,
+      "elevationMeters": 13.4,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 71,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885428000,
+      "elapsedSeconds": 1728,
+      "distanceMeters": 5269.3,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 142,
+      "cadence": 175,
+      "elevationMeters": 13.3,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 71,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885446000,
+      "elapsedSeconds": 1746,
+      "distanceMeters": 5324.2,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 142,
+      "cadence": 175,
+      "elevationMeters": 13.2,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 71,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885464000,
+      "elapsedSeconds": 1764,
+      "distanceMeters": 5379.1,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 141,
+      "cadence": 176,
+      "elevationMeters": 13.1,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 71,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885482000,
+      "elapsedSeconds": 1782,
+      "distanceMeters": 5434,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 141,
+      "cadence": 177,
+      "elevationMeters": 13,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 70,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885500000,
+      "elapsedSeconds": 1800,
+      "distanceMeters": 5488.9,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 142,
+      "cadence": 178,
+      "elevationMeters": 12.9,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 70,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885518000,
+      "elapsedSeconds": 1818,
+      "distanceMeters": 5543.8,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 142,
+      "cadence": 178,
+      "elevationMeters": 12.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 70,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    },
+    {
+      "timestamp": 1792885536000,
+      "elapsedSeconds": 1836,
+      "distanceMeters": 5598.7,
+      "speedMps": 3.05,
+      "paceSecPerKm": 328,
+      "heartRate": 143,
+      "cadence": 178,
+      "elevationMeters": 12.8,
+      "gradeAdjustedSpeedMps": 3.05,
+      "bodyBattery": 70,
+      "verticalOscillationCm": 7.2,
+      "groundContactTimeMs": 254,
+      "strideLengthM": 1.04
+    }
+  ],
+  "splits": [
+    {
+      "splitNumber": 1,
+      "distanceMeters": 1000,
+      "durationSeconds": 328,
+      "paceSecPerKm": 328,
+      "avgHeartRate": 138,
+      "elevationDiffMeters": -2.2,
+      "avgCadence": 177
+    },
+    {
+      "splitNumber": 2,
+      "distanceMeters": 1000,
+      "durationSeconds": 331,
+      "paceSecPerKm": 331,
+      "avgHeartRate": 139,
+      "elevationDiffMeters": 2.2,
+      "avgCadence": 176
+    },
+    {
+      "splitNumber": 3,
+      "distanceMeters": 1000,
+      "durationSeconds": 325,
+      "paceSecPerKm": 325,
+      "avgHeartRate": 141,
+      "elevationDiffMeters": -2.2,
+      "avgCadence": 177
+    },
+    {
+      "splitNumber": 4,
+      "distanceMeters": 1000,
+      "durationSeconds": 328,
+      "paceSecPerKm": 328,
+      "avgHeartRate": 142,
+      "elevationDiffMeters": 2.2,
+      "avgCadence": 176
+    },
+    {
+      "splitNumber": 5,
+      "distanceMeters": 1000,
+      "durationSeconds": 331,
+      "paceSecPerKm": 331,
+      "avgHeartRate": 144,
+      "elevationDiffMeters": -2.2,
+      "avgCadence": 177
+    },
+    {
+      "splitNumber": 6,
+      "distanceMeters": 620,
+      "durationSeconds": 202,
+      "paceSecPerKm": 326,
+      "avgHeartRate": 145,
+      "elevationDiffMeters": 0.5,
+      "avgCadence": 178
+    }
+  ],
+  "boundingBox": {
+    "minLat": -6.3109,
+    "maxLat": -6.2969,
+    "minLon": 106.6472,
+    "maxLon": 106.6612
+  }
+}

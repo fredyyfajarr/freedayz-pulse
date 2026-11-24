@@ -20,6 +20,7 @@ import {
   BookOpen,
   MessageSquare,
   DollarSign,
+  ArrowLeft,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -247,7 +248,11 @@ export default function Sidebar() {
         {isDesktopOpen ? (
           /* EXPANDED HEADER */
           <div className="h-16 px-3.5 border-b-2 border-slate-200 dark:border-violet-900/60 bg-slate-50/50 dark:bg-[#090d1c]/50 flex items-center justify-between gap-2 overflow-hidden">
-            <Link href="/dashboard" className="flex items-center gap-2 group min-w-0">
+            <Link 
+              href="/" 
+              title={isId ? 'Kembali ke Beranda (Landing Page)' : 'Return to Landing Page'} 
+              className="flex items-center gap-2 group min-w-0"
+            >
               <BrandLogo size={32} />
               <div className="flex flex-col min-w-0">
                 <span className="font-black italic tracking-wider text-sm text-slate-900 dark:text-white whitespace-nowrap">
@@ -281,6 +286,26 @@ export default function Sidebar() {
 
         {/* Navigation Links Area */}
         <div className={`flex-1 overflow-y-auto py-3 space-y-1 font-mono ${isDesktopOpen ? 'px-3' : 'px-2'}`}>
+          {/* 1. Explicit Back to Landing Page Link */}
+          {isDesktopOpen ? (
+            <Link
+              href="/"
+              title={isId ? 'Kembali ke Halaman Beranda (Landing Page)' : 'Return to Landing Page'}
+              className="flex items-center gap-2 px-3 py-2 text-[11px] font-black tracking-wider uppercase bg-slate-100/90 hover:bg-violet-100 dark:bg-[#090d1c] dark:hover:bg-violet-950/60 text-slate-700 dark:text-zinc-300 hover:text-violet-700 dark:hover:text-cyan-300 border-2 border-slate-300 dark:border-violet-900/80 shadow-[2px_2px_0px_#cbd5e1] dark:shadow-[2px_2px_0px_#1e1b4b] active:translate-x-0.5 active:translate-y-0.5 transition-all mb-3 cursor-pointer group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-violet-600 dark:text-cyan-400 group-hover:-translate-x-1 transition-transform" />
+              <span>{isId ? '← BERANDA // LANDING' : '← BACK TO LANDING'}</span>
+            </Link>
+          ) : (
+            <Link
+              href="/"
+              title={isId ? 'Kembali ke Landing Page' : 'Return to Landing Page'}
+              className="w-10 h-10 mx-auto flex items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-zinc-800/60 border border-transparent hover:border-slate-300 dark:hover:border-zinc-700 transition-all mb-3 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+          )}
+
           {isDesktopOpen && (
             <div className="px-3 pb-2 flex items-center justify-between text-[10px] font-black tracking-widest uppercase">
               {isCoach ? (
@@ -508,7 +533,11 @@ export default function Sidebar() {
          ========================================================================= */}
       <header className="md:hidden sticky top-0 z-40 h-14 bg-white/95 dark:bg-[#070a14]/95 backdrop-blur-md border-b-2 border-slate-200 dark:border-violet-900/60 px-3 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.05)] transition-colors select-none">
         {/* Brand Logo & Name */}
-        <Link href="/dashboard" className="flex items-center gap-2 group shrink-0">
+        <Link 
+          href="/" 
+          title={isId ? 'Kembali ke Beranda (Landing Page)' : 'Return to Landing Page'} 
+          className="flex items-center gap-2 group shrink-0"
+        >
           <BrandLogo size={28} />
           <span className="font-black italic tracking-wider text-sm sm:text-base text-slate-900 dark:text-white whitespace-nowrap">
             FREEDAYZZ<span className={isCoach ? 'text-cyan-500' : 'text-violet-600 dark:text-violet-400'}>.PULSE</span>
@@ -572,8 +601,9 @@ export default function Sidebar() {
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-violet-900/60">
                 <button 
                   type="button"
-                  onClick={() => handleNavigate('/dashboard')}
+                  onClick={() => handleNavigate('/')}
                   className="flex items-center gap-2.5 shrink-0 text-left cursor-pointer"
+                  title={isId ? 'Kembali ke Beranda (Landing Page)' : 'Return to Landing Page'}
                 >
                   <BrandLogo size={32} />
                   <div className="flex flex-col">
@@ -596,6 +626,15 @@ export default function Sidebar() {
 
               {/* Navigation Links inside Drawer */}
               <nav className="mt-4 space-y-1.5 font-mono">
+                {/* Mobile Back to Landing Page CTA */}
+                <button
+                  type="button"
+                  onClick={() => handleNavigate('/')}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mb-2.5 text-xs font-black tracking-wider uppercase bg-slate-100/90 hover:bg-violet-100 dark:bg-[#090d1c] dark:hover:bg-violet-950/60 text-slate-700 dark:text-zinc-300 hover:text-violet-700 dark:hover:text-cyan-300 border-2 border-slate-300 dark:border-violet-900/80 shadow-[2px_2px_0px_#cbd5e1] dark:shadow-[2px_2px_0px_#1e1b4b] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 text-violet-600 dark:text-cyan-400" />
+                  <span>{isId ? '← BERANDA // LANDING' : '← BACK TO LANDING'}</span>
+                </button>
                 {navLinks.map(link => {
                   const Icon = link.icon;
                   const isActive = link.isActive;
