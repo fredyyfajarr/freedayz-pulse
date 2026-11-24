@@ -227,7 +227,7 @@ export default function AthleteBiodataCard({ initialProfile }: Props) {
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="e.g. Fredy Fajar"
+              placeholder="e.g. Bimo Pratama"
               className="w-full p-2.5 bg-slate-50 dark:bg-[#070a14] border-2 border-slate-300 dark:border-zinc-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-violet-500 transition-colors"
             />
           </div>

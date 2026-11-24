@@ -1,5 +1,5 @@
-import { BestEffort } from '../entities/BestEffort';
-import { VO2MaxEstimate, TrainingZonePace } from '../entities/GarminHealthMetrics';
+import type { BestEffort } from '../entities/BestEffort';
+import type { VO2MaxEstimate, TrainingZonePace } from '../entities/GarminHealthMetrics';
 
 export class VO2MaxCalculator {
   /**

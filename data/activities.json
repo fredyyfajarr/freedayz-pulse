@@ -1,8 +1,64 @@
 [
   {
+    "id": "25136191911",
+    "externalId": 25136191911,
+    "name": "Morning Easy Aerobic Base 5.7K",
+    "sportType": "running",
+    "startTime": "2026-11-19T22:38:10.000Z",
+    "startTimeLocalStr": "2026-11-20 05:38:10",
+    "distanceMeters": 5724.97,
+    "durationSeconds": 3013,
+    "movingDurationSeconds": 3011,
+    "elevationGainMeters": 13,
+    "elevationLossMeters": 7,
+    "avgSpeedMps": 1.899999976158142,
+    "maxSpeedMps": 2.378999948501587,
+    "avgPaceSecPerKm": 526.315796078077,
+    "maxPaceSecPerKm": 420.3446917390015,
+    "avgGradeAdjustedSpeedMps": 1.902999997138977,
+    "avgHeartRate": 148,
+    "maxHeartRate": 164,
+    "hrZones": {
+      "zone1Seconds": 605.983,
+      "zone2Seconds": 2271.911,
+      "zone3Seconds": 33.683,
+      "zone4Seconds": 0,
+      "zone5Seconds": 0,
+      "totalZoneSeconds": 2911.577
+    },
+    "avgPowerWatts": 147,
+    "maxPowerWatts": 197,
+    "normalizedPowerWatts": 149,
+    "dynamics": {
+      "avgCadence": 177,
+      "maxCadence": 192,
+      "avgStrideLengthMeters": 0.64,
+      "avgGroundContactTimeMs": 275,
+      "avgVerticalOscillationCm": 6.6,
+      "avgVerticalRatioPercent": 10.4,
+      "avgGroundContactBalanceLeftPercent": 50.4,
+      "avgGroundContactBalanceRightPercent": 49.6
+    },
+    "calories": 324,
+    "steps": 8870,
+    "aerobicTrainingEffect": 2.299999952316284,
+    "trainingEffectLabel": "AEROBIC_BASE",
+    "differenceBodyBattery": -7,
+    "relativeEffortScore": 68,
+    "fastest1000mSeconds": 526,
+    "fastest1609mSeconds": 846,
+    "fastest5000mSeconds": 2630,
+    "minTemperatureCelsius": 28,
+    "maxTemperatureCelsius": 31,
+    "locationName": "Gelora Bung Karno Track",
+    "hasGpsData": true,
+    "startLatitude": -6.203801762312651,
+    "startLongitude": 106.59967442974448
+  },
+  {
     "id": "25125787256",
     "externalId": 25125787256,
-    "name": "Tangerang Running",
+    "name": "Sunday Steady Long Run 10K",
     "sportType": "running",
     "startTime": "2026-11-18T22:37:27.000Z",
     "startTimeLocalStr": "2026-11-19 05:37:27",
@@ -51,7 +107,7 @@
     "fastest10000mSeconds": 5077,
     "minTemperatureCelsius": 30,
     "maxTemperatureCelsius": 34,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.203638147562742,
     "startLongitude": 106.59965925849974
@@ -59,7 +115,7 @@
   {
     "id": "25114434210",
     "externalId": 25114434210,
-    "name": "after mulesss",
+    "name": "Aerobic Recovery Flush 6K",
     "sportType": "running",
     "startTime": "2026-11-17T22:58:32.000Z",
     "startTimeLocalStr": "2026-11-18 05:58:32",
@@ -107,7 +163,7 @@
     "fastest5000mSeconds": 2465,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 32,
-    "locationName": "Tangerang",
+    "locationName": "Alam Sutera Green Belt",
     "hasGpsData": true,
     "startLatitude": -6.203749962151051,
     "startLongitude": 106.59902717918158
@@ -115,7 +171,7 @@
   {
     "id": "25114433214",
     "externalId": 25114433214,
-    "name": "jadi ini adalah before mules",
+    "name": "Pre-Run Mobility & Warmup Strides",
     "sportType": "running",
     "startTime": "2026-11-17T22:31:40.000Z",
     "startTimeLocalStr": "2026-11-18 05:31:40",
@@ -161,7 +217,7 @@
     "fastest1000mSeconds": 452,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 31,
-    "locationName": "Tangerang",
+    "locationName": "Alam Sutera Green Belt",
     "hasGpsData": true,
     "startLatitude": -6.203746777027845,
     "startLongitude": 106.59964693710208
@@ -169,7 +225,7 @@
   {
     "id": "25092320243",
     "externalId": 25092320243,
-    "name": "Tangerang Running",
+    "name": "Sunset Easy Aerobic Jog 6.5K",
     "sportType": "running",
     "startTime": "2026-11-15T22:32:59.000Z",
     "startTimeLocalStr": "2026-11-16 05:32:59",
@@ -217,7 +273,7 @@
     "fastest5000mSeconds": 2871,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 32,
-    "locationName": "Tangerang",
+    "locationName": "BSD City Running Loop",
     "hasGpsData": true,
     "startLatitude": -6.203763708472252,
     "startLongitude": 106.59965842030942
@@ -225,7 +281,7 @@
   {
     "id": "25074171351",
     "externalId": 25074171351,
-    "name": "kalo kata ahel jgn di push",
+    "name": "Lactate Threshold Tempo Run 5K",
     "sportType": "running",
     "startTime": "2026-11-14T10:06:37.000Z",
     "startTimeLocalStr": "2026-11-14 17:06:37",
@@ -274,7 +330,7 @@
     "fastest5000mSeconds": 1936,
     "minTemperatureCelsius": 31,
     "maxTemperatureCelsius": 33,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.200682185590267,
     "startLongitude": 106.60116297192872
@@ -282,7 +338,7 @@
   {
     "id": "25049613584",
     "externalId": 25049613584,
-    "name": "Tangerang Running",
+    "name": "Progression Long Run 11K",
     "sportType": "running",
     "startTime": "2026-11-11T23:07:47.000Z",
     "startTimeLocalStr": "2026-11-12 06:07:47",
@@ -332,7 +388,7 @@
     "fastest10000mSeconds": 5343,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 34,
-    "locationName": "Tangerang",
+    "locationName": "BSD City Running Loop",
     "hasGpsData": true,
     "startLatitude": -6.203750967979431,
     "startLongitude": 106.5990793146193
@@ -340,7 +396,7 @@
   {
     "id": "25037428565",
     "externalId": 25037428565,
-    "name": "Tangerang Running",
+    "name": "Morning Recovery Run 5.7K",
     "sportType": "running",
     "startTime": "2026-11-10T23:12:20.000Z",
     "startTimeLocalStr": "2026-11-11 06:12:20",
@@ -388,7 +444,7 @@
     "fastest5000mSeconds": 2620,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 32,
-    "locationName": "Tangerang",
+    "locationName": "Alam Sutera Green Belt",
     "hasGpsData": true,
     "startLatitude": -6.2037579249590635,
     "startLongitude": 106.59978934563696
@@ -396,7 +452,7 @@
   {
     "id": "25025279989",
     "externalId": 25025279989,
-    "name": "Tangerang Running",
+    "name": "Easy Aerobic Base Run 5K",
     "sportType": "running",
     "startTime": "2026-11-09T22:32:25.000Z",
     "startTimeLocalStr": "2026-11-10 05:32:25",
@@ -445,7 +501,7 @@
     "fastest5000mSeconds": 2399,
     "minTemperatureCelsius": 28,
     "maxTemperatureCelsius": 31,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.203816765919328,
     "startLongitude": 106.60026837140322
@@ -453,7 +509,7 @@
   {
     "id": "25014705240",
     "externalId": 25014705240,
-    "name": "Tangerang Running",
+    "name": "Zone 2 Low-Heart-Rate Flow 5K",
     "sportType": "running",
     "startTime": "2026-11-08T23:19:55.000Z",
     "startTimeLocalStr": "2026-11-09 06:19:55",
@@ -501,7 +557,7 @@
     "fastest5000mSeconds": 2766,
     "minTemperatureCelsius": 28,
     "maxTemperatureCelsius": 31,
-    "locationName": "Tangerang",
+    "locationName": "BSD City Running Loop",
     "hasGpsData": true,
     "startLatitude": -6.203992618247867,
     "startLongitude": 106.60031237639487
@@ -509,7 +565,7 @@
   {
     "id": "24994782032",
     "externalId": 24994782032,
-    "name": "Tangerang Running",
+    "name": "5K Tempo Pace Intervals",
     "sportType": "running",
     "startTime": "2026-11-07T09:05:00.000Z",
     "startTimeLocalStr": "2026-11-07 16:05:00",
@@ -558,7 +614,7 @@
     "fastest5000mSeconds": 1910,
     "minTemperatureCelsius": 33,
     "maxTemperatureCelsius": 34,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.2042544689029455,
     "startLongitude": 106.60030852071941
@@ -566,7 +622,7 @@
   {
     "id": "24972384756",
     "externalId": 24972384756,
-    "name": "Bogor Walking",
+    "name": "Post-Run Active Recovery Walk",
     "sportType": "walking",
     "startTime": "2026-11-05T01:39:39.000Z",
     "startTimeLocalStr": "2026-11-05 08:39:39",
@@ -602,7 +658,7 @@
     "relativeEffortScore": 3,
     "minTemperatureCelsius": 30,
     "maxTemperatureCelsius": 33,
-    "locationName": "Bogor",
+    "locationName": "Kebun Raya Bogor",
     "hasGpsData": true,
     "startLatitude": -6.5958556439727545,
     "startLongitude": 106.95909689180553
@@ -610,7 +666,7 @@
   {
     "id": "24957744986",
     "externalId": 24957744986,
-    "name": "Tangerang Running",
+    "name": "Steady State Aerobic Run 5K",
     "sportType": "running",
     "startTime": "2026-11-03T22:35:33.000Z",
     "startTimeLocalStr": "2026-11-04 05:35:33",
@@ -658,7 +714,7 @@
     "fastest5000mSeconds": 2110,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 31,
-    "locationName": "Tangerang",
+    "locationName": "BSD City Running Loop",
     "hasGpsData": true,
     "startLatitude": -6.205421229824424,
     "startLongitude": 106.5999292396009
@@ -666,7 +722,7 @@
   {
     "id": "24934370153",
     "externalId": 24934370153,
-    "name": "Kekuatan",
+    "name": "Core Strength & Functional Conditioning",
     "sportType": "other",
     "startTime": "2026-11-01T23:26:49.000Z",
     "startTimeLocalStr": "2026-11-02 06:26:49",
@@ -699,12 +755,13 @@
     "relativeEffortScore": 12,
     "minTemperatureCelsius": 31,
     "maxTemperatureCelsius": 33,
-    "hasGpsData": false
+    "hasGpsData": false,
+    "locationName": "Freedayzz Fitness Lab"
   },
   {
     "id": "24914482160",
     "externalId": 24914482160,
-    "name": "Tangerang Running",
+    "name": "Weekend Aerobic Long Run 10K",
     "sportType": "running",
     "startTime": "2026-10-31T09:15:48.000Z",
     "startTimeLocalStr": "2026-10-31 16:15:48",
@@ -754,7 +811,7 @@
     "fastest10000mSeconds": 4642,
     "minTemperatureCelsius": 32,
     "maxTemperatureCelsius": 34,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.203909553587437,
     "startLongitude": 106.60033232532442
@@ -762,7 +819,7 @@
   {
     "id": "24863029863",
     "externalId": 24863029863,
-    "name": "Tangerang Running",
+    "name": "Fast 5K Time Trial Session",
     "sportType": "running",
     "startTime": "2026-10-26T22:32:59.000Z",
     "startTimeLocalStr": "2026-10-27 05:32:59",
@@ -810,7 +867,7 @@
     "fastest5000mSeconds": 1720,
     "minTemperatureCelsius": 28,
     "maxTemperatureCelsius": 30,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.20359112508595,
     "startLongitude": 106.60137126222253
@@ -818,7 +875,7 @@
   {
     "id": "24862791402",
     "externalId": 24862791402,
-    "name": "Tangerang Running",
+    "name": "Cool-down Shakeout Jog",
     "sportType": "running",
     "startTime": "2026-10-26T22:24:15.000Z",
     "startTimeLocalStr": "2026-10-27 05:24:15",
@@ -863,7 +920,7 @@
     "relativeEffortScore": 4,
     "minTemperatureCelsius": 30,
     "maxTemperatureCelsius": 32,
-    "locationName": "Tangerang",
+    "locationName": "Alam Sutera Green Belt",
     "hasGpsData": true,
     "startLatitude": -6.204613046720624,
     "startLongitude": 106.60024783574045
@@ -871,7 +928,7 @@
   {
     "id": "24840915224",
     "externalId": 24840915224,
-    "name": "Tangerang Running",
+    "name": "Aerobic Base Maintenance 5K",
     "sportType": "running",
     "startTime": "2026-10-24T23:22:15.000Z",
     "startTimeLocalStr": "2026-10-25 06:22:15",
@@ -919,7 +976,7 @@
     "fastest5000mSeconds": 2313,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 32,
-    "locationName": "Tangerang",
+    "locationName": "BSD City Running Loop",
     "hasGpsData": true,
     "startLatitude": -6.204476589336991,
     "startLongitude": 106.60029058344662
@@ -927,7 +984,7 @@
   {
     "id": "24833796713",
     "externalId": 24833796713,
-    "name": "Tangerang Running",
+    "name": "Morning Easy Z2 Jog 5.6K",
     "sportType": "running",
     "startTime": "2026-10-24T09:27:23.000Z",
     "startTimeLocalStr": "2026-10-24 16:27:23",
@@ -975,7 +1032,7 @@
     "fastest5000mSeconds": 2407,
     "minTemperatureCelsius": 33,
     "maxTemperatureCelsius": 34,
-    "locationName": "Tangerang",
+    "locationName": "Alam Sutera Green Belt",
     "hasGpsData": true,
     "startLatitude": -6.204438032582402,
     "startLongitude": 106.60029955208302
@@ -983,7 +1040,7 @@
   {
     "id": "24812378918",
     "externalId": 24812378918,
-    "name": "Tangerang Running",
+    "name": "Cadence & Form Stride Drills",
     "sportType": "running",
     "startTime": "2026-10-22T10:25:20.000Z",
     "startTimeLocalStr": "2026-10-22 17:25:20",
@@ -1029,7 +1086,7 @@
     "relativeEffortScore": 2,
     "minTemperatureCelsius": 32,
     "maxTemperatureCelsius": 32,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.207391731441021,
     "startLongitude": 106.59726588986814
@@ -1037,7 +1094,7 @@
   {
     "id": "24812165203",
     "externalId": 24812165203,
-    "name": "Tangerang Running",
+    "name": "Sub-Threshold Long Run 11K",
     "sportType": "running",
     "startTime": "2026-10-22T08:39:47.000Z",
     "startTimeLocalStr": "2026-10-22 15:39:47",
@@ -1086,7 +1143,7 @@
     "fastest10000mSeconds": 4241,
     "minTemperatureCelsius": 33,
     "maxTemperatureCelsius": 35,
-    "locationName": "Tangerang",
+    "locationName": "BSD City Running Loop",
     "hasGpsData": true,
     "startLatitude": -6.203523734584451,
     "startLongitude": 106.60034305416048
@@ -1094,7 +1151,7 @@
   {
     "id": "24796871747",
     "externalId": 24796871747,
-    "name": "Tangerang Running",
+    "name": "Easy Aerobic Flush 4.8K",
     "sportType": "running",
     "startTime": "2026-10-20T22:29:38.000Z",
     "startTimeLocalStr": "2026-10-21 05:29:38",
@@ -1142,7 +1199,7 @@
     "fastest1609mSeconds": 740,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 31,
-    "locationName": "Tangerang",
+    "locationName": "Alam Sutera Green Belt",
     "hasGpsData": true,
     "startLatitude": -6.204630816355348,
     "startLongitude": 106.6002226062119
@@ -1150,7 +1207,7 @@
   {
     "id": "24784958445",
     "externalId": 24784958445,
-    "name": "Kekuatan",
+    "name": "Mobility & Runner Core Workout",
     "sportType": "other",
     "startTime": "2026-10-19T23:38:15.000Z",
     "startTimeLocalStr": "2026-10-20 06:38:15",
@@ -1182,12 +1239,13 @@
     "relativeEffortScore": 3,
     "minTemperatureCelsius": 32,
     "maxTemperatureCelsius": 34,
-    "hasGpsData": false
+    "hasGpsData": false,
+    "locationName": "Freedayzz Fitness Lab"
   },
   {
     "id": "24770080297",
     "externalId": 24770080297,
-    "name": "Tangerang Running",
+    "name": "Midweek Steady Tempo 5K",
     "sportType": "running",
     "startTime": "2026-10-18T15:09:34.000Z",
     "startTimeLocalStr": "2026-10-18 22:09:34",
@@ -1235,7 +1293,7 @@
     "fastest5000mSeconds": 2165,
     "minTemperatureCelsius": 31,
     "maxTemperatureCelsius": 32,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.2746318615973,
     "startLongitude": 106.61900829523802
@@ -1243,7 +1301,7 @@
   {
     "id": "24755730977",
     "externalId": 24755730977,
-    "name": "Tangerang Running",
+    "name": "Zone 3 Aerobic Flow Run 5K",
     "sportType": "running",
     "startTime": "2026-10-17T11:42:49.000Z",
     "startTimeLocalStr": "2026-10-17 18:42:49",
@@ -1292,7 +1350,7 @@
     "fastest5000mSeconds": 2075,
     "minTemperatureCelsius": 31,
     "maxTemperatureCelsius": 32,
-    "locationName": "Tangerang",
+    "locationName": "BSD City Running Loop",
     "hasGpsData": true,
     "startLatitude": -6.174654867500067,
     "startLongitude": 106.63876527920365
@@ -1300,7 +1358,7 @@
   {
     "id": "24727943662",
     "externalId": 24727943662,
-    "name": "Tangerang Running",
+    "name": "Endurance Base Builder 10K",
     "sportType": "running",
     "startTime": "2026-10-14T22:51:39.000Z",
     "startTimeLocalStr": "2026-10-15 05:51:39",
@@ -1349,7 +1407,7 @@
     "fastest10000mSeconds": 4798,
     "minTemperatureCelsius": 30,
     "maxTemperatureCelsius": 33,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.201826063916087,
     "startLongitude": 106.60049577243626
@@ -1357,7 +1415,7 @@
   {
     "id": "24715227217",
     "externalId": 24715227217,
-    "name": "Tangerang Running",
+    "name": "Recovery Strides & Dynamic Drills",
     "sportType": "running",
     "startTime": "2026-10-13T22:55:43.000Z",
     "startTimeLocalStr": "2026-10-14 05:55:43",
@@ -1405,7 +1463,7 @@
     "fastest1609mSeconds": 645,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 31,
-    "locationName": "Tangerang",
+    "locationName": "Alam Sutera Green Belt",
     "hasGpsData": true,
     "startLatitude": -6.207399778068066,
     "startLongitude": 106.59835352562368
@@ -1413,7 +1471,7 @@
   {
     "id": "24691431813",
     "externalId": 24691431813,
-    "name": "Tangerang Running",
+    "name": "Easy Zone 2 Morning Run 5.4K",
     "sportType": "running",
     "startTime": "2026-10-11T22:58:34.000Z",
     "startTimeLocalStr": "2026-10-12 05:58:34",
@@ -1461,7 +1519,7 @@
     "fastest5000mSeconds": 2488,
     "minTemperatureCelsius": 30,
     "maxTemperatureCelsius": 32,
-    "locationName": "Tangerang",
+    "locationName": "BSD City Running Loop",
     "hasGpsData": true,
     "startLatitude": -6.2039534747600555,
     "startLongitude": 106.6003587283194
@@ -1469,7 +1527,7 @@
   {
     "id": "24674373583",
     "externalId": 24674373583,
-    "name": "Tangerang Running",
+    "name": "Interval VO2Max Track Repeats",
     "sportType": "running",
     "startTime": "2026-10-10T12:55:00.000Z",
     "startTimeLocalStr": "2026-10-10 19:55:00",
@@ -1518,7 +1576,7 @@
     "fastest5000mSeconds": 1851,
     "minTemperatureCelsius": 31,
     "maxTemperatureCelsius": 33,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.246123248711228,
     "startLongitude": 106.626754431054
@@ -1526,7 +1584,7 @@
   {
     "id": "24646431059",
     "externalId": 24646431059,
-    "name": "Tangerang Running",
+    "name": "Sunday Long Run Session 10K",
     "sportType": "running",
     "startTime": "2026-10-07T23:08:51.000Z",
     "startTimeLocalStr": "2026-10-08 06:08:51",
@@ -1575,7 +1633,7 @@
     "fastest10000mSeconds": 5161,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 33,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.200467608869076,
     "startLongitude": 106.60148500464857
@@ -1583,7 +1641,7 @@
   {
     "id": "24620085243",
     "externalId": 24620085243,
-    "name": "Tangerang Running",
+    "name": "5K Race Pace Simulation",
     "sportType": "running",
     "startTime": "2026-10-05T22:19:29.000Z",
     "startTimeLocalStr": "2026-10-06 05:19:29",
@@ -1632,7 +1690,7 @@
     "fastest5000mSeconds": 1793,
     "minTemperatureCelsius": 29,
     "maxTemperatureCelsius": 31,
-    "locationName": "Tangerang",
+    "locationName": "Gelora Bung Karno Track",
     "hasGpsData": true,
     "startLatitude": -6.203390127047896,
     "startLongitude": 106.6004179045558
@@ -1640,7 +1698,7 @@
   {
     "id": "24875523576",
     "externalId": 24875523576,
-    "name": "Tangerang Running",
+    "name": "Threshold Intervals 5K",
     "sportType": "running",
     "startTime": "2026-10-03T11:54:00.000Z",
     "startTimeLocalStr": "2026-10-03 18:54:00",
@@ -1669,12 +1727,13 @@
     "fastest1000mSeconds": 381,
     "fastest1609mSeconds": 614,
     "fastest5000mSeconds": 1907,
-    "hasGpsData": false
+    "hasGpsData": false,
+    "locationName": "BSD City Running Loop"
   },
   {
     "id": "24875519165",
     "externalId": 24875519165,
-    "name": "Tangerang Running",
+    "name": "Recovery Shakeout Run 5.6K",
     "sportType": "running",
     "startTime": "2026-10-01T22:33:00.000Z",
     "startTimeLocalStr": "2026-10-02 05:33:00",
@@ -1703,12 +1762,13 @@
     "fastest1000mSeconds": 558,
     "fastest1609mSeconds": 898,
     "fastest5000mSeconds": 2789,
-    "hasGpsData": false
+    "hasGpsData": false,
+    "locationName": "Alam Sutera Green Belt"
   },
   {
     "id": "24875497643",
     "externalId": 24875497643,
-    "name": "Tangerang Running",
+    "name": "Easy Aerobic Base Jog 6.2K",
     "sportType": "running",
     "startTime": "2026-10-01T09:00:00.000Z",
     "startTimeLocalStr": "2026-10-01 16:00:00",
@@ -1737,12 +1797,13 @@
     "fastest1000mSeconds": 564,
     "fastest1609mSeconds": 908,
     "fastest5000mSeconds": 2821,
-    "hasGpsData": false
+    "hasGpsData": false,
+    "locationName": "BSD City Running Loop"
   },
   {
     "id": "24869616545",
     "externalId": 24869616545,
-    "name": "Tangerang Running",
+    "name": "Steady Aerobic Pace Run 5K",
     "sportType": "running",
     "startTime": "2026-09-30T22:25:00.000Z",
     "startTimeLocalStr": "2026-10-01 05:25:00",
@@ -1776,6 +1837,7 @@
     "fastest1000mSeconds": 417,
     "fastest1609mSeconds": 671,
     "fastest5000mSeconds": 2084,
-    "hasGpsData": false
+    "hasGpsData": false,
+    "locationName": "Gelora Bung Karno Track"
   }
 ]

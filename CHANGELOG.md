@@ -13,6 +13,7 @@ Dokumen ini mencatat seluruh riwayat iterasi, evolusi arsitektur, perbaikan bug 
 
 | Versi | Tanggal | Milestone Utama | Status |
 | :--- | :--- | :--- | :--- |
+| **v1.1.0** | 20 Nov 2026 | **Change Request CR-01: Security Hardening (`/api/*` Auth Guard & BYOK Per-User), Automated Domain Unit Tests, Flow Fixes & Coach Cloud Sync Schema** | ✅ Selesai |
 | **v1.0.0** | 19 Nov 2026 | **Production Release: Zero-Defect UAT, Dokumen Manajemen Proyek TI (MS Project WBS), Full Mobile Guardrails** | ✅ Selesai |
 | **v0.9.0** | 19 Nov 2026 | **Akurasi Telemetri HR Aktivitas: Sinkronisasi Stream Detik-ke-Detik, Presisi Joe Friel LTHR, Kunci Plafon Max HR (201 BPM)** | ✅ Selesai |
 | **v0.8.0** | 18 Nov 2026 | **Mesin Kalibrasi 4-Metode Zona Detak Jantung (%HRR, %LTHR, %Max HR, Manual BPM), Modal Interaktif & Tampilan Mobile Khusus** | ✅ Selesai |
@@ -28,6 +29,24 @@ Dokumen ini mencatat seluruh riwayat iterasi, evolusi arsitektur, perbaikan bug 
 ---
 
 ## 🚀 Log Rinci Perubahan (Detailed Changelog)
+
+### [v1.1.0] — 2026-11-20 (Change Request CR-01: Security Hardening, Automated Domain Unit Tests & Multi-Role Flow Alignment)
+
+#### 🌟 Ditambahkan (Added)
+* **Automated Domain Unit Test Suite (WBS 4.1 / CR-01):**
+  * Menambahkan test suite otomatis (`npm test`) menggunakan Node.js native test runner pada `src/domain/services/__tests__/domainServices.test.ts` yang mencakup `PaceCalculator`, `TRIMPCalculator`, `ACWRCalculator`, `PMCEngine`, `HRProfileCalculator` (4 metode + plafon 201 BPM), dan `VO2MaxCalculator`.
+* **API Authentication Guard & Centralized Access Resolver:**
+  * Menambahkan `src/utils/supabase/apiAuth.ts` (`requireAuthenticatedUser`) untuk memproteksi seluruh endpoint `/api/*`.
+  * Menambahkan `src/utils/athleteAccess.ts` (`getCurrentUserAccess`) untuk konsistensi isolasi akun baru dan kontrol role (`athlete` vs `coach`) di seluruh halaman.
+* **Skema Cloud Sync Modul Pelatih (Supabase):**
+  * Menambahkan tabel `squad_athletes` dan `coach_tasks` lengkap dengan kebijakan RLS di `supabase/schema.sql`, serta metode sinkronisasi hybrid cloud-to-localStorage di `src/utils/coachingStorage.ts`.
+
+#### 🛠️ Diperbaiki (Fixed)
+* **Keamanan BYOK & Auth:** Menghapus API Key Garmin yang sebelumnya tertulis statis di `src/app/onboarding/page.tsx`, menutup celah *open redirect* di `src/app/auth/callback/route.ts`, dan memisahkan cache token Garmin per kunci API di `GarminAuthenticator.ts`.
+* **Alur Onboarding & Multi-Role:** Memperbaiki redirect login agar tidak melewati `/onboarding`, memisahkan status mode demo vs koneksi Garmin aktif, mengarahkan tombol setup atlet baru ke `/onboarding`, menambahkan tombol `ATUR API KEY` di `/settings`, serta memblokir akses role `coach` di `/activities/[id]` dan `/activities/compare`.
+* **Konsistensi Data & Timezone:** Menghubungkan `WeeklyTargetWidget` ke `weekly_target_km` profil pengguna dengan proteksi pembagian nol, mengganti tanggal statis di `MonthInSportExportModal.tsx` ke `new Date()`, dan memperbaiki konsistensi tanggal UTC pada `PMCEngine.ts`.
+
+---
 
 ### [v1.0.0] — 2026-11-19 (Production Release: Zero-Defect UAT, Dokumen Manajemen Proyek TI, Full Mobile Viewport Guardrails)
 

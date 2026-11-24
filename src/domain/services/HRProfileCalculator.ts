@@ -1,4 +1,4 @@
-import { Activity } from '../entities/Activity';
+import type { Activity } from '../entities/Activity';
 
 export type HRMethod = 'HRR' | 'MAX_HR' | 'LTHR' | 'MANUAL_BPM';
 

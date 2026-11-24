@@ -555,18 +555,18 @@ export default function Sidebar() {
       </header>
 
       {/* =========================================================================
-          3. MOBILE SLIDE-OUT DRAWER & BACKDROP
+          3. MOBILE SLIDE-OUT DRAWER & BACKDROP (Opens from Right to match Hamburger)
          ========================================================================= */}
       {isMobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50">
+        <div className="md:hidden fixed inset-0 z-50 flex justify-end">
           {/* Backdrop overlay */}
           <div 
             onClick={closeMobile}
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200 cursor-pointer"
           />
 
-          {/* Slide-out drawer panel */}
-          <div className="relative z-10 w-72 max-w-[85vw] h-full bg-white dark:bg-[#070a14] border-r-2 border-slate-200 dark:border-violet-900/70 shadow-2xl flex flex-col justify-between p-4 animate-in slide-in-from-left duration-200 overflow-y-auto">
+          {/* Slide-out drawer panel (Right side aligned with top-right hamburger) */}
+          <div className="relative z-10 ml-auto w-72 max-w-[85vw] h-full bg-white dark:bg-[#070a14] border-l-2 border-slate-200 dark:border-violet-900/70 shadow-2xl flex flex-col justify-between p-4 animate-in slide-in-from-right duration-200 overflow-y-auto">
             {/* Drawer Top Header with Animated X Button */}
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-violet-900/60">

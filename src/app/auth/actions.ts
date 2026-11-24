@@ -44,7 +44,11 @@ export async function login(formData: FormData) {
     if (userRole === 'coach') {
       targetUrl = '/dashboard';
     } else {
-      const hasMetaConnection = meta?.garmin_connected === true || !!meta?.garmin_api_key;
+      const hasMetaConnection =
+        meta?.garmin_connected === true ||
+        meta?.onboarding_completed === true ||
+        meta?.garmin_demo_mode === true ||
+        !!meta?.garmin_api_key;
 
       if (!hasMetaConnection) {
         try {
@@ -66,7 +70,15 @@ export async function login(formData: FormData) {
     }
   }
 
-  if (next && next.startsWith('/') && next !== '/login' && next !== '/onboarding') {
+  // Only honor `next` when user is not required to complete onboarding first
+  if (
+    targetUrl !== '/onboarding' &&
+    next &&
+    next.startsWith('/') &&
+    !next.startsWith('//') &&
+    next !== '/login' &&
+    next !== '/onboarding'
+  ) {
     targetUrl = next;
   }
 
@@ -80,7 +92,8 @@ export async function signup(formData: FormData) {
   const email = (formData.get('email') as string)?.trim();
   const password = formData.get('password') as string;
   const fullName = (formData.get('fullName') as string)?.trim() || email.split('@')[0];
-  const role = (formData.get('role') as string) || 'athlete';
+  const rawRole = (formData.get('role') as string) || 'athlete';
+  const role: 'athlete' | 'coach' = rawRole === 'coach' ? 'coach' : 'athlete';
 
   if (!email || !password) {
     return { error: 'Email dan kata sandi wajib diisi' };
@@ -151,16 +164,20 @@ export async function saveGarminConnection(formData: FormData) {
 
   const garminApiKey = (formData.get('garminApiKey') as string)?.trim() || '';
   const hrZoneMethod = (formData.get('hrZoneMethod') as string) || 'HRR';
-  const weeklyTargetKm = parseFloat((formData.get('weeklyTargetKm') as string) || '30');
+  const parsedWeeklyTarget = parseFloat((formData.get('weeklyTargetKm') as string) || '30');
+  const weeklyTargetKm = Number.isFinite(parsedWeeklyTarget) && parsedWeeklyTarget > 0 ? parsedWeeklyTarget : 30;
+  const hasRealKey = garminApiKey.length > 0;
 
   // 1. Always save in Supabase Auth user_metadata (guaranteed to persist with user identity)
   await supabase.auth.updateUser({
     data: {
       garmin_api_key: garminApiKey,
-      garmin_connected: true,
+      garmin_connected: hasRealKey,
+      garmin_demo_mode: !hasRealKey,
+      onboarding_completed: true,
       hr_zone_method: hrZoneMethod,
       weekly_target_km: weeklyTargetKm,
-      garmin_connected_at: new Date().toISOString(),
+      garmin_connected_at: hasRealKey ? new Date().toISOString() : null,
     },
   });
 
@@ -169,8 +186,8 @@ export async function saveGarminConnection(formData: FormData) {
     await supabase.from('user_garmin_connections').upsert({
       user_id: user.id,
       garmin_api_key: garminApiKey,
-      is_active: true,
-      sync_status: garminApiKey ? 'CONFIGURED' : 'DEMO_MODE',
+      is_active: hasRealKey,
+      sync_status: hasRealKey ? 'CONFIGURED' : 'DEMO_MODE',
       last_synced_at: new Date().toISOString(),
     }, { onConflict: 'user_id' });
 

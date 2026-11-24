@@ -23,6 +23,8 @@ export interface LandingTranslations {
     };
     mockup: {
       windowTitle: string;
+      previewTag: string;
+      previewFootnote: string;
       sensorSync: string;
       metric1Label: string;
       metric1Sub: string;
@@ -159,8 +161,10 @@ export const landingTranslations: Record<Language, LandingTranslations> = {
         recovery: 'Korelasi Tidur & Pemulihan',
       },
       mockup: {
-        windowTitle: 'FREEDAYZZ_PULSE // LIVE_COCKPIT_TELEMETRI.EXE',
-        sensorSync: 'SENSOR GARMIN TERHUBUNG // LATENSI 12ms',
+        windowTitle: 'FREEDAYZZ_PULSE // PREVIEW_COCKPIT_TELEMETRI.EXE',
+        previewTag: 'SIMULASI FITUR // PREVIEW MOCKUP',
+        previewFootnote: '*Data ilustratif simulasi tampilan kokpit telemetri atlet Freedayzz Pulse.',
+        sensorSync: 'SIMULASI SENSOR GARMIN // PREVIEW UI',
         metric1Label: 'JARAK MINGGUAN',
         metric1Sub: '▲ +14% vs minggu lalu',
         metric2Label: 'RADAR RISIKO ACWR',
@@ -338,8 +342,10 @@ export const landingTranslations: Record<Language, LandingTranslations> = {
         recovery: 'Sleep & Recovery Correlation',
       },
       mockup: {
-        windowTitle: 'FREEDAYZZ_PULSE // LIVE_COCKPIT_TELEMETRY.EXE',
-        sensorSync: 'GARMIN SENSOR SYNCED // LATENCY 12ms',
+        windowTitle: 'FREEDAYZZ_PULSE // PREVIEW_COCKPIT_TELEMETRY.EXE',
+        previewTag: 'FEATURE SIMULATION // PREVIEW MOCKUP',
+        previewFootnote: '*Illustrative simulation data showcasing Freedayzz Pulse athlete cockpit UI.',
+        sensorSync: 'SIMULATED GARMIN SENSOR // PREVIEW UI',
         metric1Label: 'WEEKLY DISTANCE',
         metric1Sub: '▲ +14% vs last week',
         metric2Label: 'ACWR INJURY RADAR',

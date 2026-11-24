@@ -1,4 +1,4 @@
-import { Activity } from '../entities/Activity';
+import type { Activity } from '../entities/Activity';
 
 export interface ACWRResult {
   acuteLoad: number; // 7-day load

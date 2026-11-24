@@ -417,7 +417,7 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder={isId ? 'Misal: Fredy Fajar' : 'e.g. John Doe'}
+                  placeholder={isId ? 'Misal: Bimo Pratama' : 'e.g. Bimo Pratama'}
                   className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#070a14] border border-slate-300 dark:border-zinc-800 text-slate-900 dark:text-white text-xs font-mono rounded-none focus:outline-none focus:border-violet-500 transition-colors"
                 />
               </div>
@@ -489,6 +489,21 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
             </span>
             <ArrowRight className="w-4 h-4" />
           </button>
+
+          {mode === 'login' && (
+            <button
+              type="button"
+              onClick={() => {
+                document.cookie = 'pulse_demo_mode=1; path=/; max-age=86400; SameSite=Lax';
+                router.push('/dashboard');
+                router.refresh();
+              }}
+              className="w-full py-2.5 px-4 bg-cyan-50 dark:bg-cyan-950/40 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 text-cyan-800 dark:text-cyan-300 font-black text-xs uppercase tracking-wider border border-cyan-500/60 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{isId ? 'COBA MODE DEMO (TANPA LOGIN)' : 'TRY DEMO TELEMETRY LAB (1-CLICK)'}</span>
+            </button>
+          )}
         </form>
 
         {/* Footer Note */}

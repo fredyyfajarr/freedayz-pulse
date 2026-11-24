@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Key, RefreshCw, CheckCircle2, AlertTriangle, Activity, Wifi, Radio } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -184,6 +185,14 @@ export default function GarminConnectionCard({ initialStatus }: Props) {
           <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-cyan-300' : ''}`} />
           <span>{isSyncing ? (isId ? 'MENYINKRONKAN...' : 'SYNCING...') : (isId ? 'SINKRONKAN SEKARANG' : 'SYNC NOW')}</span>
         </button>
+
+        <Link
+          href="/onboarding"
+          className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-cyan-700/70 text-cyan-300 hover:text-cyan-200 font-bold uppercase transition-colors flex items-center gap-1.5 cursor-pointer"
+        >
+          <Key className="w-3.5 h-3.5 text-cyan-400" />
+          <span>{isId ? 'ATUR API KEY' : 'MANAGE API KEY'}</span>
+        </Link>
       </div>
     </div>
   );

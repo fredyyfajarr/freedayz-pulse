@@ -1,5 +1,5 @@
-import { Activity } from '../entities/Activity';
-import { DailyPMCPoint, FitnessSummary, FormStatus } from '../entities/FitnessFreshness';
+import type { Activity } from '../entities/Activity';
+import type { DailyPMCPoint, FitnessSummary, FormStatus } from '../entities/FitnessFreshness';
 
 export class PMCEngine {
   private static CTL_TIME_CONSTANT = 42; // Chronic Training Load (Fitness)
@@ -18,9 +18,10 @@ export class PMCEngine {
     const sorted = [...activities].sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
     
     const now = new Date();
+    now.setUTCHours(23, 59, 59, 999);
     const startDate = new Date();
-    startDate.setDate(now.getDate() - daysBack);
-    startDate.setHours(0, 0, 0, 0);
+    startDate.setUTCDate(startDate.getUTCDate() - daysBack);
+    startDate.setUTCHours(0, 0, 0, 0);
 
     // Group activities by date string YYYY-MM-DD
     const activitiesByDay = new Map<string, Activity[]>();
@@ -74,14 +75,15 @@ export class PMCEngine {
         totalDistanceMeters: dayDistance,
       });
 
-      curr.setDate(curr.getDate() + 1);
+      curr.setUTCDate(curr.getUTCDate() + 1);
     }
 
     const latest = timeline[timeline.length - 1];
     
     // Calculate last 7 days total distance and TRIMP
     const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(now.getDate() - 7);
+    sevenDaysAgo.setUTCDate(sevenDaysAgo.getUTCDate() - 7);
+    sevenDaysAgo.setUTCHours(0, 0, 0, 0);
     const recentDays = timeline.filter(p => p.date >= sevenDaysAgo);
     const sevenDayDistanceKm = Math.round(recentDays.reduce((acc, p) => acc + p.totalDistanceMeters, 0) / 1000 * 10) / 10;
     const sevenDayTrimp = Math.round(recentDays.reduce((acc, p) => acc + p.dailyTrimp, 0));

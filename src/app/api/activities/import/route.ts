@@ -3,8 +3,12 @@ import { container } from '@/infrastructure/di/container';
 import { Activity } from '@/domain/entities/Activity';
 import { ActivityDetail } from '@/domain/entities/ActivityDetail';
 import { revalidatePath } from 'next/cache';
+import { requireAuthenticatedUser } from '@/utils/supabase/apiAuth';
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuthenticatedUser();
+  if (auth.response) return auth.response;
+
   try {
     const body = await request.json();
     const { activity, detail } = body;

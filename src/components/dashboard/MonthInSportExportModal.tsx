@@ -57,8 +57,8 @@ export default function MonthInSportExportModal({ activities, isOpen, onClose }:
       }
     });
 
-    // Ensure November 2026 (current month) is present if in 2026
-    const now = new Date('2026-11-04T10:30:00');
+    // Ensure current month is always present
+    const now = new Date();
     const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     if (!monthsMap.has(currentKey)) {
       const currentMonthName = now.toLocaleDateString(isId ? 'id-ID' : 'en-US', {

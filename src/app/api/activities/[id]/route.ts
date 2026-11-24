@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { container } from '@/infrastructure/di/container';
+import { requireAuthenticatedUser } from '@/utils/supabase/apiAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,9 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAuthenticatedUser();
+  if (auth.response) return auth.response;
+
   try {
     const { id } = await params;
     const result = await container.activityDetailUseCase.execute(id);

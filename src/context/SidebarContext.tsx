@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 interface SidebarContextType {
   isMobileOpen: boolean;
@@ -41,11 +41,11 @@ export function SidebarProvider({
     }
   }, []);
 
-  const toggleMobile = () => setIsMobileOpen(prev => !prev);
-  const closeMobile = () => setIsMobileOpen(false);
-  const openMobile = () => setIsMobileOpen(true);
+  const toggleMobile = useCallback(() => setIsMobileOpen(prev => !prev), []);
+  const closeMobile = useCallback(() => setIsMobileOpen(false), []);
+  const openMobile = useCallback(() => setIsMobileOpen(true), []);
 
-  const toggleDesktop = () => {
+  const toggleDesktop = useCallback(() => {
     setIsDesktopOpen(prev => {
       const next = !prev;
       try {
@@ -56,9 +56,9 @@ export function SidebarProvider({
       }
       return next;
     });
-  };
+  }, []);
 
-  const setDesktopOpen = (open: boolean) => {
+  const setDesktopOpen = useCallback((open: boolean) => {
     setIsDesktopOpen(open);
     try {
       localStorage.setItem('freedayzz_sidebar', String(open));
@@ -66,21 +66,24 @@ export function SidebarProvider({
     } catch {
       // Ignore
     }
-  };
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({
+      isMobileOpen,
+      isDesktopOpen,
+      toggleMobile,
+      toggleDesktop,
+      closeMobile,
+      openMobile,
+      setDesktopOpen,
+      mounted,
+    }),
+    [isMobileOpen, isDesktopOpen, toggleMobile, toggleDesktop, closeMobile, openMobile, setDesktopOpen, mounted]
+  );
 
   return (
-    <SidebarContext.Provider
-      value={{
-        isMobileOpen,
-        isDesktopOpen,
-        toggleMobile,
-        toggleDesktop,
-        closeMobile,
-        openMobile,
-        setDesktopOpen,
-        mounted,
-      }}
-    >
+    <SidebarContext.Provider value={contextValue}>
       {children}
     </SidebarContext.Provider>
   );

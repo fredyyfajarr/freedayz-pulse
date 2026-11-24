@@ -2,12 +2,14 @@ import { GetActivityDetailUseCase } from '@/application/use-cases/GetActivityDet
 import { GetDashboardSummaryUseCase } from '@/application/use-cases/GetDashboardSummaryUseCase';
 import { GetHealthTelemetryUseCase } from '@/application/use-cases/GetHealthTelemetryUseCase';
 import { SyncActivitiesUseCase } from '@/application/use-cases/SyncActivitiesUseCase';
+import { IActivityRepository } from '@/domain/repositories/IActivityRepository';
 import { GarminApiClient } from '../garmin/GarminApiClient';
 import { LocalFileActivityRepository } from '../persistence/LocalFileActivityRepository';
+import { SupabaseActivityRepository } from '../persistence/SupabaseActivityRepository';
 
 class DIContainer {
   private static instance: DIContainer;
-  public repository: LocalFileActivityRepository;
+  public repository: IActivityRepository;
   public garminClient: GarminApiClient;
 
   public syncUseCase: SyncActivitiesUseCase;
@@ -16,7 +18,8 @@ class DIContainer {
   public healthUseCase: GetHealthTelemetryUseCase;
 
   private constructor() {
-    this.repository = new LocalFileActivityRepository();
+    const localFallback = new LocalFileActivityRepository();
+    this.repository = new SupabaseActivityRepository(localFallback);
     this.garminClient = new GarminApiClient();
 
     this.syncUseCase = new SyncActivitiesUseCase(this.garminClient, this.repository);

@@ -1,4 +1,4 @@
-import { HRZoneBreakdown } from '../entities/Activity';
+import type { HRZoneBreakdown } from '../entities/Activity';
 
 export class TRIMPCalculator {
   /**

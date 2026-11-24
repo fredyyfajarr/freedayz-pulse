@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { container } from '@/infrastructure/di/container';
 import PaginatedActivitiesList from '@/components/activities/PaginatedActivitiesList';
 import CoachActivitiesHub from '@/components/coach/CoachActivitiesHub';
+import NewAthleteSetupCard from '@/components/dashboard/NewAthleteSetupCard';
 import { createClient } from '@/utils/supabase/server';
+import { getCurrentUserAccess } from '@/utils/athleteAccess';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -20,14 +22,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ActivitiesPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const role = user?.user_metadata?.role || 'athlete';
+  const access = await getCurrentUserAccess();
 
-  if (role === 'coach') {
+  if (access.isCoach) {
     return (
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
         <CoachActivitiesHub />
+      </div>
+    );
+  }
+
+  if (!access.hasTelemetryAccess) {
+    return (
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
+        <NewAthleteSetupCard athleteName={access.fullName} athleteEmail={access.email} />
       </div>
     );
   }

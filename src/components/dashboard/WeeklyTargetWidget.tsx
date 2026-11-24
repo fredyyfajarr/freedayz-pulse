@@ -11,7 +11,8 @@ interface Props {
 
 export default function WeeklyTargetWidget({ currentKm, weeklyTargetKm = 30 }: Props) {
   const { t } = useLanguage();
-  const goalPercent = Math.min(100, Math.round((currentKm / weeklyTargetKm) * 100));
+  const safeTargetKm = weeklyTargetKm > 0 ? weeklyTargetKm : 30;
+  const goalPercent = Math.min(100, Math.max(0, Math.round((currentKm / safeTargetKm) * 100)));
 
   return (
     <div className="bg-white dark:bg-[#0d1224] border-2 border-slate-200 dark:border-violet-900/60 p-5 shadow-[4px_4px_0px_#cbd5e1] dark:shadow-[4px_4px_0px_#1e1b4b] font-mono transition-colors">
@@ -27,12 +28,12 @@ export default function WeeklyTargetWidget({ currentKm, weeklyTargetKm = 30 }: P
 
       <div className="flex items-baseline justify-between mb-2">
         <span className="text-2xl font-black text-slate-900 dark:text-white">
-          {currentKm.toFixed(1)} <span className="text-xs text-slate-500 dark:text-zinc-400">/ {weeklyTargetKm} KM</span>
+          {currentKm.toFixed(1)} <span className="text-xs text-slate-500 dark:text-zinc-400">/ {safeTargetKm} KM</span>
         </span>
         <span className="text-[10px] text-slate-600 dark:text-zinc-400 font-bold">
-          {currentKm >= weeklyTargetKm
+          {currentKm >= safeTargetKm
             ? t('target.goal_done')
-            : `${(weeklyTargetKm - currentKm).toFixed(1)} ${t('target.km_left')}`}
+            : `${(safeTargetKm - currentKm).toFixed(1)} ${t('target.km_left')}`}
         </span>
       </div>
 

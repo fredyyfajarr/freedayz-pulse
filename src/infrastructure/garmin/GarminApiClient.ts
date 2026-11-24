@@ -9,17 +9,19 @@ import { GarminMappers } from './GarminMappers';
 
 export class GarminApiClient implements IGarminClient {
   private baseUrl: string;
+  private apiKey?: string;
 
-  constructor(baseUrl?: string) {
+  constructor(baseUrl?: string, apiKey?: string) {
     this.baseUrl = baseUrl || process.env.GARMIN_BASE_URL || 'https://personal.connectapi.garmin.com';
+    this.apiKey = apiKey;
   }
 
   public isConfigured(): boolean {
-    return Boolean(process.env.GARMIN_PERSONAL_API_KEY);
+    return Boolean(this.apiKey || process.env.GARMIN_PERSONAL_API_KEY);
   }
 
   public async fetchRecentActivities(limit: number = 50, start: number = 0): Promise<Activity[]> {
-    const token = await GarminAuthenticator.getBearerToken();
+    const token = await GarminAuthenticator.getBearerToken(this.apiKey);
     const url = `${this.baseUrl}/activitylist-service/activities/search/activities?start=${start}&limit=${limit}`;
 
     const response = await fetch(url, {
@@ -44,7 +46,7 @@ export class GarminApiClient implements IGarminClient {
   }
 
   public async fetchActivityDetail(activityId: string | number): Promise<ActivityDetail> {
-    const token = await GarminAuthenticator.getBearerToken();
+    const token = await GarminAuthenticator.getBearerToken(this.apiKey);
     const url = `${this.baseUrl}/activity-service/activity/${activityId}/details`;
 
     const response = await fetch(url, {
@@ -66,7 +68,7 @@ export class GarminApiClient implements IGarminClient {
 
   public async fetchDailySummary(dateStr: string): Promise<GarminDailySummary | null> {
     try {
-      const token = await GarminAuthenticator.getBearerToken();
+      const token = await GarminAuthenticator.getBearerToken(this.apiKey);
       const url = `${this.baseUrl}/usersummary-service/usersummary/daily?calendarDate=${dateStr}`;
 
       const response = await fetch(url, {
@@ -153,7 +155,7 @@ export class GarminApiClient implements IGarminClient {
 
   public async fetchHRVHistory(startDate: string, endDate: string): Promise<GarminHRVSummary[]> {
     try {
-      const token = await GarminAuthenticator.getBearerToken();
+      const token = await GarminAuthenticator.getBearerToken(this.apiKey);
       const url = `${this.baseUrl}/hrv-service/hrv/daily/${startDate}/${endDate}`;
 
       const response = await fetch(url, {

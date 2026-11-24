@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { AthleteSettingsManager } from '@/infrastructure/persistence/AthleteSettingsManager';
 import { createClient } from '@/utils/supabase/server';
+import { requireAuthenticatedUser } from '@/utils/supabase/apiAuth';
 
 export async function GET() {
+  const auth = await requireAuthenticatedUser();
+  if (auth.response) return auth.response;
+
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    const userBiometrics = user?.user_metadata?.athlete_biometrics;
+    const userBiometrics = auth.user.user_metadata?.athlete_biometrics;
 
     const localSettings = AthleteSettingsManager.getSettings();
     const merged = {
@@ -22,6 +24,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuthenticatedUser();
+  if (auth.response) return auth.response;
+
   try {
     const body = await request.json();
     const payload = {
@@ -34,18 +39,15 @@ export async function POST(request: Request) {
     // 1. Update local cache/JSON
     const updated = AthleteSettingsManager.updateSettings(payload);
 
-    // 2. If user is authenticated in Supabase, also persist to their cloud user_metadata
+    // 2. Persist to authenticated user's cloud user_metadata
     try {
       const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.auth.updateUser({
-          data: {
-            athlete_biometrics: updated,
-            biometrics_updated_at: new Date().toISOString(),
-          },
-        });
-      }
+      await supabase.auth.updateUser({
+        data: {
+          athlete_biometrics: updated,
+          biometrics_updated_at: new Date().toISOString(),
+        },
+      });
     } catch (authErr) {
       console.warn('Optional Supabase user metadata update notice:', authErr);
     }

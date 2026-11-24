@@ -8,6 +8,7 @@ import SystemPreferencesCard from '@/components/profile/SystemPreferencesCard';
 import GarminConnectionCard from '@/components/profile/GarminConnectionCard';
 import CoachClubSettingsCard from '@/components/profile/CoachClubSettingsCard';
 import { createClient } from '@/utils/supabase/server';
+import { getCurrentUserAccess } from '@/utils/athleteAccess';
 import { Settings, Watch, ShieldCheck } from 'lucide-react';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,13 +27,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SettingsPage() {
-  // Supabase user profile & metadata for biodata & cloud biometrics
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const access = await getCurrentUserAccess();
+  const { user, isCoach, isDemoMode } = access;
   const userMeta = user?.user_metadata || {};
-  const isCoach = userMeta.role === 'coach';
 
-  // If Coach: Render dedicated Club & Coach Profile Settings (Zero Fredy HR zones, Zero athlete Garmin sync)
+  // If Coach: Render dedicated Club & Coach Profile Settings
   if (isCoach) {
     return (
       <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-4 sm:space-y-6 min-w-0">
@@ -80,17 +79,29 @@ export default async function SettingsPage() {
     ...(userMeta.athlete_biometrics || {}),
   };
 
-  const initialProfile = {
-    fullName: userMeta.full_name || '',
-    email: user?.email || '',
-    role: userMeta.role || 'athlete',
-    gender: userMeta.gender || 'male',
-    birthDate: userMeta.birth_date || '2000-01-01',
-    weightKg: userMeta.weight_kg ? Number(userMeta.weight_kg) : 62,
-    heightCm: userMeta.height_cm ? Number(userMeta.height_cm) : 172,
-    runningClub: userMeta.running_club || 'Freedayzz Running Club',
-    weeklyTargetKm: userMeta.weekly_target_km ? Number(userMeta.weekly_target_km) : 30,
-  };
+  const initialProfile = isDemoMode
+    ? {
+        fullName: 'Bimo Pratama',
+        email: 'bimo.pratama@freedayzz.pulse',
+        role: 'athlete',
+        gender: 'male',
+        birthDate: '1999-04-12',
+        weightKg: 62,
+        heightCm: 172,
+        runningClub: 'Freedayzz Athletic Club',
+        weeklyTargetKm: 35,
+      }
+    : {
+        fullName: userMeta.full_name || '',
+        email: user?.email || '',
+        role: userMeta.role || 'athlete',
+        gender: userMeta.gender || 'male',
+        birthDate: userMeta.birth_date || '2000-01-01',
+        weightKg: userMeta.weight_kg ? Number(userMeta.weight_kg) : 62,
+        heightCm: userMeta.height_cm ? Number(userMeta.height_cm) : 172,
+        runningClub: userMeta.running_club || 'Freedayzz Running Club',
+        weeklyTargetKm: userMeta.weekly_target_km ? Number(userMeta.weekly_target_km) : 30,
+      };
 
   return (
     <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-4 sm:space-y-6 min-w-0">

@@ -36,3 +36,8 @@ ID,WBS,Task_Name,Duration,Start_Date,Finish_Date,Predecessors,Resource_Names,Cos
 35,5.2,"Ekspor Berkas MS Project (WBS, Gantt, EVM, Resource Sheet)",1d,2026-11-19,2026-11-19,34,Project Manager,Rp 500.000
 36,5.3,Update Changelog Versi v1.0.0 & Final Repository Clean,1d,2026-11-19,2026-11-19,35,Lead Developer,Rp 300.000
 37,5.4,Milestone 5: Serah Terima Final Proyek & Siap Operasional,0d,2026-11-19,2026-11-19,36,"Project Sponsor, PM, Team",Rp 0
+38,6.0,CHANGE REQUEST CR-01 (RELEASE v1.1.0 - HARDENING & DUAL-ROLE COACH),1d,2026-11-20,2026-11-20,37,"Lead System Architect, QA Engineer",Rp 0
+39,6.1,"Security Hardening (API Auth Guard, BYOK Token Cache, Open Redirect Fix)",0.5d,2026-11-20,2026-11-20,37,Lead System Architect,Rp 0
+40,6.2,"Dual-Role Coach Portal, GPX Import & Supabase Hybrid Sync Schema",0.25d,2026-11-20,2026-11-20,39,Senior Fullstack Engineer,Rp 0
+41,6.3,"Automated Domain Unit Test Suite (6 Kalkulator Domain - 9/9 Pass)",0.25d,2026-11-20,2026-11-20,40,QA Engineer,Rp 0
+42,6.4,Milestone 6: Release v1.1.0 Terverifikasi & Sinkronisasi Dokumen MPI,0d,2026-11-20,2026-11-20,41,"Project Manager, QA Engineer",Rp 0

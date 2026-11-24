@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { container } from '@/infrastructure/di/container';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { AthleteSettingsManager } from '@/infrastructure/persistence/AthleteSettingsManager';
+import { getCurrentUserAccess } from '@/utils/athleteAccess';
+import NewAthleteSetupCard from '@/components/dashboard/NewAthleteSetupCard';
 import ActivityHeroHeader from '@/components/activity/ActivityHeroHeader';
 import RouteMap from '@/components/activity/RouteMap';
 import ElevationPaceChart from '@/components/activity/ElevationPaceChart';
@@ -37,6 +39,18 @@ export default async function ActivityDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const access = await getCurrentUserAccess();
+  if (access.isCoach) {
+    redirect('/activities');
+  }
+  if (!access.hasTelemetryAccess) {
+    return (
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
+        <NewAthleteSetupCard athleteName={access.fullName} athleteEmail={access.email} />
+      </div>
+    );
+  }
+
   const { id } = await params;
 
   let result;

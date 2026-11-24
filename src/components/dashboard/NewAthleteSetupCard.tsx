@@ -47,7 +47,7 @@ export default function NewAthleteSetupCard({
 
         <div className="flex items-center gap-2">
           <Link
-            href="/settings"
+            href="/onboarding"
             className="px-3.5 py-2 bg-violet-600 hover:bg-violet-500 border border-violet-300 text-white text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-[2px_2px_0px_#7c3aed] cursor-pointer whitespace-nowrap"
           >
             <Key className="w-3.5 h-3.5 text-cyan-300" />
@@ -67,8 +67,8 @@ export default function NewAthleteSetupCard({
             </strong>
             <p className="text-zinc-400 text-[11px] font-sans mt-0.5 leading-relaxed">
               {isId
-                ? 'Untuk mulai menyinkronkan aktivitas lari, detak jantung, dan metrik pemulihan pribadi Anda, masukkan Personal API Key Garmin Anda di halaman Pengaturan.'
-                : 'To start syncing your own running activities, heart rate zones, and recovery metrics, enter your Garmin Personal API Key in the Settings page.'}
+                ? 'Untuk mulai menyinkronkan aktivitas lari, detak jantung, dan metrik pemulihan pribadi Anda, masukkan Personal API Key Garmin Anda melalui halaman Onboarding.'
+                : 'To start syncing your own running activities, heart rate zones, and recovery metrics, enter your Garmin Personal API Key on the Onboarding page.'}
             </p>
           </div>
         </div>

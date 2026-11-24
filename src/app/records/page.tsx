@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { container } from '@/infrastructure/di/container';
 import RecordsClient from '@/components/records/RecordsClient';
 import CoachRecordsHub from '@/components/coach/CoachRecordsHub';
+import NewAthleteSetupCard from '@/components/dashboard/NewAthleteSetupCard';
 import { createClient } from '@/utils/supabase/server';
+import { getCurrentUserAccess } from '@/utils/athleteAccess';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -20,14 +22,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RecordsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const role = user?.user_metadata?.role || 'athlete';
+  const access = await getCurrentUserAccess();
 
-  if (role === 'coach') {
+  if (access.isCoach) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 space-y-6">
         <CoachRecordsHub />
+      </div>
+    );
+  }
+
+  if (!access.hasTelemetryAccess) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 space-y-6">
+        <NewAthleteSetupCard athleteName={access.fullName} athleteEmail={access.email} />
       </div>
     );
   }

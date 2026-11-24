@@ -17,6 +17,7 @@ import NewAthleteSetupCard from '@/components/dashboard/NewAthleteSetupCard';
 import AthleteCoachTasksWidget from '@/components/dashboard/AthleteCoachTasksWidget';
 import { ACWRCalculator } from '@/domain/services/ACWRCalculator';
 import { createClient } from '@/utils/supabase/server';
+import { getCurrentUserAccess } from '@/utils/athleteAccess';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -35,16 +36,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DashboardPage() {
-  // Auth User & Base Role Inspection
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const userMeta = user?.user_metadata || {};
-  const userRole = (userMeta.role as 'athlete' | 'coach' | 'admin') || 'athlete';
-  const userEmail = user?.email || '';
-  const fullName = userMeta.full_name || userEmail.split('@')[0] || 'User';
+  // Auth User, Role & Telemetry Access Inspection
+  const access = await getCurrentUserAccess();
+  const { user, isCoach, hasTelemetryAccess, fullName, email: userEmail, weeklyTargetKm } = access;
 
-  // 1. DEDICATED COACH PORTAL (Zero Fredy data, Zero athlete telemetry widgets)
-  if (userRole === 'coach') {
+  // 1. DEDICATED COACH PORTAL (Zero athlete telemetry widgets)
+  if (isCoach) {
     return (
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
         <CoachDashboard
@@ -56,11 +53,8 @@ export default async function DashboardPage() {
     );
   }
 
-  // 2. ATHLETE ROLE: Check connection & isolate new accounts
-  const isGarminConnected = userMeta.garmin_connected === true || userEmail.toLowerCase() === 'fredyafajr46@gmail.com';
-
-  // If user is a new athlete without Garmin connected, isolate their account and guide them to setup
-  if (!isGarminConnected) {
+  // 2. ATHLETE ROLE: Isolate new accounts without Garmin connection or explicit Demo Mode
+  if (!hasTelemetryAccess) {
     return (
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
         <NewAthleteSetupCard
@@ -134,7 +128,7 @@ export default async function DashboardPage() {
           <ACWRWidget acwr={acwr} />
 
           {/* Weekly Target Goal Tracker */}
-          <WeeklyTargetWidget currentKm={summary.hero.currentWeekDistanceKm} weeklyTargetKm={30} />
+          <WeeklyTargetWidget currentKm={summary.hero.currentWeekDistanceKm} weeklyTargetKm={weeklyTargetKm} />
 
           {/* HRR Profile Calibration Note */}
           <HRRProfileWidget />

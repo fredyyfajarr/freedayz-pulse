@@ -20,10 +20,10 @@ export async function requireAuthenticatedUser(): Promise<ApiAuthResult> {
     if (isDemoCookie) {
       const demoUser: User = {
         id: '00000000-0000-0000-0000-000000000001',
-        email: 'demo@freedayzz.pulse',
+        email: 'bimo.pratama@freedayzz.pulse',
         app_metadata: {},
         user_metadata: {
-          full_name: 'Demo Athlete',
+          full_name: 'Bimo Pratama',
           role: 'athlete',
           garmin_demo_mode: true,
           garmin_connected: true,

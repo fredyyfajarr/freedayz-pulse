@@ -1,9 +1,12 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { container } from '@/infrastructure/di/container';
 import CompareClient from './CompareClient';
 import { Activity } from '@/domain/entities/Activity';
 import Link from 'next/link';
+import { getCurrentUserAccess } from '@/utils/athleteAccess';
+import NewAthleteSetupCard from '@/components/dashboard/NewAthleteSetupCard';
 
 export const metadata: Metadata = {
   title: 'Komparasi Head-to-Head Telemetri',
@@ -14,6 +17,18 @@ interface Props {
 }
 
 export default async function ActivityComparePage({ searchParams }: Props) {
+  const access = await getCurrentUserAccess();
+  if (access.isCoach) {
+    redirect('/activities');
+  }
+  if (!access.hasTelemetryAccess) {
+    return (
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 space-y-4 sm:space-y-6 min-w-0">
+        <NewAthleteSetupCard athleteName={access.fullName} athleteEmail={access.email} />
+      </div>
+    );
+  }
+
   const { a: idA, b: idB } = await searchParams;
   const activities = (await container.repository.getAllActivities()).filter(
     act => act.sportType === 'running' || act.name?.toLowerCase().includes('run')

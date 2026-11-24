@@ -54,8 +54,10 @@ export async function updateSession(request: NextRequest) {
 
   const isAuthRoute = pathname === '/login' || pathname === '/register';
 
+  const isDemoCookie = request.cookies.get('pulse_demo_mode')?.value === '1';
+
   // 1. If unauthenticated visitor tries to access protected route -> redirect to /login
-  if (!user && isProtectedRoute) {
+  if (!user && !isDemoCookie && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('next', pathname);

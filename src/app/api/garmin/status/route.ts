@@ -1,25 +1,34 @@
 import { NextResponse } from 'next/server';
 import { container } from '@/infrastructure/di/container';
 import { GarminAuthenticator } from '@/infrastructure/garmin/GarminAuthenticator';
+import { requireAuthenticatedUser } from '@/utils/supabase/apiAuth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const apiKey = process.env.GARMIN_PERSONAL_API_KEY;
+  const auth = await requireAuthenticatedUser();
+  if (auth.response) return auth.response;
+
+  const userKey =
+    typeof auth.user.user_metadata?.garmin_api_key === 'string' &&
+    auth.user.user_metadata.garmin_api_key.trim().length > 0
+      ? auth.user.user_metadata.garmin_api_key.trim()
+      : undefined;
+  const apiKey = userKey || process.env.GARMIN_PERSONAL_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json({
       configured: false,
       connected: false,
       latencyMs: 0,
-      message: 'GARMIN_PERSONAL_API_KEY is not configured in environment variables.',
+      message: 'Garmin Personal API Key belum dikonfigurasi pada akun ini.',
     });
   }
 
   const startTime = Date.now();
   try {
-    // Attempt token retrieval to verify authentication validity
-    const token = await GarminAuthenticator.getBearerToken();
+    // Attempt token retrieval to verify authentication validity for this user's key
+    const token = await GarminAuthenticator.getBearerToken(apiKey);
     const latencyMs = Date.now() - startTime;
 
     const [lastSync, allActivities] = await Promise.all([

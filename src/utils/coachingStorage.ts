@@ -1,5 +1,6 @@
 'use client';
 
+import { createClient } from '@/utils/supabase/client';
 import { 
   CoachTask, 
   SquadAthlete, 
@@ -69,6 +70,7 @@ export class CoachingStorage {
     if (typeof window !== 'undefined') {
       localStorage.setItem(SQUAD_ATHLETES_KEY, JSON.stringify(updated));
       window.dispatchEvent(new Event('squad_athlete_updated'));
+      void this.persistSquadAthleteToCloud(newAthlete);
     }
     return newAthlete;
   }
@@ -78,6 +80,7 @@ export class CoachingStorage {
     const filtered = athletes.filter(a => a.id !== id);
     if (typeof window !== 'undefined') {
       localStorage.setItem(SQUAD_ATHLETES_KEY, JSON.stringify(filtered));
+      void this.deleteSquadAthleteFromCloud(id);
       window.dispatchEvent(new Event('squad_athlete_updated'));
     }
     return true;
@@ -433,6 +436,136 @@ export class CoachingStorage {
       realizedExpenseIdr,
       budgetUtilizationPercentage,
       costPerAthleteIdr,
+    };
+  }
+
+  // --- SUPABASE CLOUD SYNC (HYBRID FALLBACK TO LOCALSTORAGE) ---
+  public static async persistSquadAthleteToCloud(athlete: SquadAthlete): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from('squad_athletes').upsert({
+        id: athlete.id,
+        coach_id: user.id,
+        name: athlete.name,
+        email: athlete.email,
+        target_race: athlete.targetRace,
+        acwr: athlete.acwr,
+        acwr_zone: athlete.acwrZone,
+        weekly_mileage_km: athlete.weeklyMileageKm,
+        target_weekly_km: athlete.targetWeeklyKm,
+        last_session: athlete.lastSession,
+        tsb: athlete.tsb,
+        package_tier: athlete.packageTier,
+        joined_at: athlete.joinedAt,
+      }, { onConflict: 'id' });
+    } catch {
+      // Fallback safely to localStorage if Supabase tables are not yet migrated
+    }
+  }
+
+  public static async deleteSquadAthleteFromCloud(id: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const supabase = createClient();
+      await supabase.from('squad_athletes').delete().eq('id', id);
+    } catch {
+      // Fallback safely to localStorage
+    }
+  }
+
+  public static async persistTaskToCloud(task: CoachTask, athleteEmail?: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from('coach_tasks').upsert({
+        id: task.id,
+        coach_id: user.id,
+        athlete_id: task.athleteId,
+        athlete_name: task.athleteName,
+        athlete_email: athleteEmail || null,
+        coach_name: task.coachName,
+        title: task.title,
+        type: task.type,
+        due_date: task.dueDate,
+        target_distance_km: task.targetDistanceKm,
+        target_pace: task.targetPace,
+        target_hr_zone: task.targetHrZone,
+        instructions: task.instructions,
+        status: task.status,
+        completed_at: task.completedAt || null,
+        reported_rpe: task.reportedRpe ?? null,
+        athlete_feedback: task.athleteFeedback || null,
+        coach_review_note: task.coachReviewNote || null,
+        adherence_score: task.adherenceScore ?? null,
+      }, { onConflict: 'id' });
+    } catch {
+      // Fallback safely to localStorage
+    }
+  }
+
+  public static async syncFromCloud(): Promise<{ athletes: SquadAthlete[]; tasks: CoachTask[] }> {
+    if (typeof window === 'undefined') return { athletes: [], tasks: [] };
+    try {
+      const supabase = createClient();
+      const [{ data: cloudAthletes }, { data: cloudTasks }] = await Promise.all([
+        supabase.from('squad_athletes').select('*').order('created_at', { ascending: false }),
+        supabase.from('coach_tasks').select('*').order('created_at', { ascending: false }),
+      ]);
+
+      if (Array.isArray(cloudAthletes) && cloudAthletes.length > 0) {
+        const mappedAthletes: SquadAthlete[] = cloudAthletes.map((a: any) => ({
+          id: a.id,
+          coachId: a.coach_id,
+          name: a.name,
+          email: a.email,
+          targetRace: a.target_race || '',
+          acwr: Number(a.acwr ?? 1.0),
+          acwrZone: a.acwr_zone || 'SWEET_SPOT',
+          weeklyMileageKm: Number(a.weekly_mileage_km ?? 0),
+          targetWeeklyKm: Number(a.target_weekly_km ?? 30),
+          lastSession: a.last_session || '-',
+          tsb: Number(a.tsb ?? 0),
+          packageTier: a.package_tier || 'Standard',
+          joinedAt: a.joined_at,
+        }));
+        localStorage.setItem(SQUAD_ATHLETES_KEY, JSON.stringify(mappedAthletes));
+        window.dispatchEvent(new Event('squad_athlete_updated'));
+      }
+
+      if (Array.isArray(cloudTasks) && cloudTasks.length > 0) {
+        const mappedTasks: CoachTask[] = cloudTasks.map((t: any) => ({
+          id: t.id,
+          athleteId: t.athlete_id,
+          athleteName: t.athlete_name,
+          coachName: t.coach_name,
+          title: t.title,
+          type: t.type,
+          dueDate: t.due_date,
+          targetDistanceKm: Number(t.target_distance_km ?? 0),
+          targetPace: t.target_pace || '',
+          targetHrZone: t.target_hr_zone || '',
+          instructions: t.instructions || '',
+          status: t.status || 'PENDING',
+          completedAt: t.completed_at || undefined,
+          reportedRpe: t.reported_rpe ?? undefined,
+          athleteFeedback: t.athlete_feedback || undefined,
+          coachReviewNote: t.coach_review_note || undefined,
+          adherenceScore: t.adherence_score ?? undefined,
+        }));
+        localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(mappedTasks));
+        window.dispatchEvent(new Event('coaching_tasks_updated'));
+      }
+    } catch {
+      // Gracefully keep localStorage cache if cloud tables aren't created yet
+    }
+    return {
+      athletes: this.getSquadAthletes(),
+      tasks: this.getTasks(),
     };
   }
 }

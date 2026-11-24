@@ -1,23 +1,36 @@
+import { createHash } from 'crypto';
+
+interface CachedTokenEntry {
+  token: string;
+  expiresAt: number;
+}
+
 export class GarminAuthenticator {
-  private static cachedToken: string | null = null;
-  private static tokenExpiresAt: number = 0;
+  private static tokenCache = new Map<string, CachedTokenEntry>();
+
+  private static getCacheKey(apiKey: string): string {
+    return createHash('sha256').update(apiKey.trim()).digest('hex');
+  }
 
   /**
    * Returns a valid Bearer token for personal.connectapi.garmin.com.
-   * Caches the token in-memory and refreshes before expiration (default 24h validity).
+   * Caches tokens per API key in-memory and refreshes before expiration (default 24h validity).
    */
   public static async getBearerToken(apiKey?: string): Promise<string> {
-    const key = apiKey || process.env.GARMIN_PERSONAL_API_KEY;
+    const key = (apiKey && apiKey.trim()) || process.env.GARMIN_PERSONAL_API_KEY;
     if (!key) {
       throw new Error(
-        'Garmin Personal API Key is not configured. Please set GARMIN_PERSONAL_API_KEY in .env.local'
+        'Garmin Personal API Key is not configured. Please connect your key in Onboarding or set GARMIN_PERSONAL_API_KEY in .env.local'
       );
     }
 
+    const cacheKey = this.getCacheKey(key);
     const now = Date.now();
+    const cached = this.tokenCache.get(cacheKey);
+
     // If token exists and is valid for at least another 5 minutes, reuse it
-    if (this.cachedToken && this.tokenExpiresAt > now + 5 * 60 * 1000) {
-      return this.cachedToken;
+    if (cached && cached.expiresAt > now + 5 * 60 * 1000) {
+      return cached.token;
     }
 
     const tokenEndpoint =
@@ -56,14 +69,19 @@ export class GarminAuthenticator {
     }
 
     // Default 23 hours cache to stay safely within 24h expiration
-    this.cachedToken = tokenStr;
-    this.tokenExpiresAt = now + 23 * 60 * 60 * 1000;
+    this.tokenCache.set(cacheKey, {
+      token: tokenStr,
+      expiresAt: now + 23 * 60 * 60 * 1000,
+    });
 
-    return this.cachedToken;
+    return tokenStr;
   }
 
-  public static clearCache(): void {
-    this.cachedToken = null;
-    this.tokenExpiresAt = 0;
+  public static clearCache(apiKey?: string): void {
+    if (apiKey) {
+      this.tokenCache.delete(this.getCacheKey(apiKey));
+      return;
+    }
+    this.tokenCache.clear();
   }
 }

@@ -32,14 +32,10 @@ export default function OnboardingPage() {
   const { theme, toggleTheme } = useTheme();
   const isId = language === 'ID';
 
-  const defaultKeyFromEnv =
-    'GCDC_92d09644-66c3-4643-abd0-f54ae03a582e.b34d5549-2a76-4501-b7f6-163916b4ad00.yhUs3BnSlp2MHwpOVBCPtWL7oTxC0AdfA6bRJ3sZp+Y.3967855271';
-
   const [garminKey, setGarminKey] = useState('');
   const [hrMethod, setHrMethod] = useState<'HRR' | 'LTHR' | 'MAX_HR'>('HRR');
   const [weeklyTarget, setWeeklyTarget] = useState('30');
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isAlreadyConnected, setIsAlreadyConnected] = useState(false);
 
@@ -73,12 +69,6 @@ export default function OnboardingPage() {
     }
     loadUserConnection();
   }, [router]);
-
-  const handleUseEnvKey = () => {
-    setGarminKey(defaultKeyFromEnv);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -242,14 +232,6 @@ export default function OnboardingPage() {
                   <Key className="w-3.5 h-3.5 text-violet-600 dark:text-cyan-400" />
                   <span>GARMIN PERSONAL API KEY / TOKEN</span>
                 </label>
-                <button
-                  type="button"
-                  onClick={handleUseEnvKey}
-                  className="text-[11px] font-mono font-bold text-violet-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
-                >
-                  {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                  <span>{isId ? 'Gunakan Key Yang Tersimpan' : 'Use Configured Key'}</span>
-                </button>
               </div>
 
               <textarea

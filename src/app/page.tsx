@@ -199,13 +199,16 @@ export default function LandingPage() {
           <div className="mt-12 max-w-5xl mx-auto">
             <div className="relative bg-white dark:bg-[#0a0f24] border-2 border-slate-300 dark:border-violet-700/80 p-4 sm:p-6 shadow-[8px_8px_0px_#cbd5e1] dark:shadow-[8px_8px_0px_#1e1b4b]">
               {/* Window Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-zinc-800 font-mono text-xs">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-between pb-3 sm:pb-4 border-b border-slate-200 dark:border-zinc-800 font-mono text-xs gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-rose-500 inline-block" />
                   <span className="w-3 h-3 rounded-full bg-amber-500 inline-block" />
                   <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block" />
-                  <span className="ml-2 font-bold text-slate-700 dark:text-zinc-300">
+                  <span className="ml-1 sm:ml-2 font-bold text-slate-700 dark:text-zinc-300">
                     {content.hero.mockup.windowTitle}
+                  </span>
+                  <span className="text-[9px] font-bold px-2 py-0.5 bg-violet-100 dark:bg-violet-950/80 border border-violet-400 dark:border-violet-700 text-violet-800 dark:text-violet-300 uppercase tracking-wider">
+                    {content.hero.mockup.previewTag}
                   </span>
                 </div>
                 <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold hidden sm:inline">
@@ -270,6 +273,12 @@ export default function LandingPage() {
                     {content.hero.mockup.metric4Sub}
                   </span>
                 </div>
+              </div>
+
+              {/* Micro Footnote clarifying simulation preview */}
+              <div className="mt-3 pt-2.5 border-t border-slate-200/70 dark:border-zinc-800/70 flex flex-col sm:flex-row items-start sm:items-center justify-between text-[10px] font-mono text-slate-500 dark:text-zinc-400 gap-1">
+                <span>{content.hero.mockup.previewFootnote}</span>
+                <span className="text-violet-600 dark:text-cyan-400 font-bold shrink-0">BYOK TELEMETRY ENGINE</span>
               </div>
             </div>
           </div>
